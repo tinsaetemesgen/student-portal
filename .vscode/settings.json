@@ -1,0 +1,4 @@
+{
+  "diffEditor.useInlineViewWhenSpaceIsLimited": true,
+  "editor.inlineSuggest.edits.allowCodeShifting": "always"
+}
