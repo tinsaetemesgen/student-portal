@@ -5,7 +5,7 @@ const auth = (req, res, next) => {
   // Try to get token from Authorization header (Bearer)
   let token = null;
   const authHeader = req.header('Authorization');
-  
+
   if (authHeader && authHeader.startsWith('Bearer ')) {
     token = authHeader.replace('Bearer ', '');
   } else {

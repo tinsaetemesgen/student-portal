@@ -37,16 +37,16 @@ const AdminDashboard = () => {
 
                 {/* Recent Activities */}
                 <div className="bg-white rounded-xl shadow-sm p-6">
-                    <div className="flex items-center justify-between mb-6">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
                         <h3 className="text-lg font-semibold">Recent Activities</h3>
 
-                        <div className="flex gap-3">
+                        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                             <button
                                 onClick={() => {
                                     setModalRole("student");
                                     setModalOpen(true);
                                 }}
-                                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold"
+                                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold text-sm sm:text-base"
                             >
                                 + Add Student
                             </button>
@@ -56,7 +56,7 @@ const AdminDashboard = () => {
                                     setModalRole("teacher");
                                     setModalOpen(true);
                                 }}
-                                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold"
+                                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold text-sm sm:text-base"
                             >
                                 + Add Teacher
                             </button>

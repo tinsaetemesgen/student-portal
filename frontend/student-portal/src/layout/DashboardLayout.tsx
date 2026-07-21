@@ -1,7 +1,8 @@
+import { useState } from "react";
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
 
-type Role = "admin" | "teacher" | "student";
+type Role = "admin" | "teacher" | "student" | "parent";
 
 interface DashboardLayoutProps {
     children: React.ReactNode;
@@ -9,14 +10,25 @@ interface DashboardLayoutProps {
 }
 
 const DashboardLayout = ({ children, role }: DashboardLayoutProps) => {
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const toggleSidebar = () => setSidebarOpen((prev) => !prev);
+
     return (
         <div className="flex bg-gray-100 min-h-screen">
-            <Sidebar role={role} />
+            {/* Mobile Overlay */}
+            {sidebarOpen && (
+                <div
+                    className="fixed inset-0 bg-black/50 z-30 md:hidden"
+                    onClick={() => setSidebarOpen(false)}
+                />
+            )}
 
-            <div className="flex-1">
-                <Navbar role={role} />
+            <Sidebar role={role} isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-                <main className="p-6">
+            <div className="flex-1 min-w-0">
+                <Navbar role={role} toggleSidebar={toggleSidebar} />
+
+                <main className="p-4 sm:p-6">
                     {children}
                 </main>
             </div>
