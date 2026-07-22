@@ -1,4 +1,4 @@
-import { Bell, Search, Menu, LogOut } from "lucide-react";
+import { Bell, Menu, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 type Role = "admin" | "teacher" | "student" | "parent";
@@ -63,15 +63,6 @@ const Navbar = ({ role, toggleSidebar }: NavbarProps) => {
 
             {/* Right Section */}
             <div className="flex items-center gap-2 sm:gap-4">
-                <div className="hidden md:flex items-center bg-gray-100 rounded-lg px-3 py-2">
-                    <Search size={18} className="text-gray-400" />
-                    <input
-                        type="text"
-                        placeholder="Search..."
-                        className="bg-transparent outline-none ml-2 text-sm w-32 lg:w-auto"
-                    />
-                </div>
-
                 {/* Notifications */}
                 <button className="relative p-2 rounded-full hover:bg-gray-100">
                     <Bell size={20} className="text-gray-600" />

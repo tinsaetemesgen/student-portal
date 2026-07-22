@@ -3,7 +3,6 @@ import DashboardLayout from "../../layout/DashboardLayout";
 import UserRegistrationModal from "../../components/forms/UserRegistrationModal";
 import type { UserData } from "../../types/user";
 
-
 const stats = [
     { title: "Total Students", value: "1,000" },
     { title: "Total Teachers", value: "50" },

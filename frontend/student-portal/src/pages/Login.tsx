@@ -42,9 +42,9 @@ const Login = () => {
                     <p className="text-sm text-gray-500 mt-1">{schoolInfo.address}</p>
                 </div>
 
-                <div className="mb-4 flex">
+                <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Login As
+                        Login as
                     </label>
 
                     <select
@@ -77,7 +77,7 @@ const Login = () => {
                     onClick={handleLogin}
                     className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
                 >
-                    Login as {role.charAt(0).toUpperCase() + role.slice(1)}
+                    Continue as {role.charAt(0).toUpperCase() + role.slice(1)}
                 </button>
             </div>
         </div>

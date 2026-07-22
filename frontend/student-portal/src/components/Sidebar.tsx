@@ -10,6 +10,7 @@ import {
     GraduationCap,
     X,
     LogOut,
+    Banknote,
 } from "lucide-react";
 
 type Role = "admin" | "teacher" | "student" | "parent";
@@ -25,7 +26,10 @@ const menuItems = {
         { name: "Dashboard", path: "/admin", icon: <LayoutDashboard size={20} /> },
         { name: "Students", path: "/admin/students", icon: <Users size={20} /> },
         { name: "Teachers", path: "/admin/teachers", icon: <UserCheck size={20} /> },
+        { name: "Attendance", path: "/admin/attendance", icon: <ClipboardCheck size={20} /> },
+        { name: "Grades", path: "/admin/grades", icon: <BookOpen size={20} /> },
         { name: "Announcements", path: "/admin/announcements", icon: <Megaphone size={20} /> },
+        { name: "Payments", path: "/admin/payments", icon: <Banknote size={20} /> },
         { name: "Settings", path: "/admin/settings", icon: <Settings size={20} /> },
     ],
 
@@ -38,15 +42,18 @@ const menuItems = {
 
     student: [
         { name: "Dashboard", path: "/student", icon: <LayoutDashboard size={20} /> },
-        { name: "My Grades", path: "/student/grades", icon: <GraduationCap size={20} /> },
-        { name: "My Attendance", path: "/student/attendance", icon: <ClipboardCheck size={20} /> },
+        { name: "Attendance", path: "/student/attendance", icon: <ClipboardCheck size={20} /> },
+        { name: "Grades", path: "/student/grades", icon: <GraduationCap size={20} /> },
+        { name: "Fees", path: "/student/fees", icon: <Banknote size={20} /> },
         { name: "Announcements", path: "/student/announcements", icon: <Megaphone size={20} /> },
     ],
 
     parent: [
         { name: "Dashboard", path: "/parent", icon: <LayoutDashboard size={20} /> },
+        { name: "Children", path: "/parent/children", icon: <Users size={20} /> },
         { name: "Attendance", path: "/parent/attendance", icon: <ClipboardCheck size={20} /> },
         { name: "Grades", path: "/parent/grades", icon: <GraduationCap size={20} /> },
+        { name: "Payments", path: "/parent/payments", icon: <Banknote size={20} /> },
         { name: "Announcements", path: "/parent/announcements", icon: <Megaphone size={20} /> },
     ],
 };

@@ -23,25 +23,25 @@ const ClassSchema = new mongoose.Schema({
     required: [true, 'Academic year is required'],
     trim: true,
   },
-  
-  
+
+
   teacherIds: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
   }],
-  
-  
+
+
   students: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
   }],
-  
+
   // Subjects taught in this class
   subjects: [{
     type: String,
     trim: true,
   }],
-  
+
   createdAt: {
     type: Date,
     default: Date.now,

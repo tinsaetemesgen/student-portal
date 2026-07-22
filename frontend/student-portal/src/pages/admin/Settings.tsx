@@ -111,7 +111,7 @@ const Settings = () => {
                 {/* Logo Upload Section */}
                 <section className="bg-white rounded-xl shadow-sm p-6">
                     <div className="flex items-center gap-3 mb-6">
-                        <div className="bg-purple-100 p-3 rounded-lg text-purple-600">
+                        <div className="bg-gray-100 p-3 rounded-lg text-gray-600">
                             <ImageIcon size={24} />
                         </div>
                         <h2 className="font-semibold text-lg">School Logo</h2>
@@ -138,7 +138,7 @@ const Settings = () => {
                             />
                             <button
                                 onClick={() => fileInputRef.current?.click()}
-                                className="flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition"
+                                className="flex items-center gap-2 bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition"
                             >
                                 <Upload size={18} />
                                 Upload Logo
@@ -151,7 +151,7 @@ const Settings = () => {
                 {/* School Information */}
                 <section className="bg-white rounded-xl shadow-sm p-6">
                     <div className="flex items-center gap-3 mb-6">
-                        <div className="bg-blue-100 p-3 rounded-lg text-blue-600">
+                        <div className="bg-gray-100 p-3 rounded-lg text-gray-600">
                             <School size={24} />
                         </div>
                         <h2 className="font-semibold text-lg">School Information</h2>
@@ -193,7 +193,7 @@ const Settings = () => {
                 {/* System Settings */}
                 <section className="bg-white rounded-xl shadow-sm p-6">
                     <div className="flex items-center gap-3 mb-6">
-                        <div className="bg-green-100 p-3 rounded-lg text-green-600">
+                        <div className="bg-gray-100 p-3 rounded-lg text-gray-600">
                             <ShieldCheck size={24} />
                         </div>
                         <h2 className="font-semibold text-lg">System Settings</h2>
@@ -227,7 +227,7 @@ const Settings = () => {
                 {/* Password Section */}
                 <section className="bg-white rounded-xl shadow-sm p-6">
                     <div className="flex items-center gap-3 mb-6">
-                        <div className="bg-red-100 p-3 rounded-lg text-red-600">
+                        <div className="bg-gray-100 p-3 rounded-lg text-gray-600">
                             <Lock size={24} />
                         </div>
                         <h2 className="font-semibold text-lg">Change Password</h2>
@@ -266,9 +266,9 @@ const Settings = () => {
                 </section>
 
                 {/* System Info */}
-                <section className="bg-blue-50 rounded-xl p-6">
-                    <h2 className="font-semibold text-lg mb-3 text-blue-900">School Portal</h2>
-                    <div className="text-sm text-blue-800 space-y-1">
+                <section className="bg-gray-100 rounded-xl p-6">
+                    <h2 className="font-semibold text-lg mb-3 text-gray-800">School Portal</h2>
+                    <div className="text-sm text-gray-700 space-y-1">
                         <p>Version: 1.0.0</p>
                         <p>Frontend: React + Tailwind</p>
                         <p>Backend: Express + MongoDB</p>

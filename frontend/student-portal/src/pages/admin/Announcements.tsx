@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Plus, Megaphone, FileText, CheckCircle, Clock, X } from "lucide-react";
+import { Plus, Megaphone, FileText, CheckCircle, Clock, X } from "lucide-react";
 import DashboardLayout from "../../layout/DashboardLayout";
 import { useAppContext } from "../../context/AppContext";
 
@@ -12,22 +12,21 @@ interface AnnouncementForm {
 }
 
 const AUDIENCE_BADGES: Record<string, string> = {
-    All: "bg-blue-100 text-blue-700",
-    Students: "bg-green-100 text-green-700",
-    Teachers: "bg-purple-100 text-purple-700",
-    Parents: "bg-orange-100 text-orange-700",
+    All: "bg-gray-100 text-gray-700",
+    Students: "bg-gray-100 text-gray-700",
+    Teachers: "bg-gray-100 text-gray-700",
+    Parents: "bg-gray-100 text-gray-700",
 };
 
 const STATUS_BADGES: Record<string, string> = {
-    Published: "bg-green-100 text-green-700",
-    Draft: "bg-yellow-100 text-yellow-700",
+    Published: "bg-gray-100 text-gray-700",
+    Draft: "bg-gray-100 text-gray-700",
 };
 
 const Announcements = () => {
     const { announcements, addAnnouncement, updateAnnouncement, deleteAnnouncement } = useAppContext();
     const [editingId, setEditingId] = useState<number | null>(null);
     const [showModal, setShowModal] = useState(false);
-    const [searchTerm, setSearchTerm] = useState("");
     const [selectedAudience, setSelectedAudience] = useState<"All" | "Students" | "Teachers" | "Parents">("All");
 
     const [formData, setFormData] = useState<AnnouncementForm>({
@@ -43,11 +42,8 @@ const Announcements = () => {
     const draftCount = announcements.filter((a) => a.status === "Draft").length;
 
     const filteredAnnouncements = announcements.filter((announcement) => {
-        const matchesSearch =
-            announcement.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            announcement.content.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesAudience = selectedAudience === "All" || announcement.audience === selectedAudience;
-        return matchesSearch && matchesAudience;
+        return matchesAudience;
     });
 
     const openAddModal = () => {
@@ -197,7 +193,7 @@ const Announcements = () => {
                 {/* Statistics Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div className="bg-white rounded-xl shadow-sm p-5 flex items-center gap-4">
-                        <div className="bg-blue-100 p-3 rounded-lg text-blue-600">
+                        <div className="bg-gray-100 p-3 rounded-lg text-gray-600">
                             <Megaphone size={25} />
                         </div>
                         <div>
@@ -206,7 +202,7 @@ const Announcements = () => {
                         </div>
                     </div>
                     <div className="bg-white rounded-xl shadow-sm p-5 flex items-center gap-4">
-                        <div className="bg-green-100 p-3 rounded-lg text-green-600">
+                        <div className="bg-gray-100 p-3 rounded-lg text-gray-600">
                             <CheckCircle size={25} />
                         </div>
                         <div>
@@ -215,7 +211,7 @@ const Announcements = () => {
                         </div>
                     </div>
                     <div className="bg-white rounded-xl shadow-sm p-5 flex items-center gap-4">
-                        <div className="bg-yellow-100 p-3 rounded-lg text-yellow-600">
+                        <div className="bg-gray-100 p-3 rounded-lg text-gray-600">
                             <Clock size={25} />
                         </div>
                         <div>
@@ -224,7 +220,7 @@ const Announcements = () => {
                         </div>
                     </div>
                     <div className="bg-white rounded-xl shadow-sm p-5 flex items-center gap-4">
-                        <div className="bg-purple-100 p-3 rounded-lg text-purple-600">
+                        <div className="bg-gray-100 p-3 rounded-lg text-gray-600">
                             <FileText size={25} />
                         </div>
                         <div>
@@ -234,18 +230,8 @@ const Announcements = () => {
                     </div>
                 </div>
 
-                {/* Search and Filter Panel */}
+                {/* Filter Panel */}
                 <div className="bg-white rounded-xl shadow-sm p-5 flex flex-col md:flex-row gap-4">
-                    <div className="relative flex-1">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                        <input
-                            type="text"
-                            placeholder="Search announcements..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full border rounded-lg pl-10 px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                    </div>
                     <select
                         value={selectedAudience}
                         onChange={(e) => setSelectedAudience(e.target.value as "All" | "Students" | "Teachers" | "Parents")}
@@ -307,13 +293,13 @@ const Announcements = () => {
                                                 <div className="flex gap-2">
                                                     <button
                                                         onClick={() => openEditModal(announcement.id)}
-                                                        className="px-3 py-1 rounded-lg bg-blue-100 text-blue-700 hover:bg-blue-200 transition"
+                                                        className="px-3 py-1 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition"
                                                     >
                                                         Edit
                                                     </button>
                                                     <button
                                                         onClick={() => handleDelete(announcement.id)}
-                                                        className="px-3 py-1 rounded-lg bg-red-100 text-red-700 hover:bg-red-200 transition"
+                                                        className="px-3 py-1 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition"
                                                     >
                                                         Delete
                                                     </button>
