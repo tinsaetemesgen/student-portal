@@ -109,6 +109,7 @@ router.post('/', async (req, res) => {
       role, 
       class: className, 
       age, 
+      gender,
       parentName, 
       parentPhone, 
       subject, 

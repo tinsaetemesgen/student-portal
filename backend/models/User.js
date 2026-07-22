@@ -28,6 +28,14 @@ const UserSchema = new mongoose.Schema({
     required: true,
     default: 'student',
   },
+  phone: {
+    type: String,
+    trim: true,
+},
+gender: {
+    type: String,
+    enum: ['Male', 'Female', 'Other'],
+},
 
   
   //  STUDENT-SPECIFIC FIELDS
@@ -107,6 +115,7 @@ UserSchema.methods.toJSON = function () {
       delete user.children;
       delete user.hireDate;
       delete user.subject;
+      delete user.phone;
       break;
 
     case 'teacher':

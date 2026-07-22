@@ -10,86 +10,124 @@ const roleCheck = require('../middleware/roleCheck');
 //  TEACHER ROUTES
 
 //  MARK ATTENDANCE (Teacher)
+// ✅ POST /api/attendance - Mark attendance (UPDATED)
 router.post('/', auth, roleCheck('teacher', 'admin'), async (req, res) => {
-  try {
-    const { classId, date, records, semester, academicYear } = req.body;
+    try {
+        const { classId, date, records, semester, academicYear } = req.body;
 
-    // Validate class exists
-    const classData = await Class.findById(classId);
-    if (!classData) {
-      return res.status(404).json({ success: false, error: 'Class not found' });
-    }
+        // Validate class exists
+        const classData = await Class.findById(classId);
+        if (!classData) {
+            return res.status(404).json({ success: false, error: 'Class not found' });
+        }
 
-    // Verify teacher is assigned to this class
-    if (req.user.role === 'teacher') {
-      const teacherIds = classData.teacherIds.map(id => id.toString());
-      if (!teacherIds.includes(req.user.id)) {
-        return res.status(403).json({
-          success: false,
-          error: 'You are not assigned to this class',
+        // Verify teacher is assigned to this class
+        if (req.user.role === 'teacher') {
+            const teacherIds = classData.teacherIds.map(id => id.toString());
+            if (!teacherIds.includes(req.user.id)) {
+                return res.status(403).json({
+                    success: false,
+                    error: 'You are not assigned to this class',
+                });
+            }
+        }
+
+        // Validate all students exist
+        for (const record of records) {
+            const student = await User.findById(record.studentId);
+            if (!student || student.role !== 'student') {
+                return res.status(404).json({
+                    success: false,
+                    error: `Student ${record.studentId} not found`,
+                });
+            }
+        }
+
+        const attendanceDate = new Date(date || Date.now());
+        attendanceDate.setHours(0, 0, 0, 0);
+
+        // Check if attendance already exists
+        let existingAttendance = await Attendance.findOne({
+            classId,
+            date: {
+                $gte: attendanceDate,
+                $lt: new Date(attendanceDate.getTime() + 24 * 60 * 60 * 1000),
+            },
         });
-      }
-    }
 
-    // Validate all students exist
-    for (const record of records) {
-      const student = await User.findById(record.studentId);
-      if (!student || student.role !== 'student') {
-        return res.status(404).json({
-          success: false,
-          error: `Student ${record.studentId} not found`,
+        if (existingAttendance) {
+            // ✅ FIX: Merge records instead of replacing
+            const existingRecordIds = existingAttendance.records.map(r => r.studentId.toString());
+            
+            for (const record of records) {
+                const studentIdStr = record.studentId.toString();
+                if (!existingRecordIds.includes(studentIdStr)) {
+                    // New student → Add to records
+                    existingAttendance.records.push({
+                        studentId: record.studentId,
+                        status: record.status,
+                        markedAt: new Date(),
+                        remarks: record.remarks || '',
+                    });
+                } else {
+                    // Existing student → Update status
+                    const index = existingAttendance.records.findIndex(
+                        r => r.studentId.toString() === studentIdStr
+                    );
+                    if (index !== -1) {
+                        existingAttendance.records[index].status = record.status;
+                        existingAttendance.records[index].markedAt = new Date();
+                        if (record.remarks) {
+                            existingAttendance.records[index].remarks = record.remarks;
+                        }
+                    }
+                }
+            }
+            
+            existingAttendance.updatedAt = new Date();
+            await existingAttendance.save();
+
+            return res.json({
+                success: true,
+                message: 'Attendance updated successfully!',
+                data: existingAttendance,
+            });
+        }
+
+        // Create new attendance
+        const attendance = new Attendance({
+            classId,
+            date: attendanceDate,
+            semester,
+            academicYear,
+            records: records.map(r => ({
+                studentId: r.studentId,
+                status: r.status,
+                markedAt: new Date(),
+                remarks: r.remarks || '',
+            })),
+            createdBy: req.user.id,
+            createdAt: new Date(),
+            updatedAt: new Date(),
         });
-      }
+
+        await attendance.save();
+
+        res.status(201).json({
+            success: true,
+            message: 'Attendance marked successfully!',
+            data: attendance,
+        });
+    } catch (error) {
+        console.error(error);
+
+        if (error.name === 'ValidationError') {
+            const errors = Object.values(error.errors).map(err => err.message);
+            return res.status(400).json({ success: false, errors });
+        }
+
+        res.status(500).json({ success: false, error: 'Server Error' });
     }
-
-    // Check if attendance already exists for this class and date
-    const existingAttendance = await Attendance.findOne({
-      classId,
-      date: new Date(date || Date.now()),
-    });
-
-    if (existingAttendance) {
-      // Update existing attendance
-      existingAttendance.records = records;
-      existingAttendance.updatedAt = new Date();
-      await existingAttendance.save();
-
-      return res.json({
-        success: true,
-        message: 'Attendance updated successfully!',
-        data: existingAttendance,
-      });
-    }
-
-    // Create new attendance
-    const attendance = new Attendance({
-      classId,
-      date: date || new Date(),
-      semester,
-      academicYear,
-      records,
-      createdBy: req.user.id,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
-
-    await attendance.save();
-
-    res.status(201).json({
-      success: true,
-      message: 'Attendance marked successfully!',
-      data: attendance,
-    });
-  } catch (error) {
-    console.error(error);
-
-    if (error.name === 'ValidationError') {
-      const errors = Object.values(error.errors).map(err => err.message);
-      return res.status(400).json({ success: false, errors });
-    }
-
-    res.status(500).json({ success: false, error: 'Server Error' });
-  }
 });
 
 //  GET ATTENDANCE FOR A CLASS (Teacher/Admin)

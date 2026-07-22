@@ -1,6 +1,6 @@
 // server.js - Add Socket.io
 require('dotenv').config();
-
+const cors = require('cors');
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
@@ -50,6 +50,7 @@ app.use((req, res, next) => {
 });
 
 // 📌 Routes
+app.use(cors());
 app.use('/api/users', userRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/parents', parentRoutes);
