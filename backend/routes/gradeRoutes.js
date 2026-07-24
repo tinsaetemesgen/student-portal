@@ -8,88 +8,101 @@ const auth = require('../middleware/auth');
 const roleCheck = require('../middleware/roleCheck');
 
 //  TEACHER ROUTES
-
-//  Enter Single Grade
+// ✅ POST /api/grades - Create grade with MANUAL calculation
 router.post('/', auth, roleCheck('teacher', 'admin'), async (req, res) => {
   try {
-    const { 
-      studentId, 
-      subject, 
-      classId, 
-      type, 
-      score, 
-      feedback, 
-      semester, 
-      academicYear 
+    const {
+      studentId,
+      subject,
+      classId,
+      semester,
+      academicYear,
+      feedback,
+      assessments,
     } = req.body;
-    
-    // Verify student exists
+
+    // Validate student exists
     const student = await User.findById(studentId);
     if (!student || student.role !== 'student') {
-      return res.status(404).json({ 
-        success: false, 
-        error: 'Student not found' 
-      });
+      return res.status(404).json({ success: false, error: 'Student not found' });
     }
-    
-    // Verify class exists
+
+    // Validate class exists
     const classData = await Class.findById(classId);
     if (!classData) {
-      return res.status(404).json({ 
-        success: false, 
-        error: 'Class not found' 
-      });
+      return res.status(404).json({ success: false, error: 'Class not found' });
     }
-    
+
     // Check if teacher is assigned to this class
     if (req.user.role === 'teacher') {
-      const teacherIdsAsStrings = classData.teacherIds.map(id => id.toString());
-      if (!teacherIdsAsStrings.includes(req.user.id)) {
+      const teacherIds = classData.teacherIds.map(id => id.toString());
+      if (!teacherIds.includes(req.user.id)) {
         return res.status(403).json({
           success: false,
           error: 'You are not assigned to this class',
         });
       }
     }
-    
-    // Calculate letter grade
-    const letterGrade = Grade.calculateGrade(score);
-    
-    // Create grade with manual timestamps
-    const newGrade = new Grade({
+
+    // Check if grade already exists
+    const existingGrade = await Grade.findOne({
+      studentId,
+      subject,
+      semester,
+      academicYear,
+    });
+
+    if (existingGrade) {
+      return res.status(400).json({
+        success: false,
+        error: 'Grade already exists for this student and subject. Use PUT to update.',
+      });
+    }
+
+    // ✅ MANUALLY CALCULATE weighted grade
+    const assessmentData = {
+      quiz: assessments?.quiz || { score: 0, maxScore: 20, weight: 15 },
+      homework: assessments?.homework || { score: 0, maxScore: 15, weight: 10 },
+      classTest: assessments?.classTest || { score: 0, maxScore: 20, weight: 20 },
+      finalTest: assessments?.finalTest || { score: 0, maxScore: 50, weight: 35 },
+      groupWork: assessments?.groupWork || { score: 0, maxScore: 20, weight: 20 },
+    };
+
+    const result = Grade.calculateWeightedGrade(assessmentData);
+
+    // Create grade with calculated values
+    const grade = new Grade({
       studentId,
       subject,
       classId,
       teacherId: req.user.id,
-      type,
-      score,
-      grade: letterGrade,
-      feedback,
       semester,
       academicYear,
+      feedback,
+      assessments: assessmentData,
+      totalScore: result.total,
+      letterGrade: result.grade,
+      gradePoints: result.points,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
-    
-    await newGrade.save();
-    
+
+    await grade.save();
+
     res.status(201).json({
       success: true,
-      message: 'Grade entered successfully!',
-      data: newGrade,
+      message: 'Grade created successfully!',
+      data: grade,
     });
   } catch (error) {
     console.error(error);
-    
     if (error.name === 'ValidationError') {
       const errors = Object.values(error.errors).map(err => err.message);
       return res.status(400).json({ success: false, errors });
     }
-    
     res.status(500).json({ success: false, error: 'Server Error' });
   }
 });
-
 // Enter Multiple Grades (Bulk)
 router.post('/bulk', auth, roleCheck('teacher', 'admin'), async (req, res) => {
   try {
@@ -198,34 +211,49 @@ router.get('/class/:classId', auth, roleCheck('teacher', 'admin'), async (req, r
 });
 
 // ✅ Update Grade
+// ✅ PUT /api/grades/:id - Update grade with assessments
+// ✅ PUT /api/grades/:id - Update grade with MANUAL recalculation
 router.put('/:id', auth, roleCheck('teacher', 'admin'), async (req, res) => {
   try {
-    const { score, feedback, type } = req.body;
-    
-    const grade = await Grade.findById(req.params.id);
+    const { id } = req.params;
+    const { assessments, feedback, subject, semester, academicYear } = req.body;
+
+    const grade = await Grade.findById(id);
     if (!grade) {
       return res.status(404).json({ success: false, error: 'Grade not found' });
     }
-    
+
+    // Check if teacher owns this grade
     if (req.user.role === 'teacher' && grade.teacherId.toString() !== req.user.id) {
       return res.status(403).json({
         success: false,
-        error: 'You can only update grades you entered',
+        error: 'You can only update grades you created',
       });
     }
-    
-    if (score !== undefined) {
-      grade.score = score;
-      grade.grade = Grade.calculateGrade(score);
+
+    // Update fields
+    if (assessments) {
+      if (assessments.quiz) grade.assessments.quiz = { ...grade.assessments.quiz, ...assessments.quiz };
+      if (assessments.homework) grade.assessments.homework = { ...grade.assessments.homework, ...assessments.homework };
+      if (assessments.classTest) grade.assessments.classTest = { ...grade.assessments.classTest, ...assessments.classTest };
+      if (assessments.finalTest) grade.assessments.finalTest = { ...grade.assessments.finalTest, ...assessments.finalTest };
+      if (assessments.groupWork) grade.assessments.groupWork = { ...grade.assessments.groupWork, ...assessments.groupWork };
+      
+      // ✅ Recalculate totalScore, letterGrade, gradePoints
+      const result = Grade.calculateWeightedGrade(grade.assessments);
+      grade.totalScore = result.total;
+      grade.letterGrade = result.grade;
+      grade.gradePoints = result.points;
     }
+    
     if (feedback) grade.feedback = feedback;
-    if (type) grade.type = type;
+    if (subject) grade.subject = subject;
+    if (semester) grade.semester = semester;
+    if (academicYear) grade.academicYear = academicYear;
     
-    // 👇 Manually update the updatedAt timestamp
     grade.updatedAt = new Date();
-    
     await grade.save();
-    
+
     res.json({
       success: true,
       message: 'Grade updated successfully!',
@@ -233,6 +261,10 @@ router.put('/:id', auth, roleCheck('teacher', 'admin'), async (req, res) => {
     });
   } catch (error) {
     console.error(error);
+    if (error.name === 'ValidationError') {
+      const errors = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({ success: false, errors });
+    }
     res.status(500).json({ success: false, error: 'Server Error' });
   }
 });
@@ -263,28 +295,41 @@ router.delete('/:id', auth, roleCheck('teacher', 'admin'), async (req, res) => {
     res.status(500).json({ success: false, error: 'Server Error' });
   }
 });
-
-// ============================================
-// 📌 STUDENT ROUTES
-// ============================================
-
-// ✅ Get Student's Own Grades
+// ✅ GET /api/grades/my-grades - Student's own grades
 router.get('/my-grades', auth, roleCheck('student'), async (req, res) => {
   try {
     const { semester, academicYear, subject } = req.query;
-    
+
     const filter = { studentId: req.user.id };
     if (semester) filter.semester = semester;
     if (academicYear) filter.academicYear = academicYear;
     if (subject) filter.subject = subject;
-    
+
     const grades = await Grade.find(filter)
       .populate('teacherId', 'name email')
       .populate('classId', 'name')
       .sort({ date: -1 });
-    
-    const gpa = await Grade.getStudentGPA(req.user.id, semester, academicYear);
-    
+
+    // ✅ Calculate GPA manually (plain JavaScript)
+    let gpa = 0;
+    let totalPoints = 0;
+    const gradeCount = grades.length;
+
+    if (gradeCount > 0) {
+      const gradeMap = {  // ✅ NO TypeScript type annotation!
+        'A+': 4.0, 'A': 4.0, 'A-': 3.7,
+        'B+': 3.3, 'B': 3.0, 'B-': 2.7,
+        'C+': 2.3, 'C': 2.0, 'C-': 1.7,
+        'D': 1.0, 'F': 0.0,
+      };
+      
+      for (const grade of grades) {
+        const points = gradeMap[grade.letterGrade || grade.grade] || 0;
+        totalPoints += points;
+      }
+      gpa = parseFloat((totalPoints / gradeCount).toFixed(2));
+    }
+
     res.json({
       success: true,
       gpa: gpa,
@@ -296,56 +341,14 @@ router.get('/my-grades', auth, roleCheck('student'), async (req, res) => {
     res.status(500).json({ success: false, error: 'Server Error' });
   }
 });
-
-// ✅ Get Student's Grade Summary
-router.get('/my-grades/summary', auth, roleCheck('student'), async (req, res) => {
-  try {
-    const { semester, academicYear } = req.query;
-    
-    const filter = { studentId: req.user.id };
-    if (semester) filter.semester = semester;
-    if (academicYear) filter.academicYear = academicYear;
-    
-    const grades = await Grade.find(filter);
-    
-    const summary = {};
-    grades.forEach(g => {
-      if (!summary[g.subject]) {
-        summary[g.subject] = {
-          subject: g.subject,
-          grades: [],
-          average: 0,
-        };
-      }
-      summary[g.subject].grades.push(g);
-    });
-    
-    Object.keys(summary).forEach(subject => {
-      const subjectGrades = summary[subject].grades;
-      const total = subjectGrades.reduce((sum, g) => sum + g.score, 0);
-      summary[subject].average = parseFloat((total / subjectGrades.length).toFixed(2));
-    });
-    
-    res.json({
-      success: true,
-      data: summary,
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, error: 'Server Error' });
-  }
-});
-
-// ============================================
-// 📌 PARENT ROUTES
-// ============================================
-
 // ✅ Get Child's Grades
+// ✅ GET /api/grades/child/:childId/grades - Parent views child's grades
 router.get('/child/:childId/grades', auth, roleCheck('parent'), async (req, res) => {
   try {
     const { childId } = req.params;
     const { semester, academicYear } = req.query;
-    
+
+    // Verify this child belongs to this parent
     const parent = await User.findById(req.user.id);
     if (!parent.children.includes(childId)) {
       return res.status(403).json({
@@ -353,18 +356,36 @@ router.get('/child/:childId/grades', auth, roleCheck('parent'), async (req, res)
         error: 'You do not have access to this student\'s grades',
       });
     }
-    
+
     const filter = { studentId: childId };
     if (semester) filter.semester = semester;
     if (academicYear) filter.academicYear = academicYear;
-    
+
     const grades = await Grade.find(filter)
       .populate('teacherId', 'name email')
       .populate('classId', 'name')
       .sort({ date: -1 });
-    
-    const gpa = await Grade.getStudentGPA(childId, semester, academicYear);
-    
+
+    // ✅ Calculate GPA manually (plain JavaScript)
+    let gpa = 0;
+    let totalPoints = 0;
+    const gradeCount = grades.length;
+
+    if (gradeCount > 0) {
+      const gradeMap = {  // ✅ NO TypeScript type annotation!
+        'A+': 4.0, 'A': 4.0, 'A-': 3.7,
+        'B+': 3.3, 'B': 3.0, 'B-': 2.7,
+        'C+': 2.3, 'C': 2.0, 'C-': 1.7,
+        'D': 1.0, 'F': 0.0,
+      };
+      
+      for (const grade of grades) {
+        const points = gradeMap[grade.letterGrade || grade.grade] || 0;
+        totalPoints += points;
+      }
+      gpa = parseFloat((totalPoints / gradeCount).toFixed(2));
+    }
+
     res.json({
       success: true,
       gpa: gpa,
@@ -376,11 +397,6 @@ router.get('/child/:childId/grades', auth, roleCheck('parent'), async (req, res)
     res.status(500).json({ success: false, error: 'Server Error' });
   }
 });
-
-// ============================================
-// 📌 ADMIN ROUTES
-// ============================================
-
 // ✅ Get All Grades
 router.get('/all', auth, roleCheck('admin'), async (req, res) => {
   try {

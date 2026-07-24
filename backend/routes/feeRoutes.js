@@ -482,6 +482,68 @@ router.get('/my-fees', auth, roleCheck('student'), async (req, res) => {
     res.status(500).json({ success: false, error: 'Server Error' });
   }
 });
+// ============================================
+// 📌 STUDENT ROUTE - VIEW ONLY FEE STATUS (No Amounts)
+// ============================================
+
+// ✅ GET MY FEE STATUS (Student only - NO amounts visible)
+router.get('/my-fees/status', auth, roleCheck('student'), async (req, res) => {
+  try {
+    const studentId = req.user.id;
+
+    // 1️⃣ Find all fees assigned to this student
+    const studentFees = await StudentFee.find({ studentId })
+      .populate('feeStructureId', 'name') // Only get the fee name from the structure
+      .sort({ dueDate: 1 });
+
+    // 2️⃣ Format the response: ONLY status, NO amounts
+    const statusData = studentFees.map(fee => {
+      // Determine status display text
+      let statusText = 'Pending';
+      let statusColor = 'yellow';
+      
+      if (fee.status === 'paid') {
+        statusText = 'Paid';
+        statusColor = 'green';
+      } else if (fee.status === 'overdue') {
+        statusText = 'Overdue';
+        statusColor = 'red';
+      }
+
+      return {
+        feeName: fee.feeName || fee.feeStructureId?.name || 'Unknown Fee',
+        status: fee.status,
+        statusText: statusText,
+        statusColor: statusColor,
+        dueDate: fee.dueDate,
+        // ❌ WE DELIBERATELY EXCLUDE: amount, feeStructureId, etc.
+      };
+    });
+
+    // 3️⃣ Calculate overall summary (still NO amounts)
+    const totalFees = studentFees.length;
+    const paidCount = studentFees.filter(f => f.status === 'paid').length;
+    const pendingCount = studentFees.filter(f => f.status === 'pending').length;
+    const overdueCount = studentFees.filter(f => f.status === 'overdue').length;
+
+    res.json({
+      success: true,
+      data: {
+        summary: {
+          totalFees,
+          paid: paidCount,
+          pending: pendingCount,
+          overdue: overdueCount,
+        },
+        fees: statusData,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, error: 'Server Error' });
+  }
+});
+
 
 //  GET MY CHILDREN'S FEES (Parent)
 router.get('/my-children', auth, roleCheck('parent'), async (req, res) => {

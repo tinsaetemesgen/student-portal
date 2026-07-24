@@ -1,8 +1,8 @@
-// models/Grade.js 
+// models/Grade.js - Simplified with NO pre-hooks
 const mongoose = require('mongoose');
 
 const GradeSchema = new mongoose.Schema({
-  // Core Fields
+  // 📌 Core Fields
   studentId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -24,46 +24,67 @@ const GradeSchema = new mongoose.Schema({
     required: [true, 'Teacher ID is required'],
   },
   
-  //  Grade Details
-  type: {
-    type: String,
-    enum: ['Assignment', 'Quiz', 'Exam', 'Project', 'Participation', 'Homework'],
-    required: [true, 'Grade type is required'],
+  // 📝 Weighted Assessments
+  assessments: {
+    quiz: {
+      score: { type: Number, default: 0, min: 0 },
+      maxScore: { type: Number, default: 20 },
+      weight: { type: Number, default: 15 },
+    },
+    homework: {
+      score: { type: Number, default: 0, min: 0 },
+      maxScore: { type: Number, default: 15 },
+      weight: { type: Number, default: 10 },
+    },
+    classTest: {
+      score: { type: Number, default: 0, min: 0 },
+      maxScore: { type: Number, default: 20 },
+      weight: { type: Number, default: 20 },
+    },
+    finalTest: {
+      score: { type: Number, default: 0, min: 0 },
+      maxScore: { type: Number, default: 50 },
+      weight: { type: Number, default: 35 },
+    },
+    groupWork: {
+      score: { type: Number, default: 0, min: 0 },
+      maxScore: { type: Number, default: 20 },
+      weight: { type: Number, default: 20 },
+    },
   },
-  score: {
+
+  // ✅ Calculated Fields (Set manually in route)
+  totalScore: {
     type: Number,
-    required: [true, 'Score is required'],
-    min: [0, 'Score cannot be less than 0'],
-    max: [100, 'Score cannot be more than 100'],
+    default: 0,
   },
-  grade: {
+  letterGrade: {
     type: String,
     enum: ['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D', 'F', 'I'],
-    required: [true, 'Letter grade is required'],
+    default: 'I',
   },
-  feedback: {
-    type: String,
-    trim: true,
-    maxlength: [500, 'Feedback cannot exceed 500 characters'],
+  gradePoints: {
+    type: Number,
+    default: 0,
   },
-  
-  //  Metadata
-  date: {
-    type: Date,
-    default: Date.now,
-  },
+
+  // 📅 Metadata
   semester: {
     type: String,
     required: [true, 'Semester is required'],
-    trim: true,
+    enum: ['Semester 1', 'Semester 2'],
   },
   academicYear: {
     type: String,
     required: [true, 'Academic year is required'],
     trim: true,
   },
-  
-  // Tracking
+  feedback: {
+    type: String,
+    trim: true,
+    maxlength: [500, 'Feedback cannot exceed 500 characters'],
+  },
+
   createdAt: {
     type: Date,
     default: Date.now,
@@ -74,48 +95,58 @@ const GradeSchema = new mongoose.Schema({
   },
 });
 
-//  Calculate letter grade based on score
-GradeSchema.statics.calculateGrade = function(score) {
-  if (score >= 97) return 'A+';
-  if (score >= 93) return 'A';
-  if (score >= 90) return 'A-';
-  if (score >= 87) return 'B+';
-  if (score >= 83) return 'B';
-  if (score >= 80) return 'B-';
-  if (score >= 77) return 'C+';
-  if (score >= 73) return 'C';
-  if (score >= 70) return 'C-';
-  if (score >= 65) return 'D';
-  return 'F';
-};
+// ❌ NO pre('save') hooks!
+// ❌ NO pre('findOneAndUpdate') hooks!
 
-// Get student's GPA for a specific semester
-GradeSchema.statics.getStudentGPA = async function(studentId, semester, academicYear) {
-  const grades = await this.find({
-    studentId,
-    semester,
-    academicYear,
-  });
-  
-  if (grades.length === 0) return 0;
-  
-  const gradeMap = {
-    'A+': 4.0, 'A': 4.0, 'A-': 3.7,
-    'B+': 3.3, 'B': 3.0, 'B-': 2.7,
-    'C+': 2.3, 'C': 2.0, 'C-': 1.7,
-    'D': 1.0, 'F': 0.0,
+// ✅ Helper function to calculate weighted grade (used in routes)
+GradeSchema.statics.calculateWeightedGrade = function(assessments) {
+  const weights = {
+    quiz: 15,
+    homework: 10,
+    classTest: 20,
+    finalTest: 35,
+    groupWork: 20,
   };
   
-  const totalPoints = grades.reduce((sum, g) => {
-    return sum + (gradeMap[g.grade] || 0);
-  }, 0);
+  let totalWeighted = 0;
+  let allZero = true;
   
-  return parseFloat((totalPoints / grades.length).toFixed(2));
+  const keys = ['quiz', 'homework', 'classTest', 'finalTest', 'groupWork'];
+  
+  for (const key of keys) {
+    const data = assessments[key];
+    if (data && data.score > 0) {
+      allZero = false;
+      const percentage = (data.score / data.maxScore) * 100;
+      totalWeighted += percentage * (weights[key] / 100);
+    }
+  }
+  
+  if (allZero) {
+    return { total: 0, grade: 'I', points: 0 };
+  }
+  
+  const total = Math.round(totalWeighted * 10) / 10;
+  
+  // Determine letter grade
+  let grade = 'F', points = 0;
+  if (total >= 97) { grade = 'A+'; points = 4.0; }
+  else if (total >= 93) { grade = 'A'; points = 4.0; }
+  else if (total >= 90) { grade = 'A-'; points = 3.7; }
+  else if (total >= 87) { grade = 'B+'; points = 3.3; }
+  else if (total >= 83) { grade = 'B'; points = 3.0; }
+  else if (total >= 80) { grade = 'B-'; points = 2.7; }
+  else if (total >= 77) { grade = 'C+'; points = 2.3; }
+  else if (total >= 73) { grade = 'C'; points = 2.0; }
+  else if (total >= 70) { grade = 'C-'; points = 1.7; }
+  else if (total >= 65) { grade = 'D'; points = 1.0; }
+  else { grade = 'F'; points = 0.0; }
+  
+  return { total, grade, points };
 };
 
-// Indexes for faster queries
-GradeSchema.index({ studentId: 1, semester: 1, academicYear: 1 });
-GradeSchema.index({ classId: 1, subject: 1 });
-GradeSchema.index({ teacherId: 1 });
+// ✅ Indexes
+GradeSchema.index({ studentId: 1, subject: 1, semester: 1, academicYear: 1 });
+GradeSchema.index({ classId: 1 });
 
 module.exports = mongoose.model('Grade', GradeSchema);

@@ -18,6 +18,9 @@ const Payment = require('./models/Payment');
 const feeRoutes = require('./routes/feeRoutes');
 const timetableRoutes = require('./routes/timetableRoutes');
 const attendanceRoutes = require('./routes/attendanceRoutes');
+const registrarRoutes = require('./routes/registrarRoutes');
+const financeOfficerRoutes = require('./routes/financeOfficerRoutes');
+
 connectDB();
 
 const app = express();
@@ -60,6 +63,8 @@ app.use('/api/messages', messageRoutes);
 app.use('/api/fees', feeRoutes);
 app.use('/api/timetable', timetableRoutes);
 app.use('/api/attendance', attendanceRoutes);
+app.use('/api/registrar', registrarRoutes);
+ app.use('/api/finance', financeOfficerRoutes);
 // Home route
 app.get('/', (req, res) => {
   res.send('Hello World! 🚀 High School Portal with Real-time Messaging!');
@@ -70,4 +75,7 @@ server.listen(PORT, () => {
   console.log(`✅ Server is running on http://localhost:${PORT}`);
   console.log(`✅ Socket.io is running on ws://localhost:${PORT}`);
   console.log(`🔧 Environment: ${process.env.NODE_ENV || 'development'}`);
+  // ✅ Import the scheduler (starts cron jobs automatically)
+require('./scheduler');
+console.log('🕐 Scheduler started!');
 });
