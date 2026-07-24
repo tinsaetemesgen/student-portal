@@ -1,22 +1,55 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppContext } from "../context/AppContext";
+import axios from "axios";
 
 const Login = () => {
     const navigate = useNavigate();
     const { schoolInfo, setCurrentRole } = useAppContext();
     const [role, setRole] = useState<"admin" | "teacher" | "student" | "parent">("student");
+    
+    // ✅ ADD: State for credentials and errors
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
 
-    const handleLogin = () => {
-        setCurrentRole(role);
-        if (role === "admin") {
-            navigate("/admin");
-        } else if (role === "teacher") {
-            navigate("/teacher");
-        } else if (role === "parent") {
-            navigate("/parent");
-        } else {
-            navigate("/student");
+    // ✅ REPLACE: This now makes a real API call
+    const handleLogin = async () => {
+        setError("");
+        setLoading(true);
+
+        try {
+            // 1. Call your backend login API
+            const response = await axios.post("http://localhost:7000/api/auth/login", {
+                email: username,
+                password: password,
+            });
+
+            if (response.data.success) {
+                // 2. Save token and user data
+                localStorage.setItem("token", response.data.token);
+                localStorage.setItem("user", JSON.stringify(response.data.data));
+
+                // 3. Set role in context
+                const userRole = response.data.data.role;
+                setCurrentRole(userRole);
+
+                // 4. Redirect based on role
+                if (userRole === "admin") {
+                    navigate("/admin");
+                } else if (userRole === "teacher") {
+                    navigate("/teacher");
+                } else if (userRole === "parent") {
+                    navigate("/parent");
+                } else {
+                    navigate("/student");
+                }
+            }
+        } catch (err: any) {
+            setError(err.response?.data?.error || "Invalid email or password");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -42,6 +75,13 @@ const Login = () => {
                     <p className="text-sm text-gray-500 mt-1">{schoolInfo.address}</p>
                 </div>
 
+                {/* ✅ ADD: Error message display */}
+                {error && (
+                    <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm text-center">
+                        {error}
+                    </div>
+                )}
+
                 <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                         Login as
@@ -64,20 +104,27 @@ const Login = () => {
                 <input
                     type="text"
                     placeholder="Username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
                     className="w-full border border-gray-300 p-3 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
 
                 <input
                     type="password"
                     placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     className="w-full border border-gray-300 p-3 rounded-lg mb-6 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
 
                 <button
                     onClick={handleLogin}
-                    className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+                    disabled={loading}
+                    className={`w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold ${
+                        loading ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
                 >
-                    Continue as {role.charAt(0).toUpperCase() + role.slice(1)}
+                    {loading ? "Logging in..." : `Continue as ${role.charAt(0).toUpperCase() + role.slice(1)}`}
                 </button>
             </div>
         </div>

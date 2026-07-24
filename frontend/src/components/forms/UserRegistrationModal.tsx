@@ -12,6 +12,7 @@ interface UserData {
     password: string;
     gender: string;
     grade?: string;
+    age?: number;
     department?: string;
 }
 
@@ -37,6 +38,7 @@ const UserRegistrationModal = ({
         gender: "",
         grade: "",
         department: "",
+        age: "", // ✅ Keep as string for input binding
     });
 
     if (!isOpen) return null;
@@ -53,10 +55,14 @@ const UserRegistrationModal = ({
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
+        // ✅ Convert age to number before sending
+        const ageValue = formData.age ? parseInt(formData.age) : undefined;
+
         onSave({
             id: Date.now(),
             role,
             ...formData,
+            age: ageValue, // ✅ Send as number
         });
 
         setFormData({
@@ -68,6 +74,7 @@ const UserRegistrationModal = ({
             gender: "",
             grade: "",
             department: "",
+            age: "",
         });
 
         onClose();
@@ -89,99 +96,115 @@ const UserRegistrationModal = ({
                     </button>
                 </div>
 
-                <form
-                    onSubmit={handleSubmit}
-                    className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4"
-                >
-                    <input
-                        name="firstName"
-                        placeholder="First Name"
-                        value={formData.firstName}
-                        onChange={handleChange}
-                        className="border p-3 rounded-lg"
-                        required
-                    />
-
-                    <input
-                        name="lastName"
-                        placeholder="Last Name"
-                        value={formData.lastName}
-                        onChange={handleChange}
-                        className="border p-3 rounded-lg"
-                        required
-                    />
-
-                    <input
-                        name="email"
-                        type="email"
-                        placeholder="Email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        className="border p-3 rounded-lg"
-                        required
-                    />
-
-                    <input
-                        name="phone"
-                        placeholder="Phone Number"
-                        value={formData.phone}
-                        onChange={handleChange}
-                        className="border p-3 rounded-lg"
-                        required
-                    />
-
-                    <input
-                        name="password"
-                        type="password"
-                        placeholder="Password"
-                        value={formData.password}
-                        onChange={handleChange}
-                        className="border p-3 rounded-lg"
-                        required
-                    />
-
-                    <select
-                        name="gender"
-                        value={formData.gender}
-                        onChange={handleChange}
-                        className="border p-3 rounded-lg"
-                        required
-                    >
-                        <option value="">Select Gender</option>
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
-                    </select>
-
-                    {role === "student" ? (
-                        <select
-                            name="grade"
-                            value={formData.grade}
-                            onChange={handleChange}
-                            className="border p-3 rounded-lg"
-                            required
-                        >
-                            <option value="">Select Grade</option>
-                            <option value="9">Grade 9</option>
-                            <option value="10">Grade 10</option>
-                            <option value="11">Grade 11</option>
-                            <option value="12">Grade 12</option>
-                        </select>
-                    ) : (
+                <form onSubmit={handleSubmit} className="p-6">
+                    {/* ✅ Grid for form fields */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <input
-                            name="department"
-                            placeholder="Department"
-                            value={formData.department}
+                            name="firstName"
+                            placeholder="First Name"
+                            value={formData.firstName}
                             onChange={handleChange}
                             className="border p-3 rounded-lg"
                             required
                         />
-                    )}
 
-                    <div className="md:col-span-2 flex justify-end gap-3 pt-4">
+                        <input
+                            name="lastName"
+                            placeholder="Last Name"
+                            value={formData.lastName}
+                            onChange={handleChange}
+                            className="border p-3 rounded-lg"
+                            required
+                        />
+
+                        <input
+                            name="email"
+                            type="email"
+                            placeholder="Email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            className="border p-3 rounded-lg"
+                            required
+                        />
+
+                        <input
+                            name="phone"
+                            placeholder="Phone Number"
+                            value={formData.phone}
+                            onChange={handleChange}
+                            className="border p-3 rounded-lg"
+                        />
+
+                        <input
+                            name="password"
+                            type="password"
+                            placeholder="Password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            className="border p-3 rounded-lg"
+                            required
+                        />
+
+                        <select
+                            name="gender"
+                            value={formData.gender}
+                            onChange={handleChange}
+                            className="border p-3 rounded-lg"
+                            required
+                        >
+                            <option value="">Select Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+
+                        {/* ✅ Age Field - Fixed placement */}
+                        <div>
+                            <input
+                                type="number"
+                                name="age"
+                                placeholder="Age"
+                                value={formData.age}
+                                onChange={handleChange}
+                                min="1"
+                                max="120"
+                                className="border p-3 rounded-lg w-full"
+                                required
+                            />
+                        </div>
+
+                        {role === "student" ? (
+                            <select
+                                name="grade"
+                                value={formData.grade}
+                                onChange={handleChange}
+                                className="border p-3 rounded-lg"
+                                required
+                            >
+                                <option value="">Select Grade</option>
+                                <option value="Grade 9">Grade 9</option>
+                                <option value="Grade 10">Grade 10</option>
+                                <option value="Grade 11">Grade 11</option>
+                                <option value="Grade 12">Grade 12</option>
+                            </select>
+                        ) : (
+                            <input
+                                name="department"
+                                placeholder="Department / Subject"
+                                value={formData.department}
+                                onChange={handleChange}
+                                className="border p-3 rounded-lg"
+                                required
+                            />
+                        )}
+                    </div>
+
+                    {/* ✅ Buttons - Full width row */}
+                    <div className="flex justify-end gap-3 pt-6 border-t mt-6">
                         <button
                             type="button"
                             onClick={onClose}
-                            className="px-5 py-3 rounded-lg border border-gray-300 font-semibold"
+                            className="px-5 py-3 rounded-lg border border-gray-300 font-semibold hover:bg-gray-50"
                         >
                             Cancel
                         </button>

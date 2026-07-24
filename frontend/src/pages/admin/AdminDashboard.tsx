@@ -1,23 +1,126 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DashboardLayout from "../../layout/DashboardLayout";
 import UserRegistrationModal from "../../components/forms/UserRegistrationModal";
 import type { UserData } from "../../types/user";
-
-const stats = [
-    { title: "Total Students", value: "1,000" },
-    { title: "Total Teachers", value: "50" },
-    { title: "Attendance Today", value: "90%" },
-    { title: "Announcements", value: "10" },
-];
+import axios from "axios";
 
 const AdminDashboard = () => {
     const [modalOpen, setModalOpen] = useState(false);
     const [modalRole, setModalRole] = useState<"student" | "teacher">("student");
+    
+    const [stats, setStats] = useState([
+        { title: "Total Students", value: "0" },
+        { title: "Total Teachers", value: "0" },
+        { title: "Attendance Today", value: "0%" },
+        { title: "Announcements", value: "0" },
+    ]);
+    const [recentActivities, setRecentActivities] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
 
-    const handleSave = (data: UserData) => {
-        console.log(data);
-        // later: add to state or send to API
+    useEffect(() => {
+        fetchDashboardData();
+    }, []);
+
+    const fetchDashboardData = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            
+            const statsRes = await axios.get('http://localhost:7000/api/users/stats/roles', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            const usersRes = await axios.get('http://localhost:7000/api/users?limit=5', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            const data = statsRes.data.data;
+            setStats([
+                { title: "Total Students", value: data.students?.toString() || "0" },
+                { title: "Total Teachers", value: data.teachers?.toString() || "0" },
+                { title: "Attendance Today", value: "90%" },
+                { title: "Announcements", value: "10" },
+            ]);
+
+            const activities = usersRes.data.data.slice(0, 5).map((user: any) => ({
+                activity: `New ${user.role} registered`,
+                user: user.name,
+                time: new Date(user.createdAt).toLocaleDateString(),
+            }));
+
+            setRecentActivities(activities);
+            setLoading(false);
+        } catch (error) {
+            console.error("Error fetching dashboard data:", error);
+            setLoading(false);
+        }
     };
+
+    // ✅ UPDATED: Handles age properly
+    const handleSave = async (data: UserData) => {
+        try {
+            const token = localStorage.getItem('token');
+            
+            // ✅ Map frontend fields to backend schema
+            const userData: any = {
+                name: `${data.firstName} ${data.lastName}`.trim(),
+                email: data.email,
+                password: data.password || "password123",
+                role: modalRole,
+            };
+
+            // ✅ Add age if provided (convert to number)
+            if (data.age) {
+                userData.age = parseInt(data.age.toString());
+            }
+
+            // ✅ Add class only for students
+            if (modalRole === "student") {
+                userData.class = data.grade || "Grade 10A";
+            }
+
+            // ✅ Add teacher-specific fields
+            if (modalRole === "teacher") {
+                userData.subject = data.department || "General";
+                userData.hireDate = new Date().toISOString().split('T')[0];
+            }
+
+            // ✅ Add phone and gender if provided
+            if (data.phone) {
+                userData.phone = data.phone;
+            }
+            if (data.gender) {
+                userData.gender = data.gender;
+            }
+
+            console.log("📤 Sending to backend:", userData);
+
+            const response = await axios.post('http://localhost:7000/api/users', userData, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            console.log("✅ User created:", response.data);
+            setModalOpen(false);
+            await fetchDashboardData();
+            alert(`${modalRole.charAt(0).toUpperCase() + modalRole.slice(1)} added successfully!`);
+            
+        } catch (error: any) {
+            console.error("❌ Error saving user:", error);
+            const errorMsg = error.response?.data?.error || 
+                             error.response?.data?.errors?.join(', ') || 
+                             "Failed to add user";
+            alert(errorMsg);
+        }
+    };
+
+    if (loading) {
+        return (
+            <DashboardLayout role="admin">
+                <div className="flex items-center justify-center min-h-[60vh]">
+                    <div className="text-xl text-gray-500">Loading dashboard...</div>
+                </div>
+            </DashboardLayout>
+        );
+    }
 
     return (
         <DashboardLayout role="admin">
@@ -80,23 +183,21 @@ const AdminDashboard = () => {
                             </thead>
 
                             <tbody className="text-gray-700">
-                                <tr className="border-b">
-                                    <td className="py-4">Added new student</td>
-                                    <td className="py-4">Admin User</td>
-                                    <td className="py-4">10 min ago</td>
-                                </tr>
-
-                                <tr className="border-b">
-                                    <td className="py-4">Published announcement</td>
-                                    <td className="py-4">Admin User</td>
-                                    <td className="py-4">1 hour ago</td>
-                                </tr>
-
-                                <tr>
-                                    <td className="py-4">Updated attendance records</td>
-                                    <td className="py-4">Teacher Samuel</td>
-                                    <td className="py-4">2 hours ago</td>
-                                </tr>
+                                {recentActivities.length > 0 ? (
+                                    recentActivities.map((activity, index) => (
+                                        <tr key={index} className="border-b last:border-b-0">
+                                            <td className="py-4">{activity.activity}</td>
+                                            <td className="py-4">{activity.user}</td>
+                                            <td className="py-4">{activity.time}</td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td className="py-4 text-gray-500" colSpan={3}>
+                                            No recent activities
+                                        </td>
+                                    </tr>
+                                )}
                             </tbody>
                         </table>
                     </div>
