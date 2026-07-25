@@ -2,7 +2,7 @@ import { useState } from "react";
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
 
-type Role = "admin" | "teacher" | "student" | "parent";
+type Role = "admin" | "registrar" | "finance_officer" | "teacher" | "student" | "parent";
 
 interface DashboardLayoutProps {
     children: React.ReactNode;

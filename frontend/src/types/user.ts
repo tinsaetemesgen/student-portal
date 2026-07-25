@@ -10,5 +10,6 @@ export interface UserData {
     department?: string;
     subject?: string;
     age?: number;
+    parentId?: string;
     role?: 'student' | 'teacher' | 'parent' | 'admin';
 }

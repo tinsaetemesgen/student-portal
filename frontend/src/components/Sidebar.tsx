@@ -11,9 +11,13 @@ import {
     X,
     LogOut,
     Banknote,
+    School,
+    DollarSign,
+    BarChart3,
+    MessageCircle,
 } from "lucide-react";
 
-type Role = "admin" | "teacher" | "student" | "parent";
+type Role = "admin" | "registrar" | "finance_officer" | "teacher" | "student" | "parent";
 
 interface SidebarProps {
     role: Role;
@@ -33,11 +37,27 @@ const menuItems = {
         { name: "Settings", path: "/admin/settings", icon: <Settings size={20} /> },
     ],
 
+    registrar: [
+        { name: "Dashboard", path: "/registrar", icon: <LayoutDashboard size={20} /> },
+        { name: "Students", path: "/registrar/students", icon: <Users size={20} /> },
+        { name: "Teachers", path: "/registrar/teachers", icon: <UserCheck size={20} /> },
+        { name: "Classes", path: "/registrar/classes", icon: <School size={20} /> },
+        { name: "Parents", path: "/registrar/parents", icon: <Users size={20} /> }, 
+    ],
+
+    finance_officer: [
+        { name: "Dashboard", path: "/finance", icon: <LayoutDashboard size={20} /> },
+        { name: "Fee Structures", path: "/finance/fees", icon: <DollarSign size={20} /> },
+        { name: "Payments", path: "/finance/payments", icon: <Banknote size={20} /> },
+        { name: "Reports", path: "/finance/reports", icon: <BarChart3 size={20} /> },
+    ],
+
     teacher: [
         { name: "Dashboard", path: "/teacher", icon: <LayoutDashboard size={20} /> },
         { name: "Attendance", path: "/teacher/attendance", icon: <ClipboardCheck size={20} /> },
         { name: "Grades", path: "/teacher/grades", icon: <BookOpen size={20} /> },
         { name: "Announcements", path: "/teacher/announcements", icon: <Megaphone size={20} /> },
+        { name: "Chat", path: "/chat", icon: <MessageCircle size={20} /> }, 
     ],
 
     student: [
@@ -55,6 +75,7 @@ const menuItems = {
         { name: "Grades", path: "/parent/grades", icon: <GraduationCap size={20} /> },
         { name: "Payments", path: "/parent/payments", icon: <Banknote size={20} /> },
         { name: "Announcements", path: "/parent/announcements", icon: <Megaphone size={20} /> },
+        { name: "Chat", path: "/chat", icon: <MessageCircle size={20} /> },
     ],
 };
 
@@ -63,18 +84,25 @@ const Sidebar = ({ role, isOpen, onClose }: SidebarProps) => {
     const navigate = useNavigate();
 
     const handleLogout = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
         onClose();
         navigate("/");
     };
 
+    const items = menuItems[role] || [];
+
     return (
         <>
-            {/* Desktop sidebar - always visible */}
+            {/* Desktop sidebar */}
             <aside className="hidden md:flex md:flex-col w-64 bg-blue-700 text-white min-h-screen p-5 shrink-0">
-                <h1 className="text-2xl font-bold mb-8">School Portal</h1>
+                <h1 className="text-2xl font-bold mb-2">🏫 School Portal</h1>
+                <p className="text-sm text-blue-200 mb-6 capitalize">
+                    Welcome, {role.replace('_', ' ')}
+                </p>
 
-                <nav className="space-y-2 flex-1">
-                    {menuItems[role].map((item) => {
+                <nav className="space-y-1 flex-1">
+                    {items.map((item) => {
                         const isActive = location.pathname === item.path;
 
                         return (
@@ -82,10 +110,11 @@ const Sidebar = ({ role, isOpen, onClose }: SidebarProps) => {
                                 key={item.name}
                                 to={item.path}
                                 onClick={onClose}
-                                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition ${isActive
-                                    ? "bg-white text-blue-700 font-semibold"
-                                    : "hover:bg-blue-800"
-                                    }`}
+                                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition ${
+                                    isActive
+                                        ? "bg-white text-blue-700 font-semibold"
+                                        : "hover:bg-blue-800"
+                                }`}
                             >
                                 {item.icon}
                                 <span>{item.name}</span>
@@ -94,7 +123,6 @@ const Sidebar = ({ role, isOpen, onClose }: SidebarProps) => {
                     })}
                 </nav>
 
-                {/* Logout Button */}
                 <button
                     onClick={handleLogout}
                     className="flex items-center gap-3 px-4 py-3 rounded-lg transition hover:bg-red-600 w-full mt-4"
@@ -104,13 +132,14 @@ const Sidebar = ({ role, isOpen, onClose }: SidebarProps) => {
                 </button>
             </aside>
 
-            {/* Mobile sidebar - drawer */}
+            {/* Mobile sidebar drawer */}
             <aside
-                className={`fixed top-0 left-0 z-40 h-full w-64 bg-blue-700 text-white p-5 transform transition-transform duration-300 ease-in-out md:hidden ${isOpen ? "translate-x-0" : "-translate-x-full"
-                    }`}
+                className={`fixed top-0 left-0 z-40 h-full w-64 bg-blue-700 text-white p-5 transform transition-transform duration-300 ease-in-out md:hidden ${
+                    isOpen ? "translate-x-0" : "-translate-x-full"
+                }`}
             >
-                <div className="flex items-center justify-between mb-8">
-                    <h1 className="text-2xl font-bold">School Portal</h1>
+                <div className="flex items-center justify-between mb-6">
+                    <h1 className="text-2xl font-bold">🏫 School Portal</h1>
                     <button
                         onClick={onClose}
                         className="p-1 rounded-lg hover:bg-blue-800 transition"
@@ -119,8 +148,12 @@ const Sidebar = ({ role, isOpen, onClose }: SidebarProps) => {
                     </button>
                 </div>
 
-                <nav className="space-y-2">
-                    {menuItems[role].map((item) => {
+                <p className="text-sm text-blue-200 mb-4 capitalize">
+                    Welcome, {role.replace('_', ' ')}
+                </p>
+
+                <nav className="space-y-1">
+                    {items.map((item) => {
                         const isActive = location.pathname === item.path;
 
                         return (
@@ -128,10 +161,11 @@ const Sidebar = ({ role, isOpen, onClose }: SidebarProps) => {
                                 key={item.name}
                                 to={item.path}
                                 onClick={onClose}
-                                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition ${isActive
-                                    ? "bg-white text-blue-700 font-semibold"
-                                    : "hover:bg-blue-800"
-                                    }`}
+                                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition ${
+                                    isActive
+                                        ? "bg-white text-blue-700 font-semibold"
+                                        : "hover:bg-blue-800"
+                                }`}
                             >
                                 {item.icon}
                                 <span>{item.name}</span>
@@ -139,7 +173,6 @@ const Sidebar = ({ role, isOpen, onClose }: SidebarProps) => {
                         );
                     })}
 
-                    {/* Logout Button - Mobile */}
                     <button
                         onClick={handleLogout}
                         className="flex items-center gap-3 px-4 py-3 rounded-lg transition hover:bg-red-600 w-full mt-4"

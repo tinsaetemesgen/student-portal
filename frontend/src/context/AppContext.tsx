@@ -36,7 +36,7 @@ export interface GradeRecord {
     date: string;
 }
 
-type Role = "admin" | "teacher" | "student" | "parent";
+type Role = "admin" | "registrar" | "finance_officer" | "teacher" | "student" | "parent";
 
 interface AppContextType {
     schoolInfo: SchoolInfo;
