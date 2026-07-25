@@ -3,6 +3,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 
 
+//ForgotPassword Page
+import ForgotPassword from "./pages/ForgotPassword";
+
 // Admin Pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import Students from "./pages/admin/Students";
@@ -122,55 +125,55 @@ function App() {
         {/* ============================================
             REGISTRAR ROUTES
             ============================================ */}
-       <Route path="/registrar" element={
-  <PrivateRoute allowedRoles={['admin', 'registrar']}>
-    <RegistrarDashboard />
-  </PrivateRoute>
-} />
-<Route path="/registrar/students" element={
-  <PrivateRoute allowedRoles={['admin', 'registrar']}>
-    <RegistrarStudents />
-  </PrivateRoute>
-} />
-<Route path="/registrar/teachers" element={
-  <PrivateRoute allowedRoles={['admin', 'registrar']}>
-    <RegistrarTeachers />
-  </PrivateRoute>
-} />
-<Route path="/registrar/classes" element={
-  <PrivateRoute allowedRoles={['admin', 'registrar']}>
-    <RegistrarClasses />
-  </PrivateRoute>
-} />
-<Route path="/registrar/parents" element={
-  <PrivateRoute allowedRoles={['admin', 'registrar']}>
-    <RegistrarParents />
-  </PrivateRoute>
-} />
+        <Route path="/registrar" element={
+          <PrivateRoute allowedRoles={['admin', 'registrar']}>
+            <RegistrarDashboard />
+          </PrivateRoute>
+        } />
+        <Route path="/registrar/students" element={
+          <PrivateRoute allowedRoles={['admin', 'registrar']}>
+            <RegistrarStudents />
+          </PrivateRoute>
+        } />
+        <Route path="/registrar/teachers" element={
+          <PrivateRoute allowedRoles={['admin', 'registrar']}>
+            <RegistrarTeachers />
+          </PrivateRoute>
+        } />
+        <Route path="/registrar/classes" element={
+          <PrivateRoute allowedRoles={['admin', 'registrar']}>
+            <RegistrarClasses />
+          </PrivateRoute>
+        } />
+        <Route path="/registrar/parents" element={
+          <PrivateRoute allowedRoles={['admin', 'registrar']}>
+            <RegistrarParents />
+          </PrivateRoute>
+        } />
 
         {/* ============================================
             FINANCE OFFICER ROUTES
             ============================================ */}
         <Route path="/finance" element={
-  <PrivateRoute allowedRoles={['admin', 'finance_officer']}>
-    <FinanceDashboard />
-  </PrivateRoute>
-} />
-<Route path="/finance/payments" element={
-  <PrivateRoute allowedRoles={['admin', 'finance_officer']}>
-    <FinancePayments />
-  </PrivateRoute>
-} />
-<Route path="/finance/fees" element={
-  <PrivateRoute allowedRoles={['admin', 'finance_officer']}>
-    <FinanceFees />
-  </PrivateRoute>
-} />
-<Route path="/finance/reports" element={
-  <PrivateRoute allowedRoles={['admin', 'finance_officer']}>
-    <FinanceDashboard />
-  </PrivateRoute>
-} />
+          <PrivateRoute allowedRoles={['admin', 'finance_officer']}>
+            <FinanceDashboard />
+          </PrivateRoute>
+        } />
+        <Route path="/finance/payments" element={
+          <PrivateRoute allowedRoles={['admin', 'finance_officer']}>
+            <FinancePayments />
+          </PrivateRoute>
+        } />
+        <Route path="/finance/fees" element={
+          <PrivateRoute allowedRoles={['admin', 'finance_officer']}>
+            <FinanceFees />
+          </PrivateRoute>
+        } />
+        <Route path="/finance/reports" element={
+          <PrivateRoute allowedRoles={['admin', 'finance_officer']}>
+            <FinanceDashboard />
+          </PrivateRoute>
+        } />
         {/* ============================================
             TEACHER ROUTES
             ============================================ */}
@@ -253,22 +256,32 @@ function App() {
           </PrivateRoute>
         } />
         <Route path="/parent/children" element={
-  <PrivateRoute allowedRoles={['admin', 'parent']}>
-    <ParentChildren />
-  </PrivateRoute>
-} />
-<Route path="/parent/child/:childId/grades" element={
-  <PrivateRoute allowedRoles={['admin', 'parent']}>
-    <ParentChildGrades />
-  </PrivateRoute>
-} />
-<Route path="/parent/child/:childId/attendance" element={
-  <PrivateRoute allowedRoles={['admin', 'parent']}>
-    <ParentChildAttendance />
-  </PrivateRoute>
-} />
+          <PrivateRoute allowedRoles={['admin', 'parent']}>
+            <ParentChildren />
+          </PrivateRoute>
+        } />
+        <Route path="/parent/child/:childId/grades" element={
+          <PrivateRoute allowedRoles={['admin', 'parent']}>
+            <ParentChildGrades />
+          </PrivateRoute>
+        } />
+        <Route path="/parent/child/:childId/attendance" element={
+          <PrivateRoute allowedRoles={['admin', 'parent']}>
+            <ParentChildAttendance />
+          </PrivateRoute>
+        } />
+
+
+         //Forgot Password
+
+        <Route path="/forgot-password" element={<ForgotPassword />} />
 
       </Routes>
+
+
+
+
+
     </BrowserRouter>
   );
 }

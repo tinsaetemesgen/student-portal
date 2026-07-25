@@ -1,10 +1,11 @@
-// Login.tsx - Update the role type and dropdown options
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { Eye, EyeOff } from "lucide-react";
 import { useAppContext } from "../context/AppContext";
+import { Link } from "react-router-dom";
 
-// ✅ Add all roles
+
 type Role = "admin" | "registrar" | "finance_officer" | "teacher" | "student" | "parent";
 
 const Login = () => {
@@ -13,6 +14,7 @@ const Login = () => {
     const [role, setRole] = useState<Role>("student");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
@@ -34,7 +36,6 @@ const Login = () => {
                 const userRole = response.data.data.role;
                 setCurrentRole(userRole);
 
-                // Redirect based on role
                 switch (userRole) {
                     case "admin":
                         navigate("/admin");
@@ -68,7 +69,6 @@ const Login = () => {
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
             <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-md w-full max-w-md mx-auto">
-                {/* School Logo and Name */}
                 <div className="flex flex-col items-center mb-6">
                     {schoolInfo.logo ? (
                         <img
@@ -87,14 +87,12 @@ const Login = () => {
                     <p className="text-sm text-gray-500 mt-1">{schoolInfo.address}</p>
                 </div>
 
-                {/* Error Message */}
                 {error && (
                     <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm text-center">
                         {error}
                     </div>
                 )}
 
-                {/* Role Selection */}
                 <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                         Login as
@@ -113,7 +111,6 @@ const Login = () => {
                     </select>
                 </div>
 
-                {/* Email */}
                 <input
                     type="email"
                     placeholder="Email"
@@ -122,27 +119,41 @@ const Login = () => {
                     className="w-full border border-gray-300 p-3 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
 
-                {/* Password */}
-                <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full border border-gray-300 p-3 rounded-lg mb-6 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+                <div className="relative mb-6">
+                    <input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pr-12"
+                    />
+                    <button
+                        type="button"
+                        onClick={() => setShowPassword((prev) => !prev)}
+                        className="absolute inset-y-0 right-3 flex items-center text-gray-500"
+                    >
+                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                </div>
 
-                {/* Login Button */}
+                <div className="mb-4 text-center">
+                    <Link
+                        to="./forgot-password"
+                        className="text-gray-600 hover:text-blue-600 transition-colors"
+                    >
+                        Forgot password?
+                    </Link>
+                </div>
+
                 <button
                     onClick={handleLogin}
                     disabled={loading}
-                    className={`w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold ${
-                        loading ? "opacity-50 cursor-not-allowed" : ""
-                    }`}
+                    className={`w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold ${loading ? "opacity-50 cursor-not-allowed" : ""
+                        }`}
                 >
                     {loading ? "Logging in..." : `Continue as ${role.charAt(0).toUpperCase() + role.slice(1)}`}
                 </button>
 
-                {/* Demo Credentials */}
                 <div className="mt-6 p-4 bg-gray-50 rounded-lg text-sm text-gray-600 text-center">
                     <p className="font-medium">🔑 Demo Credentials</p>
                     <div className="grid grid-cols-2 gap-1 mt-2 text-xs">
