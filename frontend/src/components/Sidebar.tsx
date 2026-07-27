@@ -15,6 +15,7 @@ import {
     DollarSign,
     BarChart3,
     MessageCircle,
+    FileText,
 } from "lucide-react";
 
 type Role = "admin" | "registrar" | "finance_officer" | "teacher" | "student" | "parent";
@@ -53,23 +54,26 @@ const menuItems = {
     ],
 
     teacher: [
-        { name: "Dashboard", path: "/teacher", icon: <LayoutDashboard size={20} /> },
+        
         { name: "Attendance", path: "/teacher/attendance", icon: <ClipboardCheck size={20} /> },
         { name: "Grades", path: "/teacher/grades", icon: <BookOpen size={20} /> },
         { name: "Announcements", path: "/teacher/announcements", icon: <Megaphone size={20} /> },
         { name: "Chat", path: "/chat", icon: <MessageCircle size={20} /> }, 
+        
+    { name: "Worksheets", path: "/teacher/worksheets", icon: <FileText size={20} /> },
     ],
 
     student: [
-        { name: "Dashboard", path: "/student", icon: <LayoutDashboard size={20} /> },
+       // { name: "Dashboard", path: "/student", icon: <LayoutDashboard size={20} /> },
         { name: "Attendance", path: "/student/attendance", icon: <ClipboardCheck size={20} /> },
         { name: "Grades", path: "/student/grades", icon: <GraduationCap size={20} /> },
         { name: "Fees", path: "/student/fees", icon: <Banknote size={20} /> },
         { name: "Announcements", path: "/student/announcements", icon: <Megaphone size={20} /> },
+    { name: "Worksheets", path: "/student/worksheets", icon: <FileText size={20} /> },
     ],
 
     parent: [
-        { name: "Dashboard", path: "/parent", icon: <LayoutDashboard size={20} /> },
+       // { name: "Dashboard", path: "/parent", icon: <LayoutDashboard size={20} /> },
         { name: "Children", path: "/parent/children", icon: <Users size={20} /> },
         { name: "Attendance", path: "/parent/attendance", icon: <ClipboardCheck size={20} /> },
         { name: "Grades", path: "/parent/grades", icon: <GraduationCap size={20} /> },
@@ -170,6 +174,7 @@ const Sidebar = ({ role, isOpen, onClose }: SidebarProps) => {
                                 {item.icon}
                                 <span>{item.name}</span>
                             </Link>
+                            
                         );
                     })}
 

@@ -1,6 +1,7 @@
-
+import React from 'react';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
+import Chat from './pages/Chat';
 
 
 // Admin Pages
@@ -31,7 +32,7 @@ import FinanceFees from './pages/finance/FinanceFees';
 import TeacherDashboard from "./pages/teacher/TeacherDashboard";
 import TeacherAttendance from "./pages/teacher/Attendance";
 import TeacherGrades from "./pages/teacher/Grades";
-import TeacherAnnouncements from "./pages/teacher/Announcements";
+import TeacherAnnouncements from "./pages/teacher/TeacherAnnouncement";
 
 // Student Pages
 import StudentDashboard from "./pages/student/StudentDashboard";
@@ -49,6 +50,11 @@ import ParentAnnouncements from "./pages/parent/ParentAnnouncements";
 import ParentChildren from "./pages/parent/ParentChildren";
 import ParentChildGrades from './pages/parent/ParentChildGrades';
 import ParentChildAttendance from './pages/parent/ParentChildAttendance';
+//worksheet routes
+import TeacherWorksheets from './pages/teacher/Worksheets';
+import StudentAvailableWorksheets from './pages/student/AvailableWorksheets';
+import WorksheetAttempt from './pages/student/WorksheetAttempt';
+import TeacherWorksheetResults from './pages/teacher/TeacherWorksheetResults';
 
 // Auth Guard Component
 const PrivateRoute = ({ children, allowedRoles }: { children: JSX.Element, allowedRoles?: string[] }) => {
@@ -194,6 +200,17 @@ function App() {
             <TeacherAnnouncements />
           </PrivateRoute>
         } />
+        <Route path="/teacher/worksheets" element={
+  <PrivateRoute allowedRoles={['admin', 'teacher']}>
+    <TeacherWorksheets />
+  </PrivateRoute>
+} />
+<Route path="/teacher/worksheets/:id/results" element={
+  <PrivateRoute allowedRoles={['admin', 'teacher']}>
+    <TeacherWorksheetResults />
+  </PrivateRoute>
+} />
+
 
         {/* ============================================
             STUDENT ROUTES
@@ -223,6 +240,16 @@ function App() {
             <StudentAnnouncements />
           </PrivateRoute>
         } />
+        <Route path="/student/worksheets" element={
+  <PrivateRoute allowedRoles={['admin', 'student']}>
+    <StudentAvailableWorksheets />
+  </PrivateRoute>
+} />
+<Route path="/student/worksheet/:id/attempt" element={
+  <PrivateRoute allowedRoles={['admin', 'student']}>
+    <WorksheetAttempt />
+  </PrivateRoute>
+} />
 
         {/* ============================================
             PARENT ROUTES
@@ -267,7 +294,11 @@ function App() {
     <ParentChildAttendance />
   </PrivateRoute>
 } />
-
+<Route path="/chat" element={
+  <PrivateRoute allowedRoles={['admin', 'teacher', 'parent', 'student']}>
+    <Chat />
+  </PrivateRoute>
+} />
       </Routes>
     </BrowserRouter>
   );

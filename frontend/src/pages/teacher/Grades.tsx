@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, X, BarChart3 } from "lucide-react";
+import { Plus, X, Edit2, BarChart3 } from "lucide-react";
 import DashboardLayout from "../../layout/DashboardLayout";
 import axios from "axios";
 
@@ -25,6 +25,10 @@ interface GradeRecord {
     totalScore?: number;
     letterGrade?: string;
     gradePoints?: number;
+     classId?: {          
+        _id: string;
+        name: string;
+    };
     assessments?: {
         quiz: Assessment;
         homework: Assessment;
@@ -33,6 +37,8 @@ interface GradeRecord {
         groupWork: Assessment;
     };
     feedback?: string;
+    isComplete?: boolean;
+    pendingAssessments?: string[];
 }
 
 interface GradeForm {
@@ -70,6 +76,8 @@ const Grades = () => {
     const [students, setStudents] = useState<Student[]>([]);
     const [classes, setClasses] = useState<ClassData[]>([]);
     const [showModal, setShowModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [editingGrade, setEditingGrade] = useState<GradeRecord | null>(null);
     const [loading, setLoading] = useState(true);
     const [expandedGrade, setExpandedGrade] = useState<string | null>(null);
     const [formData, setFormData] = useState<GradeForm>({
@@ -156,20 +164,6 @@ const Grades = () => {
         }
     };
 
-    const getGradeLetter = (score: number): string => {
-        if (score >= 97) return "A+";
-        if (score >= 93) return "A";
-        if (score >= 90) return "A-";
-        if (score >= 87) return "B+";
-        if (score >= 83) return "B";
-        if (score >= 80) return "B-";
-        if (score >= 77) return "C+";
-        if (score >= 73) return "C";
-        if (score >= 70) return "C-";
-        if (score >= 65) return "D";
-        return "F";
-    };
-
     const forceRefreshGrades = async () => {
         try {
             const token = localStorage.getItem('token');
@@ -203,6 +197,12 @@ const Grades = () => {
         try {
             const token = localStorage.getItem('token');
             
+            const allFilled = formData.assessments.quiz.score > 0 &&
+                              formData.assessments.homework.score > 0 &&
+                              formData.assessments.classTest.score > 0 &&
+                              formData.assessments.finalTest.score > 0 &&
+                              formData.assessments.groupWork.score > 0;
+            
             const gradeData = {
                 studentId: formData.studentId,
                 subject: formData.subject,
@@ -220,40 +220,120 @@ const Grades = () => {
                 }
             };
 
-            console.log("📤 Sending grade:", gradeData);
-
             await axios.post('http://localhost:7000/api/grades', gradeData, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
-            console.log("✅ Grade saved successfully");
-
             setShowModal(false);
-            setFormData({
-                studentId: "",
-                subject: "",
-                score: 0,
-                grade: "",
-                type: "Exam",
-                semester: "Semester 1",
-                academicYear: formData.academicYear,
-                classId: formData.classId,
-                feedback: "",
-                assessments: {
-                    quiz: { score: 0, maxScore: 20, weight: 15 },
-                    homework: { score: 0, maxScore: 15, weight: 10 },
-                    classTest: { score: 0, maxScore: 20, weight: 20 },
-                    finalTest: { score: 0, maxScore: 50, weight: 35 },
-                    groupWork: { score: 0, maxScore: 20, weight: 20 },
-                },
-            });
-            
+            resetForm();
             await forceRefreshGrades();
+            
+            alert(allFilled 
+                ? '✅ Grade saved successfully! The student can now see their complete grade.' 
+                : '⏳ Grade saved as incomplete. The final grade will be calculated when all assessments are filled.');
             
         } catch (error: any) {
             console.error("❌ Error adding grade:", error);
             alert(error.response?.data?.error || "Failed to add grade");
         }
+    };
+
+    const handleEditSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        
+        if (!editingGrade) return;
+        
+        try {
+            const token = localStorage.getItem('token');
+            
+            const allFilled = formData.assessments.quiz.score > 0 &&
+                              formData.assessments.homework.score > 0 &&
+                              formData.assessments.classTest.score > 0 &&
+                              formData.assessments.finalTest.score > 0 &&
+                              formData.assessments.groupWork.score > 0;
+            
+            const gradeData = {
+                studentId: formData.studentId,
+                subject: formData.subject,
+                classId: formData.classId,
+                type: formData.type,
+                semester: formData.semester,
+                academicYear: formData.academicYear,
+                feedback: formData.feedback,
+                assessments: {
+                    quiz: { score: formData.assessments.quiz.score, maxScore: 20, weight: 15 },
+                    homework: { score: formData.assessments.homework.score, maxScore: 15, weight: 10 },
+                    classTest: { score: formData.assessments.classTest.score, maxScore: 20, weight: 20 },
+                    finalTest: { score: formData.assessments.finalTest.score, maxScore: 50, weight: 35 },
+                    groupWork: { score: formData.assessments.groupWork.score, maxScore: 20, weight: 20 },
+                }
+            };
+
+            await axios.put(`http://localhost:7000/api/grades/${editingGrade._id}`, gradeData, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            setShowEditModal(false);
+            setEditingGrade(null);
+            resetForm();
+            await forceRefreshGrades();
+            
+            alert(allFilled 
+                ? '✅ Grade updated successfully! The student can now see their complete grade.' 
+                : '⏳ Grade updated as incomplete. The final grade will be calculated when all assessments are filled.');
+            
+        } catch (error: any) {
+            console.error("❌ Error updating grade:", error);
+            alert(error.response?.data?.error || "Failed to update grade");
+        }
+    };
+
+    const resetForm = () => {
+        setFormData({
+            studentId: "",
+            subject: "",
+            score: 0,
+            grade: "",
+            type: "Exam",
+            semester: "Semester 1",
+            academicYear: formData.academicYear,
+            classId: formData.classId,
+            feedback: "",
+            assessments: {
+                quiz: { score: 0, maxScore: 20, weight: 15 },
+                homework: { score: 0, maxScore: 15, weight: 10 },
+                classTest: { score: 0, maxScore: 20, weight: 20 },
+                finalTest: { score: 0, maxScore: 50, weight: 35 },
+                groupWork: { score: 0, maxScore: 20, weight: 20 },
+            },
+        });
+    };
+
+    const openEditModal = (grade: GradeRecord) => {
+        setEditingGrade(grade);
+        setFormData({
+            studentId: grade.studentId?._id || '',
+            subject: grade.subject || '',
+            score: grade.score || 0,
+            grade: grade.grade || '',
+            type: grade.type || 'Exam',
+            semester: grade.semester || 'Semester 1',
+            academicYear: grade.academicYear || '2024/25',
+            classId: grade.classId?._id || '',
+            feedback: grade.feedback || '',
+            assessments: grade.assessments || {
+                quiz: { score: 0, maxScore: 20, weight: 15 },
+                homework: { score: 0, maxScore: 15, weight: 10 },
+                classTest: { score: 0, maxScore: 20, weight: 20 },
+                finalTest: { score: 0, maxScore: 50, weight: 35 },
+                groupWork: { score: 0, maxScore: 20, weight: 20 },
+            },
+        });
+        setShowEditModal(true);
+    };
+
+    const toggleExpand = (id: string) => {
+        setExpandedGrade(expandedGrade === id ? null : id);
     };
 
     const gradeColors: Record<string, string> = {
@@ -268,6 +348,7 @@ const Grades = () => {
         'C-': 'bg-yellow-100 text-yellow-700',
         'D': 'bg-orange-100 text-orange-700',
         'F': 'bg-red-100 text-red-700',
+        'I': 'bg-gray-100 text-gray-500',
     };
 
     const getGradeColor = (grade: string) => {
@@ -296,39 +377,60 @@ const Grades = () => {
         return labels[key] || key;
     };
 
-    const toggleExpand = (id: string) => {
-        setExpandedGrade(expandedGrade === id ? null : id);
-    };
-
     const renderAssessmentBreakdown = (grade: GradeRecord) => {
         if (!grade.assessments) return null;
 
         const assessments = grade.assessments;
         const keys = ['quiz', 'homework', 'classTest', 'finalTest', 'groupWork'];
-        
+        const allComplete = keys.every(key => assessments[key as keyof typeof assessments]?.score > 0);
+        const pendingAssessments = keys
+            .filter(key => assessments[key as keyof typeof assessments]?.score === 0)
+            .map(key => getAssessmentLabel(key));
+
         return (
             <div className="mt-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
                 <h4 className="text-sm font-semibold text-gray-700 mb-3">📊 Assessment Breakdown</h4>
+                
+                {!allComplete && (
+                    <div className="mb-3 p-2 bg-yellow-50 border border-yellow-200 rounded-lg text-sm text-yellow-700">
+                        ⚠️ <span className="font-medium">Incomplete Grade</span> — Missing: {pendingAssessments.join(', ')}
+                        <span className="block text-xs text-yellow-600 mt-1">This grade will be calculated once all assessments are entered.</span>
+                    </div>
+                )}
+                
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
                     {keys.map((key) => {
                         const data = assessments[key as keyof typeof assessments];
                         if (!data) return null;
                         const percentage = data.maxScore > 0 ? Math.round((data.score / data.maxScore) * 100) : 0;
+                        const isPending = data.score === 0;
                         return (
-                            <div key={key} className="bg-white p-2 rounded border border-gray-100 text-center">
+                            <div key={key} className={`bg-white p-2 rounded border border-gray-100 text-center ${isPending ? 'opacity-50' : ''}`}>
                                 <div className="text-xs text-gray-500">{getAssessmentIcon(key)} {getAssessmentLabel(key)}</div>
-                                <div className="font-bold text-sm">{data.score}/{data.maxScore}</div>
+                                <div className="font-bold text-sm">
+                                    {isPending ? '—' : `${data.score}/${data.maxScore}`}
+                                </div>
                                 <div className="text-xs text-gray-400">{data.weight}% weight</div>
-                                <div className="text-xs font-medium text-blue-600">{percentage}%</div>
+                                <div className={`text-xs font-medium ${isPending ? 'text-gray-400' : 'text-blue-600'}`}>
+                                    {isPending ? '⏳ Pending' : `${percentage}%`}
+                                </div>
                             </div>
                         );
                     })}
                 </div>
-                <div className="mt-2 flex justify-between text-sm">
-                    <span className="text-gray-600">Total Score: <strong className="text-gray-800">{grade.totalScore || grade.score}%</strong></span>
-                    <span className="text-gray-600">Grade: <strong className={`${getGradeColor(grade.letterGrade || grade.grade || '')}`}>{grade.letterGrade || grade.grade}</strong></span>
-                    <span className="text-gray-600">GPA: <strong className="text-gray-800">{grade.gradePoints?.toFixed(1) || 'N/A'}</strong></span>
-                </div>
+                
+                {allComplete ? (
+                    <div className="mt-2 flex justify-between text-sm">
+                        <span className="text-gray-600">Total Score: <strong className="text-gray-800">{grade.totalScore || grade.score}%</strong></span>
+                        <span className="text-gray-600">Grade: <strong className={getGradeColor(grade.letterGrade || grade.grade || '')}>{grade.letterGrade || grade.grade}</strong></span>
+                        <span className="text-gray-600">GPA: <strong className="text-gray-800">{grade.gradePoints?.toFixed(1) || 'N/A'}</strong></span>
+                    </div>
+                ) : (
+                    <div className="mt-2 text-sm text-gray-500 italic">
+                        ⏳ Waiting for {pendingAssessments.join(', ')} to calculate final grade.
+                    </div>
+                )}
+                
                 {grade.feedback && (
                     <div className="mt-2 text-sm text-gray-600 border-t pt-2">
                         💬 <span className="italic">{grade.feedback}</span>
@@ -348,6 +450,7 @@ const Grades = () => {
         );
     }
 
+    // Add Grade Modal
     const modalContent = (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => setShowModal(false)}>
             <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
@@ -388,7 +491,7 @@ const Grades = () => {
                         </select>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Subject</label>
                             <input
@@ -417,7 +520,7 @@ const Grades = () => {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Semester</label>
                             <select
@@ -442,11 +545,30 @@ const Grades = () => {
                         </div>
                     </div>
 
-                    {/* ✅ Assessment Fields */}
-                    <div className="border-t pt-4 mt-2">
-                        <h4 className="text-sm font-semibold text-gray-700 mb-3">📊 Assessment Scores</h4>
+                    <div className="border-t pt-4">
+                        <div className="flex items-center justify-between mb-3">
+                            <h4 className="text-sm font-semibold text-gray-700">📊 Assessment Scores</h4>
+                            <span className={`text-xs px-2 py-1 rounded-full ${
+                                formData.assessments.quiz.score > 0 &&
+                                formData.assessments.homework.score > 0 &&
+                                formData.assessments.classTest.score > 0 &&
+                                formData.assessments.finalTest.score > 0 &&
+                                formData.assessments.groupWork.score > 0
+                                    ? 'bg-green-100 text-green-700'
+                                    : 'bg-yellow-100 text-yellow-700'
+                            }`}>
+                                {formData.assessments.quiz.score > 0 &&
+                                 formData.assessments.homework.score > 0 &&
+                                 formData.assessments.classTest.score > 0 &&
+                                 formData.assessments.finalTest.score > 0 &&
+                                 formData.assessments.groupWork.score > 0
+                                    ? '✅ Complete'
+                                    : '⏳ Incomplete'}
+                            </span>
+                        </div>
+                        
                         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-                            <div>
+                            <div className={`p-2 rounded-lg border ${formData.assessments.quiz.score > 0 ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-gray-50'}`}>
                                 <label className="block text-xs font-medium text-gray-600 mb-1">Quiz (15%)</label>
                                 <input
                                     type="number"
@@ -460,12 +582,13 @@ const Grades = () => {
                                             quiz: { ...formData.assessments.quiz, score: parseInt(e.target.value) || 0 }
                                         }
                                     })}
-                                    className="w-full border rounded-lg px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                                    className={`w-full border rounded-lg px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-blue-500 ${formData.assessments.quiz.score > 0 ? 'border-green-500' : ''}`}
                                     placeholder="/20"
                                 />
                                 <span className="text-xs text-gray-400">/20</span>
                             </div>
-                            <div>
+                            
+                            <div className={`p-2 rounded-lg border ${formData.assessments.homework.score > 0 ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-gray-50'}`}>
                                 <label className="block text-xs font-medium text-gray-600 mb-1">Homework (10%)</label>
                                 <input
                                     type="number"
@@ -479,12 +602,13 @@ const Grades = () => {
                                             homework: { ...formData.assessments.homework, score: parseInt(e.target.value) || 0 }
                                         }
                                     })}
-                                    className="w-full border rounded-lg px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                                    className={`w-full border rounded-lg px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-blue-500 ${formData.assessments.homework.score > 0 ? 'border-green-500' : ''}`}
                                     placeholder="/15"
                                 />
                                 <span className="text-xs text-gray-400">/15</span>
                             </div>
-                            <div>
+                            
+                            <div className={`p-2 rounded-lg border ${formData.assessments.classTest.score > 0 ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-gray-50'}`}>
                                 <label className="block text-xs font-medium text-gray-600 mb-1">Class Test (20%)</label>
                                 <input
                                     type="number"
@@ -498,12 +622,13 @@ const Grades = () => {
                                             classTest: { ...formData.assessments.classTest, score: parseInt(e.target.value) || 0 }
                                         }
                                     })}
-                                    className="w-full border rounded-lg px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                                    className={`w-full border rounded-lg px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-blue-500 ${formData.assessments.classTest.score > 0 ? 'border-green-500' : ''}`}
                                     placeholder="/20"
                                 />
                                 <span className="text-xs text-gray-400">/20</span>
                             </div>
-                            <div>
+                            
+                            <div className={`p-2 rounded-lg border ${formData.assessments.finalTest.score > 0 ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-gray-50'}`}>
                                 <label className="block text-xs font-medium text-gray-600 mb-1">Final Test (35%)</label>
                                 <input
                                     type="number"
@@ -517,12 +642,13 @@ const Grades = () => {
                                             finalTest: { ...formData.assessments.finalTest, score: parseInt(e.target.value) || 0 }
                                         }
                                     })}
-                                    className="w-full border rounded-lg px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                                    className={`w-full border rounded-lg px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-blue-500 ${formData.assessments.finalTest.score > 0 ? 'border-green-500' : ''}`}
                                     placeholder="/50"
                                 />
                                 <span className="text-xs text-gray-400">/50</span>
                             </div>
-                            <div>
+                            
+                            <div className={`p-2 rounded-lg border ${formData.assessments.groupWork.score > 0 ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-gray-50'}`}>
                                 <label className="block text-xs font-medium text-gray-600 mb-1">Group Work (20%)</label>
                                 <input
                                     type="number"
@@ -536,11 +662,34 @@ const Grades = () => {
                                             groupWork: { ...formData.assessments.groupWork, score: parseInt(e.target.value) || 0 }
                                         }
                                     })}
-                                    className="w-full border rounded-lg px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                                    className={`w-full border rounded-lg px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-blue-500 ${formData.assessments.groupWork.score > 0 ? 'border-green-500' : ''}`}
                                     placeholder="/20"
                                 />
                                 <span className="text-xs text-gray-400">/20</span>
                             </div>
+                        </div>
+                        
+                        <div className="mt-3 p-2 rounded-lg bg-gray-50 border border-gray-200 text-sm">
+                            {formData.assessments.quiz.score > 0 &&
+                             formData.assessments.homework.score > 0 &&
+                             formData.assessments.classTest.score > 0 &&
+                             formData.assessments.finalTest.score > 0 &&
+                             formData.assessments.groupWork.score > 0 ? (
+                                <div className="text-green-700">✅ All assessments complete. Grade will be calculated.</div>
+                            ) : (
+                                <div className="text-yellow-700">
+                                    ⏳ <span className="font-medium">Incomplete Grade</span> — Fill all assessment fields to calculate final grade.
+                                    <span className="block text-xs text-gray-500 mt-1">Missing: {
+                                        [
+                                            !formData.assessments.quiz.score && 'Quiz',
+                                            !formData.assessments.homework.score && 'Homework',
+                                            !formData.assessments.classTest.score && 'Class Test',
+                                            !formData.assessments.finalTest.score && 'Final Test',
+                                            !formData.assessments.groupWork.score && 'Group Work'
+                                        ].filter(Boolean).join(', ') || 'All fields filled'
+                                    }</span>
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -575,6 +724,260 @@ const Grades = () => {
         </div>
     );
 
+    // Edit Grade Modal
+    const editModalContent = showEditModal && editingGrade && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => setShowEditModal(false)}>
+            <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+                <div className="flex items-center justify-between p-5 border-b">
+                    <h2 className="text-lg font-semibold">Edit Grade</h2>
+                    <button onClick={() => setShowEditModal(false)} className="p-1 rounded-lg hover:bg-gray-100">
+                        <X size={20} className="text-gray-500" />
+                    </button>
+                </div>
+                <form onSubmit={handleEditSubmit} className="p-5 space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Student</label>
+                        <input
+                            type="text"
+                            disabled
+                            value={editingGrade.studentId?.name || 'Unknown'}
+                            className="w-full border rounded-lg px-4 py-2 bg-gray-100 text-gray-700"
+                        />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+                            <input
+                                type="text"
+                                required
+                                value={formData.subject}
+                                onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                                className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="e.g., Mathematics"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Grade Type</label>
+                            <select
+                                value={formData.type}
+                                onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                                className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                                <option value="Exam">Exam</option>
+                                <option value="Quiz">Quiz</option>
+                                <option value="Assignment">Assignment</option>
+                                <option value="Project">Project</option>
+                                <option value="Participation">Participation</option>
+                                <option value="Homework">Homework</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Semester</label>
+                            <select
+                                value={formData.semester}
+                                onChange={(e) => setFormData({ ...formData, semester: e.target.value })}
+                                className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                                <option value="Semester 1">Semester 1</option>
+                                <option value="Semester 2">Semester 2</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Academic Year</label>
+                            <input
+                                type="text"
+                                required
+                                value={formData.academicYear}
+                                onChange={(e) => setFormData({ ...formData, academicYear: e.target.value })}
+                                className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder="e.g., 2024/25"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="border-t pt-4">
+                        <div className="flex items-center justify-between mb-3">
+                            <h4 className="text-sm font-semibold text-gray-700">📊 Assessment Scores</h4>
+                            <span className={`text-xs px-2 py-1 rounded-full ${
+                                formData.assessments.quiz.score > 0 &&
+                                formData.assessments.homework.score > 0 &&
+                                formData.assessments.classTest.score > 0 &&
+                                formData.assessments.finalTest.score > 0 &&
+                                formData.assessments.groupWork.score > 0
+                                    ? 'bg-green-100 text-green-700'
+                                    : 'bg-yellow-100 text-yellow-700'
+                            }`}>
+                                {formData.assessments.quiz.score > 0 &&
+                                 formData.assessments.homework.score > 0 &&
+                                 formData.assessments.classTest.score > 0 &&
+                                 formData.assessments.finalTest.score > 0 &&
+                                 formData.assessments.groupWork.score > 0
+                                    ? '✅ Complete'
+                                    : '⏳ Incomplete'}
+                            </span>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                            <div className={`p-2 rounded-lg border ${formData.assessments.quiz.score > 0 ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-gray-50'}`}>
+                                <label className="block text-xs font-medium text-gray-600 mb-1">Quiz (15%)</label>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    max="20"
+                                    value={formData.assessments.quiz.score}
+                                    onChange={(e) => setFormData({
+                                        ...formData,
+                                        assessments: {
+                                            ...formData.assessments,
+                                            quiz: { ...formData.assessments.quiz, score: parseInt(e.target.value) || 0 }
+                                        }
+                                    })}
+                                    className={`w-full border rounded-lg px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-blue-500 ${formData.assessments.quiz.score > 0 ? 'border-green-500' : ''}`}
+                                    placeholder="/20"
+                                />
+                                <span className="text-xs text-gray-400">/20</span>
+                            </div>
+                            
+                            <div className={`p-2 rounded-lg border ${formData.assessments.homework.score > 0 ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-gray-50'}`}>
+                                <label className="block text-xs font-medium text-gray-600 mb-1">Homework (10%)</label>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    max="15"
+                                    value={formData.assessments.homework.score}
+                                    onChange={(e) => setFormData({
+                                        ...formData,
+                                        assessments: {
+                                            ...formData.assessments,
+                                            homework: { ...formData.assessments.homework, score: parseInt(e.target.value) || 0 }
+                                        }
+                                    })}
+                                    className={`w-full border rounded-lg px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-blue-500 ${formData.assessments.homework.score > 0 ? 'border-green-500' : ''}`}
+                                    placeholder="/15"
+                                />
+                                <span className="text-xs text-gray-400">/15</span>
+                            </div>
+                            
+                            <div className={`p-2 rounded-lg border ${formData.assessments.classTest.score > 0 ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-gray-50'}`}>
+                                <label className="block text-xs font-medium text-gray-600 mb-1">Class Test (20%)</label>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    max="20"
+                                    value={formData.assessments.classTest.score}
+                                    onChange={(e) => setFormData({
+                                        ...formData,
+                                        assessments: {
+                                            ...formData.assessments,
+                                            classTest: { ...formData.assessments.classTest, score: parseInt(e.target.value) || 0 }
+                                        }
+                                    })}
+                                    className={`w-full border rounded-lg px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-blue-500 ${formData.assessments.classTest.score > 0 ? 'border-green-500' : ''}`}
+                                    placeholder="/20"
+                                />
+                                <span className="text-xs text-gray-400">/20</span>
+                            </div>
+                            
+                            <div className={`p-2 rounded-lg border ${formData.assessments.finalTest.score > 0 ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-gray-50'}`}>
+                                <label className="block text-xs font-medium text-gray-600 mb-1">Final Test (35%)</label>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    max="50"
+                                    value={formData.assessments.finalTest.score}
+                                    onChange={(e) => setFormData({
+                                        ...formData,
+                                        assessments: {
+                                            ...formData.assessments,
+                                            finalTest: { ...formData.assessments.finalTest, score: parseInt(e.target.value) || 0 }
+                                        }
+                                    })}
+                                    className={`w-full border rounded-lg px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-blue-500 ${formData.assessments.finalTest.score > 0 ? 'border-green-500' : ''}`}
+                                    placeholder="/50"
+                                />
+                                <span className="text-xs text-gray-400">/50</span>
+                            </div>
+                            
+                            <div className={`p-2 rounded-lg border ${formData.assessments.groupWork.score > 0 ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-gray-50'}`}>
+                                <label className="block text-xs font-medium text-gray-600 mb-1">Group Work (20%)</label>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    max="20"
+                                    value={formData.assessments.groupWork.score}
+                                    onChange={(e) => setFormData({
+                                        ...formData,
+                                        assessments: {
+                                            ...formData.assessments,
+                                            groupWork: { ...formData.assessments.groupWork, score: parseInt(e.target.value) || 0 }
+                                        }
+                                    })}
+                                    className={`w-full border rounded-lg px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-blue-500 ${formData.assessments.groupWork.score > 0 ? 'border-green-500' : ''}`}
+                                    placeholder="/20"
+                                />
+                                <span className="text-xs text-gray-400">/20</span>
+                            </div>
+                        </div>
+                        
+                        <div className="mt-3 p-2 rounded-lg bg-gray-50 border border-gray-200 text-sm">
+                            {formData.assessments.quiz.score > 0 &&
+                             formData.assessments.homework.score > 0 &&
+                             formData.assessments.classTest.score > 0 &&
+                             formData.assessments.finalTest.score > 0 &&
+                             formData.assessments.groupWork.score > 0 ? (
+                                <div className="text-green-700">✅ All assessments complete. Grade will be calculated.</div>
+                            ) : (
+                                <div className="text-yellow-700">
+                                    ⏳ <span className="font-medium">Incomplete Grade</span> — Fill all assessment fields to calculate final grade.
+                                    <span className="block text-xs text-gray-500 mt-1">Missing: {
+                                        [
+                                            !formData.assessments.quiz.score && 'Quiz',
+                                            !formData.assessments.homework.score && 'Homework',
+                                            !formData.assessments.classTest.score && 'Class Test',
+                                            !formData.assessments.finalTest.score && 'Final Test',
+                                            !formData.assessments.groupWork.score && 'Group Work'
+                                        ].filter(Boolean).join(', ') || 'All fields filled'
+                                    }</span>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Feedback (optional)</label>
+                        <input
+                            type="text"
+                            value={formData.feedback}
+                            onChange={(e) => setFormData({ ...formData, feedback: e.target.value })}
+                            className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="e.g., Good work!"
+                        />
+                    </div>
+
+                    <div className="flex justify-end gap-3 pt-2">
+                        <button
+                            type="button"
+                            onClick={() => setShowEditModal(false)}
+                            className="px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-50"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                        >
+                            Update Grade
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    );
+
     return (
         <DashboardLayout role="teacher">
             <div className="space-y-6">
@@ -601,14 +1004,15 @@ const Grades = () => {
                                     <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600">Score</th>
                                     <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600">Grade</th>
                                     <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600">Type</th>
+                                    <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600">Status</th>
                                     <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600">Date</th>
-                                    <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600">Details</th>
+                                    <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600">Actions</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
                                 {gradeRecords.length === 0 ? (
                                     <tr>
-                                        <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
+                                        <td colSpan={8} className="px-6 py-8 text-center text-gray-500">
                                             No grades recorded yet.
                                         </td>
                                     </tr>
@@ -625,24 +1029,43 @@ const Grades = () => {
                                                     </span>
                                                 </td>
                                                 <td className="px-6 py-4">{record.type}</td>
+                                                <td className="px-6 py-4">
+                                                    {record.isComplete ? (
+                                                        <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
+                                                            ✅ Complete
+                                                        </span>
+                                                    ) : (
+                                                        <span className="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-medium">
+                                                            ⏳ Pending
+                                                        </span>
+                                                    )}
+                                                </td>
                                                 <td className="px-6 py-4 text-gray-600">
                                                     {new Date(record.date).toLocaleDateString()}
                                                 </td>
                                                 <td className="px-6 py-4">
-                                                    {record.assessments && (
+                                                    <div className="flex gap-2">
                                                         <button
-                                                            onClick={() => toggleExpand(record._id)}
-                                                            className="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center gap-1"
+                                                            onClick={() => openEditModal(record)}
+                                                            className="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg text-xs hover:bg-blue-200 flex items-center gap-1"
                                                         >
-                                                            <BarChart3 size={16} />
-                                                            {expandedGrade === record._id ? 'Hide' : 'View'}
+                                                            <Edit2 size={14} /> Edit
                                                         </button>
-                                                    )}
+                                                        {record.assessments && (
+                                                            <button
+                                                                onClick={() => toggleExpand(record._id)}
+                                                                className="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center gap-1"
+                                                            >
+                                                                <BarChart3 size={16} />
+                                                                {expandedGrade === record._id ? 'Hide' : 'View'}
+                                                            </button>
+                                                        )}
+                                                    </div>
                                                 </td>
                                             </tr>
                                             {expandedGrade === record._id && (
                                                 <tr>
-                                                    <td colSpan={7} className="px-6 py-4 bg-gray-50">
+                                                    <td colSpan={8} className="px-6 py-4 bg-gray-50">
                                                         {renderAssessmentBreakdown(record)}
                                                     </td>
                                                 </tr>
@@ -657,6 +1080,7 @@ const Grades = () => {
             </div>
 
             {showModal && modalContent}
+            {editModalContent}
         </DashboardLayout>
     );
 };
