@@ -34,6 +34,7 @@ const menuItems = {
         { name: "Grades", path: "/admin/grades", icon: <BookOpen size={20} /> },
         { name: "Announcements", path: "/admin/announcements", icon: <Megaphone size={20} /> },
         { name: "Payments", path: "/admin/payments", icon: <Banknote size={20} /> },
+        { name: "Chat", path: "/admin/chat", icon: <MessageCircle size={20} /> },
         { name: "Settings", path: "/admin/settings", icon: <Settings size={20} /> },
     ],
 
@@ -42,7 +43,7 @@ const menuItems = {
         { name: "Students", path: "/registrar/students", icon: <Users size={20} /> },
         { name: "Teachers", path: "/registrar/teachers", icon: <UserCheck size={20} /> },
         { name: "Classes", path: "/registrar/classes", icon: <School size={20} /> },
-        { name: "Parents", path: "/registrar/parents", icon: <Users size={20} /> }, 
+        { name: "Parents", path: "/registrar/parents", icon: <Users size={20} /> },
     ],
 
     finance_officer: [
@@ -57,7 +58,7 @@ const menuItems = {
         { name: "Attendance", path: "/teacher/attendance", icon: <ClipboardCheck size={20} /> },
         { name: "Grades", path: "/teacher/grades", icon: <BookOpen size={20} /> },
         { name: "Announcements", path: "/teacher/announcements", icon: <Megaphone size={20} /> },
-        { name: "Chat", path: "/chat", icon: <MessageCircle size={20} /> }, 
+        { name: "Chat", path: "/chat", icon: <MessageCircle size={20} /> },
     ],
 
     student: [
@@ -75,7 +76,7 @@ const menuItems = {
         { name: "Grades", path: "/parent/grades", icon: <GraduationCap size={20} /> },
         { name: "Payments", path: "/parent/payments", icon: <Banknote size={20} /> },
         { name: "Announcements", path: "/parent/announcements", icon: <Megaphone size={20} /> },
-        { name: "Chat", path: "/chat", icon: <MessageCircle size={20} /> },
+        { name: "Chat", path: "/parent/chat", icon: <MessageCircle size={20} /> },
     ],
 };
 
@@ -110,11 +111,10 @@ const Sidebar = ({ role, isOpen, onClose }: SidebarProps) => {
                                 key={item.name}
                                 to={item.path}
                                 onClick={onClose}
-                                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition ${
-                                    isActive
-                                        ? "bg-white text-blue-700 font-semibold"
-                                        : "hover:bg-blue-800"
-                                }`}
+                                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition ${isActive
+                                    ? "bg-white text-blue-700 font-semibold"
+                                    : "hover:bg-blue-800"
+                                    }`}
                             >
                                 {item.icon}
                                 <span>{item.name}</span>
@@ -134,9 +134,8 @@ const Sidebar = ({ role, isOpen, onClose }: SidebarProps) => {
 
             {/* Mobile sidebar drawer */}
             <aside
-                className={`fixed top-0 left-0 z-40 h-full w-64 bg-blue-700 text-white p-5 transform transition-transform duration-300 ease-in-out md:hidden ${
-                    isOpen ? "translate-x-0" : "-translate-x-full"
-                }`}
+                className={`fixed top-0 left-0 z-40 h-full w-64 bg-blue-700 text-white p-5 transform transition-transform duration-300 ease-in-out md:hidden ${isOpen ? "translate-x-0" : "-translate-x-full"
+                    }`}
             >
                 <div className="flex items-center justify-between mb-6">
                     <h1 className="text-2xl font-bold">🏫 School Portal</h1>
@@ -161,11 +160,10 @@ const Sidebar = ({ role, isOpen, onClose }: SidebarProps) => {
                                 key={item.name}
                                 to={item.path}
                                 onClick={onClose}
-                                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition ${
-                                    isActive
-                                        ? "bg-white text-blue-700 font-semibold"
-                                        : "hover:bg-blue-800"
-                                }`}
+                                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition ${isActive
+                                    ? "bg-white text-blue-700 font-semibold"
+                                    : "hover:bg-blue-800"
+                                    }`}
                             >
                                 {item.icon}
                                 <span>{item.name}</span>

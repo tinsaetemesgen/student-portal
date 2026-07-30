@@ -9,6 +9,7 @@ const parentRoutes = require('./routes/parentRoutes');
 const classRoutes = require('./routes/classRoutes');
 const gradeRoutes = require('./routes/gradeRoutes');
 const app = express();
+const cors = require("cors");
 const PORT = process.env.PORT || 7000;
 
 // Connect to MongoDB before starting the server
@@ -17,6 +18,12 @@ const startServer = async () => {
     await connectDB();
 
     // Middleware
+    app.use(
+      cors({
+        origin: "http://localhost:5173",
+        credentials: true,
+      })
+    );
     app.use(express.json());
 
     // Logger middleware (optional)
