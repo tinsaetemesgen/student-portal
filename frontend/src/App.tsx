@@ -1,7 +1,8 @@
 
+import { type ReactElement } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
-
+import Register from "./pages/Register";
 
 //ForgotPassword Page
 import ForgotPassword from "./pages/ForgotPassword";
@@ -52,9 +53,11 @@ import ParentAnnouncements from "./pages/parent/ParentAnnouncements";
 import ParentChildren from "./pages/parent/ParentChildren";
 import ParentChildGrades from './pages/parent/ParentChildGrades';
 import ParentChildAttendance from './pages/parent/ParentChildAttendance';
+import ParentChat from "./pages/parent/ParentChat";
+import AdminChat from "./pages/admin/AdminChat";
 
 // Auth Guard Component
-const PrivateRoute = ({ children, allowedRoles }: { children: JSX.Element, allowedRoles?: string[] }) => {
+const PrivateRoute = ({ children, allowedRoles }: { children: ReactElement, allowedRoles?: string[] }) => {
   const token = localStorage.getItem('token');
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
@@ -77,6 +80,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
 
         {/* ============================================
             ADMIN ROUTES
@@ -119,6 +123,11 @@ function App() {
         <Route path="/admin/settings" element={
           <PrivateRoute allowedRoles={['admin']}>
             <Settings />
+          </PrivateRoute>
+        } />
+        <Route path="/admin/chat" element={
+          <PrivateRoute allowedRoles={['admin']}>
+            <AdminChat />
           </PrivateRoute>
         } />
 
@@ -268,6 +277,11 @@ function App() {
         <Route path="/parent/child/:childId/attendance" element={
           <PrivateRoute allowedRoles={['admin', 'parent']}>
             <ParentChildAttendance />
+          </PrivateRoute>
+        } />
+        <Route path="/parent/chat" element={
+          <PrivateRoute allowedRoles={['admin', 'parent']}>
+            <ParentChat />
           </PrivateRoute>
         } />
 
