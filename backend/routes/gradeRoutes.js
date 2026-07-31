@@ -104,85 +104,108 @@ router.post('/', auth, roleCheck('teacher', 'admin'), async (req, res) => {
   }
 });
 // Enter Multiple Grades (Bulk)
-router.post('/bulk', auth, roleCheck('teacher', 'admin'), async (req, res) => {
+// ✅ POST /api/grades - Create grade with Incomplete status
+router.post('/', auth, roleCheck('teacher', 'admin'), async (req, res) => {
   try {
-    const { grades } = req.body;
-    
-    if (!grades || !Array.isArray(grades) || grades.length === 0) {
-      return res.status(400).json({
-        success: false,
-        error: 'Please provide an array of grades',
-      });
+    const {
+      studentId,
+      subject,
+      classId,
+      semester,
+      academicYear,
+      feedback,
+      assessments,
+    } = req.body;
+
+    // Validate student exists
+    const student = await User.findById(studentId);
+    if (!student || student.role !== 'student') {
+      return res.status(404).json({ success: false, error: 'Student not found' });
     }
-    
-    const results = {
-      successful: [],
-      failed: [],
-    };
-    
-    for (const gradeData of grades) {
-      try {
-        const { 
-          studentId, 
-          subject, 
-          classId, 
-          type, 
-          score, 
-          feedback, 
-          semester, 
-          academicYear 
-        } = gradeData;
-        
-        const student = await User.findById(studentId);
-        if (!student || student.role !== 'student') {
-          results.failed.push({ studentId, reason: 'Student not found' });
-          continue;
-        }
-        
-        const classData = await Class.findById(classId);
-        if (!classData) {
-          results.failed.push({ studentId, reason: 'Class not found' });
-          continue;
-        }
-        
-        const letterGrade = Grade.calculateGrade(score);
-        
-        const newGrade = new Grade({
-          studentId,
-          subject,
-          classId,
-          teacherId: req.user.id,
-          type,
-          score,
-          grade: letterGrade,
-          feedback,
-          semester,
-          academicYear,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        });
-        
-        await newGrade.save();
-        results.successful.push(newGrade);
-      } catch (error) {
-        results.failed.push({ 
-          studentId: gradeData.studentId, 
-          reason: error.message 
+
+    // Validate class exists
+    const classData = await Class.findById(classId);
+    if (!classData) {
+      return res.status(404).json({ success: false, error: 'Class not found' });
+    }
+
+    // Check if teacher is assigned to this class
+    if (req.user.role === 'teacher') {
+      const teacherIds = classData.teacherIds.map(id => id.toString());
+      if (!teacherIds.includes(req.user.id)) {
+        return res.status(403).json({
+          success: false,
+          error: 'You are not assigned to this class',
         });
       }
     }
-    
-    res.json({
+
+    // Check if grade already exists
+    const existingGrade = await Grade.findOne({
+      studentId,
+      subject,
+      semester,
+      academicYear,
+    });
+
+    if (existingGrade) {
+      return res.status(400).json({
+        success: false,
+        error: 'Grade already exists. Use PUT to update.',
+      });
+    }
+
+    // ✅ Prepare assessment data
+    const assessmentData = {
+      quiz: assessments?.quiz || { score: 0, maxScore: 20, weight: 15 },
+      homework: assessments?.homework || { score: 0, maxScore: 15, weight: 10 },
+      classTest: assessments?.classTest || { score: 0, maxScore: 20, weight: 20 },
+      finalTest: assessments?.finalTest || { score: 0, maxScore: 50, weight: 35 },
+      groupWork: assessments?.groupWork || { score: 0, maxScore: 20, weight: 20 },
+    };
+
+    // ✅ Calculate weighted grade
+    const result = Grade.calculateWeightedGrade(assessmentData);
+
+    // ✅ Create grade
+    const grade = new Grade({
+      studentId,
+      subject,
+      classId,
+      teacherId: req.user.id,
+      semester,
+      academicYear,
+      feedback,
+      assessments: assessmentData,
+      totalScore: result.total,
+      letterGrade: result.grade,
+      gradePoints: result.points,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    await grade.save();
+
+    // ✅ Populate for response
+    const populatedGrade = await Grade.findById(grade._id)
+      .populate('studentId', 'name email')
+      .populate('teacherId', 'name email')
+      .populate('classId', 'name');
+
+    res.status(201).json({
       success: true,
-      message: `Added ${results.successful.length} grades successfully`,
-      data: results,
+      message: result.isComplete ? 'Grade created successfully!' : 'Grade saved as incomplete. Please complete all assessments.',
+      data: populatedGrade,
     });
   } catch (error) {
     console.error(error);
+    if (error.name === 'ValidationError') {
+      const errors = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({ success: false, errors });
+    }
     res.status(500).json({ success: false, error: 'Server Error' });
   }
 });
-
 // Get Grades by Class
 router.get('/class/:classId', auth, roleCheck('teacher', 'admin'), async (req, res) => {
   try {
@@ -209,10 +232,7 @@ router.get('/class/:classId', auth, roleCheck('teacher', 'admin'), async (req, r
     res.status(500).json({ success: false, error: 'Server Error' });
   }
 });
-
-// ✅ Update Grade
-// ✅ PUT /api/grades/:id - Update grade with assessments
-// ✅ PUT /api/grades/:id - Update grade with MANUAL recalculation
+// ✅ PUT /api/grades/:id - Update grade with recalculation
 router.put('/:id', auth, roleCheck('teacher', 'admin'), async (req, res) => {
   try {
     const { id } = req.params;
@@ -231,7 +251,7 @@ router.put('/:id', auth, roleCheck('teacher', 'admin'), async (req, res) => {
       });
     }
 
-    // Update fields
+    // ✅ Update assessment fields
     if (assessments) {
       if (assessments.quiz) grade.assessments.quiz = { ...grade.assessments.quiz, ...assessments.quiz };
       if (assessments.homework) grade.assessments.homework = { ...grade.assessments.homework, ...assessments.homework };
@@ -254,10 +274,18 @@ router.put('/:id', auth, roleCheck('teacher', 'admin'), async (req, res) => {
     grade.updatedAt = new Date();
     await grade.save();
 
+    // ✅ Populate for response
+    const populatedGrade = await Grade.findById(grade._id)
+      .populate('studentId', 'name email')
+      .populate('teacherId', 'name email')
+      .populate('classId', 'name');
+
+    const isComplete = populatedGrade.isComplete;
+
     res.json({
       success: true,
-      message: 'Grade updated successfully!',
-      data: grade,
+      message: isComplete ? 'Grade updated successfully!' : 'Grade saved as incomplete. Please complete all assessments.',
+      data: populatedGrade,
     });
   } catch (error) {
     console.error(error);
@@ -265,33 +293,6 @@ router.put('/:id', auth, roleCheck('teacher', 'admin'), async (req, res) => {
       const errors = Object.values(error.errors).map(err => err.message);
       return res.status(400).json({ success: false, errors });
     }
-    res.status(500).json({ success: false, error: 'Server Error' });
-  }
-});
-
-// ✅ Delete Grade
-router.delete('/:id', auth, roleCheck('teacher', 'admin'), async (req, res) => {
-  try {
-    const grade = await Grade.findById(req.params.id);
-    if (!grade) {
-      return res.status(404).json({ success: false, error: 'Grade not found' });
-    }
-    
-    if (req.user.role === 'teacher' && grade.teacherId.toString() !== req.user.id) {
-      return res.status(403).json({
-        success: false,
-        error: 'You can only delete grades you entered',
-      });
-    }
-    
-    await grade.deleteOne();
-    
-    res.json({
-      success: true,
-      message: 'Grade deleted successfully!',
-    });
-  } catch (error) {
-    console.error(error);
     res.status(500).json({ success: false, error: 'Server Error' });
   }
 });

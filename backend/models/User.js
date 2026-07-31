@@ -39,7 +39,13 @@ gender: {
 
   
   //  STUDENT-SPECIFIC FIELDS
- 
+ classLevel: {
+    type: String,
+    enum: ['primary', 'middle', 'secondary'],
+    required: function () {
+      return this.role === 'student';
+    },
+  },
   class: {
     type: String,
     required: function () {
@@ -92,6 +98,22 @@ gender: {
   }],
 
 
+resetPasswordToken: {
+  type: String,
+  default: null
+},
+resetPasswordExpires: {
+  type: Date,
+  default: null
+},
+resetRequestedAt: {
+  type: Date,
+  default: null
+},
+resetRequestedBy: {
+  type: String, // email of user who requested
+  default: null
+},
   //  COMMON FIELDS
 
   createdAt: {

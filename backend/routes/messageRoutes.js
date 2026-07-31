@@ -1,107 +1,60 @@
-// routes/messageRoutes.js - Message routes
+// routes/messageRoutes.js - FIXED role-based chatting
 const express = require('express');
 const router = express.Router();
 const Message = require('../models/Message');
 const User = require('../models/User');
 const auth = require('../middleware/auth');
 
-// ============================================
-// 📌 GET CONVERSATIONS (All users you've chatted with)
-// ============================================
-router.get('/conversations', auth, async (req, res) => {
+// ✅ GET AVAILABLE USERS (Role-based)
+router.get('/users/available', auth, async (req, res) => {
   try {
-    const userId = req.user.id;
+    const user = await User.findById(req.user.id);
+    let targetUsers = [];
 
-    // Get all unique users this user has chatted with
-    const messages = await Message.find({
-      $or: [{ senderId: userId }, { receiverId: userId }]
-    })
-      .populate('senderId', 'name email role')
-      .populate('receiverId', 'name email role')
-      .sort({ createdAt: -1 });
+    // ✅ ROLE-BASED FILTERING
+    switch (user.role) {
+      case 'admin':
+        // Admin can chat with everyone
+        targetUsers = await User.find({
+          _id: { $ne: req.user.id }
+        }).select('name email role');
+        break;
 
-    // Extract unique users from messages
-    const conversations = {};
-    messages.forEach(msg => {
-      const otherUser = msg.senderId._id.toString() === userId
-        ? msg.receiverId
-        : msg.senderId;
+      case 'teacher':
+        // Teacher can chat with parents, admins, and students
+        targetUsers = await User.find({
+          _id: { $ne: req.user.id },
+          role: { $in: ['parent', 'admin', 'student'] }
+        }).select('name email role');
+        break;
 
-      const key = otherUser._id.toString();
-      if (!conversations[key]) {
-        conversations[key] = {
-          user: otherUser,
-          lastMessage: msg,
-          unreadCount: 0,
-        };
-      }
-    });
+      case 'parent':
+        // Parent can chat with teachers, admins, and their children's teachers
+        // For simplicity, teachers and admins
+        targetUsers = await User.find({
+          _id: { $ne: req.user.id },
+          role: { $in: ['teacher', 'admin'] }
+        }).select('name email role');
+        
+        // Also, get the teachers of their children
+        // This is a simplified version - in production, you'd fetch teachers of linked students
+        break;
 
-    // Count unread messages
-    const unreadMessages = await Message.find({
-      receiverId: userId,
-      isRead: false,
-    });
+      case 'student':
+        // Student can chat with teachers and admins
+        targetUsers = await User.find({
+          _id: { $ne: req.user.id },
+          role: { $in: ['teacher', 'admin'] }
+        }).select('name email role');
+        break;
 
-    unreadMessages.forEach(msg => {
-      const key = msg.senderId.toString();
-      if (conversations[key]) {
-        conversations[key].unreadCount++;
-      }
-    });
-
-    res.json({
-      success: true,
-      data: Object.values(conversations),
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, error: 'Server Error' });
-  }
-});
-
-// ============================================
-// 📌 GET MESSAGES BETWEEN TWO USERS
-// ============================================
-router.get('/:userId', auth, async (req, res) => {
-  try {
-    const { userId } = req.params;
-    const currentUserId = req.user.id;
-    const { limit = 50, before } = req.query;
-
-    const filter = {
-      $or: [
-        { senderId: currentUserId, receiverId: userId },
-        { senderId: userId, receiverId: currentUserId },
-      ],
-    };
-
-    if (before) {
-      filter.createdAt = { $lt: new Date(before) };
+      default:
+        targetUsers = [];
     }
 
-    const messages = await Message.find(filter)
-      .populate('senderId', 'name email role')
-      .populate('receiverId', 'name email role')
-      .sort({ createdAt: -1 })
-      .limit(parseInt(limit));
-
-    // Mark messages as read
-    await Message.updateMany(
-      {
-        senderId: userId,
-        receiverId: currentUserId,
-        isRead: false,
-      },
-      {
-        $set: { isRead: true, readAt: new Date() },
-      }
-    );
-
     res.json({
       success: true,
-      count: messages.length,
-      data: messages.reverse(), // Return in chronological order
+      data: targetUsers,
     });
   } catch (error) {
     console.error(error);
@@ -109,9 +62,7 @@ router.get('/:userId', auth, async (req, res) => {
   }
 });
 
-// ============================================
-// 📌 GET UNREAD MESSAGE COUNT
-// ============================================
+// ✅ GET UNREAD COUNT (with role-based filtering)
 router.get('/unread/count', auth, async (req, res) => {
   try {
     const count = await Message.countDocuments({
@@ -122,6 +73,29 @@ router.get('/unread/count', auth, async (req, res) => {
     res.json({
       success: true,
       data: { unread: count },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, error: 'Server Error' });
+  }
+});
+
+// ✅ MARK ALL AS READ (for notification badge)
+router.put('/read-all', auth, async (req, res) => {
+  try {
+    const result = await Message.updateMany(
+      {
+        receiverId: req.user.id,
+        isRead: false,
+      },
+      {
+        $set: { isRead: true, readAt: new Date() },
+      }
+    );
+
+    res.json({
+      success: true,
+      message: `Marked ${result.modifiedCount} messages as read`,
     });
   } catch (error) {
     console.error(error);

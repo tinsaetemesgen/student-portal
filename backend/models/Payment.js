@@ -1,4 +1,4 @@
-// models/Payment.js - Updated (NO pre('save') hooks)
+// models/Payment.js - Enhanced with receipt support
 const mongoose = require('mongoose');
 
 const PaymentSchema = new mongoose.Schema({
@@ -6,66 +6,71 @@ const PaymentSchema = new mongoose.Schema({
   studentFeeId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'StudentFee',
-    required: [true, 'Student fee ID is required'],
+    required: true,
   },
   studentId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: [true, 'Student ID is required'],
+    required: true,
   },
-  
-  // 📌 Payment Details
   amount: {
     type: Number,
-    required: [true, 'Amount is required'],
-    min: [0, 'Amount cannot be negative'],
+    required: true,
+    min: 0,
   },
   
-  // 📌 Payment Method
-  method: {
-    type: String,
-    enum: ['bank', 'telebir', 'chapa'],
-    required: [true, 'Payment method is required'],
-  },
-  
-  // 🏦 Bank Transfer Fields
+  // 🏦 Bank Information
   bankName: {
     type: String,
     enum: ['CBE', 'Abysina', 'Dashen', 'Coop', 'Wegagan', 'Other'],
-    required: function() { return this.method === 'bank'; },
+    required: true,
   },
   referenceNumber: {
     type: String,
-    required: function() { return this.method === 'bank'; },
+    required: true,
     trim: true,
+    unique: true, // ✅ Ensures uniqueness at database level
+    validate: {
+      validator: function(v) {
+        return /^[a-zA-Z0-9]{6,30}$/.test(v);
+      },
+      message: 'Reference number must be 6-30 alphanumeric characters',
+    },
   },
   
-  // 📱 Telebir Fields
-  telebirNumber: {
+  // 📸 Screenshot
+  screenshotUrl: {
     type: String,
-    required: function() { return this.method === 'telebir'; },
-    trim: true,
+    required: true,
   },
-  telebirName: {
+  screenshotPublicId: {
     type: String,
-    required: function() { return this.method === 'telebir'; },
-    trim: true,
   },
   
-  // 💳 Chapa Fields (Future)
-  chapaRef: {
-    type: String,
-    trim: true,
+  // 💵 Payment Details
+  paymentDate: {
+    type: Date,
+    default: Date.now,
   },
   
   // 📌 Status
   status: {
     type: String,
-    enum: ['pending', 'confirmed', 'failed'],
+    enum: ['pending', 'confirmed', 'rejected', 'failed'],
     default: 'pending',
   },
   
-  // 📌 Confirmation Details
+  // 🧾 Receipt
+  receiptNumber: {
+    type: String,
+    unique: true,
+    sparse: true,
+  },
+  receiptUrl: {
+    type: String,
+  },
+  
+  // 👤 Verification Details
   confirmedBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -73,19 +78,13 @@ const PaymentSchema = new mongoose.Schema({
   confirmedAt: {
     type: Date,
   },
-  
-  // 📌 Receipt
-  receiptNumber: {
+  rejectionReason: {
     type: String,
     trim: true,
-  },
-  notes: {
-    type: String,
-    trim: true,
-    maxlength: [500, 'Notes cannot exceed 500 characters'],
+    maxlength: 500,
   },
   
-  // 📅 Timestamps (manual)
+  // 📅 Audit
   createdAt: {
     type: Date,
     default: Date.now,
@@ -96,10 +95,7 @@ const PaymentSchema = new mongoose.Schema({
   },
 });
 
-// ✅ Indexes
 PaymentSchema.index({ studentId: 1, status: 1 });
-PaymentSchema.index({ studentFeeId: 1 });
-
-
+PaymentSchema.index({ status: 1, createdAt: -1 });
 
 module.exports = mongoose.model('Payment', PaymentSchema);

@@ -1,4 +1,4 @@
-// models/Grade.js - Simplified with NO pre-hooks
+// models/Grade.js - Updated with Incomplete status logic
 const mongoose = require('mongoose');
 
 const GradeSchema = new mongoose.Schema({
@@ -53,7 +53,7 @@ const GradeSchema = new mongoose.Schema({
     },
   },
 
-  // ✅ Calculated Fields (Set manually in route)
+  // ✅ Calculated Fields
   totalScore: {
     type: Number,
     default: 0,
@@ -95,58 +95,75 @@ const GradeSchema = new mongoose.Schema({
   },
 });
 
-// ❌ NO pre('save') hooks!
-// ❌ NO pre('findOneAndUpdate') hooks!
+// ✅ VIRTUAL: Check if all assessments are filled
+GradeSchema.virtual('isComplete').get(function() {
+  const keys = ['quiz', 'homework', 'classTest', 'finalTest', 'groupWork'];
+  return keys.every(key => this.assessments[key].score > 0);
+});
 
-// ✅ Helper function to calculate weighted grade (used in routes)
-GradeSchema.statics.calculateWeightedGrade = function(assessments) {
-  const weights = {
-    quiz: 15,
-    homework: 10,
-    classTest: 20,
-    finalTest: 35,
-    groupWork: 20,
+// ✅ VIRTUAL: Get list of pending assessments
+GradeSchema.virtual('pendingAssessments').get(function() {
+  const keys = ['quiz', 'homework', 'classTest', 'finalTest', 'groupWork'];
+  const labels = {
+    quiz: 'Quiz',
+    homework: 'Homework',
+    classTest: 'Class Test',
+    finalTest: 'Final Test',
+    groupWork: 'Group Work',
   };
+  return keys
+    .filter(key => this.assessments[key].score === 0)
+    .map(key => labels[key]);
+});
+
+// ✅ Helper function to calculate weighted grade
+GradeSchema.statics.calculateWeightedGrade = function(assessments) {
+  const keys = ['quiz', 'homework', 'classTest', 'finalTest', 'groupWork'];
   
   let totalWeighted = 0;
   let allZero = true;
-  
-  const keys = ['quiz', 'homework', 'classTest', 'finalTest', 'groupWork'];
   
   for (const key of keys) {
     const data = assessments[key];
     if (data && data.score > 0) {
       allZero = false;
       const percentage = (data.score / data.maxScore) * 100;
-      totalWeighted += percentage * (weights[key] / 100);
+      totalWeighted += percentage * (data.weight / 100);
     }
   }
   
   if (allZero) {
-    return { total: 0, grade: 'I', points: 0 };
+    return { total: 0, grade: 'I', points: 0, isComplete: false };
   }
   
   const total = Math.round(totalWeighted * 10) / 10;
+  const isComplete = keys.every(key => assessments[key].score > 0);
   
-  // Determine letter grade
-  let grade = 'F', points = 0;
-  if (total >= 97) { grade = 'A+'; points = 4.0; }
-  else if (total >= 93) { grade = 'A'; points = 4.0; }
-  else if (total >= 90) { grade = 'A-'; points = 3.7; }
-  else if (total >= 87) { grade = 'B+'; points = 3.3; }
-  else if (total >= 83) { grade = 'B'; points = 3.0; }
-  else if (total >= 80) { grade = 'B-'; points = 2.7; }
-  else if (total >= 77) { grade = 'C+'; points = 2.3; }
-  else if (total >= 73) { grade = 'C'; points = 2.0; }
-  else if (total >= 70) { grade = 'C-'; points = 1.7; }
-  else if (total >= 65) { grade = 'D'; points = 1.0; }
-  else { grade = 'F'; points = 0.0; }
+  // Determine letter grade (only if complete)
+  let grade = 'I', points = 0;
+  if (isComplete) {
+    if (total >= 97) { grade = 'A+'; points = 4.0; }
+    else if (total >= 93) { grade = 'A'; points = 4.0; }
+    else if (total >= 90) { grade = 'A-'; points = 3.7; }
+    else if (total >= 87) { grade = 'B+'; points = 3.3; }
+    else if (total >= 83) { grade = 'B'; points = 3.0; }
+    else if (total >= 80) { grade = 'B-'; points = 2.7; }
+    else if (total >= 77) { grade = 'C+'; points = 2.3; }
+    else if (total >= 73) { grade = 'C'; points = 2.0; }
+    else if (total >= 70) { grade = 'C-'; points = 1.7; }
+    else if (total >= 65) { grade = 'D'; points = 1.0; }
+    else { grade = 'F'; points = 0.0; }
+  }
   
-  return { total, grade, points };
+  return { total, grade, points, isComplete };
 };
 
 // ✅ Indexes
 GradeSchema.index({ studentId: 1, subject: 1, semester: 1, academicYear: 1 });
 GradeSchema.index({ classId: 1 });
+
+// ✅ Enable virtuals in JSON output
+GradeSchema.set('toJSON', { virtuals: true });
+GradeSchema.set('toObject', { virtuals: true });
 
 module.exports = mongoose.model('Grade', GradeSchema);

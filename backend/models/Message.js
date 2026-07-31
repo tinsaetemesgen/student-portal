@@ -1,4 +1,4 @@
-// models/Message.js - Message model
+// models/Message.js
 const mongoose = require('mongoose');
 
 const MessageSchema = new mongoose.Schema({
@@ -31,7 +31,7 @@ const MessageSchema = new mongoose.Schema({
   },
 });
 
-// Indexes for faster queries
+// ✅ Indexes for faster queries
 MessageSchema.index({ senderId: 1, receiverId: 1 });
 MessageSchema.index({ receiverId: 1, isRead: 1 });
 

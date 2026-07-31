@@ -1,4 +1,5 @@
-// models/StudentFee.js - Updated (NO pre('save') hooks)
+// models/StudentFee.js - COMPLETE UPDATE
+
 const mongoose = require('mongoose');
 
 const StudentFeeSchema = new mongoose.Schema({
@@ -30,6 +31,39 @@ const StudentFeeSchema = new mongoose.Schema({
     required: [true, 'Fee type is required'],
   },
   
+  // ✅ NEW: Class Level
+  classLevel: {
+    type: String,
+    enum: ['primary', 'middle', 'secondary'],
+    required: [true, 'Class level is required'],
+  },
+  
+  // ✅ NEW: Date Range
+  startDate: {
+    type: Date,
+    required: [true, 'Start date is required'],
+  },
+  endDate: {
+    type: Date,
+    required: [true, 'End date is required'],
+  },
+  dueDate: {
+    type: Date,
+    required: [true, 'Due date is required'],
+  },
+  
+  // ✅ NEW: Penalty System
+  lateFeeAmount: {
+    type: Number,
+    default: 0,
+    min: [0, 'Late fee cannot be negative'],
+  },
+  gracePeriodDays: {
+    type: Number,
+    default: 0,
+    min: [0, 'Grace period cannot be negative'],
+  },
+  
   // 📌 Status
   status: {
     type: String,
@@ -37,11 +71,7 @@ const StudentFeeSchema = new mongoose.Schema({
     default: 'pending',
   },
   
-  // 📌 Dates
-  dueDate: {
-    type: Date,
-    required: [true, 'Due date is required'],
-  },
+  // 📌 Payment Info
   paidAt: {
     type: Date,
   },
@@ -56,7 +86,11 @@ const StudentFeeSchema = new mongoose.Schema({
     required: [true, 'Academic year is required'],
   },
   
-  // 📅 Timestamps (manual)
+  // 📅 Timestamps
+  assignedAt: {
+    type: Date,
+    default: Date.now,
+  },
   createdAt: {
     type: Date,
     default: Date.now,
@@ -67,10 +101,10 @@ const StudentFeeSchema = new mongoose.Schema({
   },
 });
 
-// ✅ Indexes
+// ✅ Indexes for faster queries
 StudentFeeSchema.index({ studentId: 1, status: 1 });
 StudentFeeSchema.index({ feeStructureId: 1 });
-
-
+StudentFeeSchema.index({ classLevel: 1, status: 1 });
+StudentFeeSchema.index({ endDate: 1, status: 1 });
 
 module.exports = mongoose.model('StudentFee', StudentFeeSchema);

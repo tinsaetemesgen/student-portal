@@ -1,4 +1,4 @@
-// socket/socket.js - Socket.io configuration
+// socket/socket.js - Complete with role-based messaging and self-message prevention
 const Message = require('../models/Message');
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
@@ -25,7 +25,7 @@ const initializeSocket = (io) => {
   });
 
   io.on('connection', (socket) => {
-    console.log(`✅ User connected: ${socket.userId}`);
+    console.log(`✅ User connected: ${socket.userId} (${socket.userRole})`);
 
     // Store user connection
     connectedUsers[socket.userId] = socket.id;
@@ -38,14 +38,38 @@ const initializeSocket = (io) => {
       try {
         const { receiverId, content } = data;
 
-        // Validate receiver exists
+        // 1️⃣ Prevent self-messaging
+        if (receiverId === socket.userId) {
+          socket.emit('message:error', { error: 'You cannot send a message to yourself' });
+          return;
+        }
+
+        // 2️⃣ Validate receiver exists
         const receiver = await User.findById(receiverId);
         if (!receiver) {
           socket.emit('message:error', { error: 'User not found' });
           return;
         }
 
-        // Create and save message
+        // 3️⃣ Validate role-based chat permissions
+        const sender = await User.findById(socket.userId);
+        
+        // Define allowed chat partners
+        const allowedRoles = {
+          admin: ['admin', 'teacher', 'parent', 'student'],
+          teacher: ['admin', 'parent', 'student'],
+          parent: ['admin', 'teacher'],
+          student: ['admin', 'teacher'],
+        };
+
+        if (!allowedRoles[sender.role]?.includes(receiver.role)) {
+          socket.emit('message:error', { 
+            error: `You are not allowed to chat with ${receiver.role}s` 
+          });
+          return;
+        }
+
+        // 4️⃣ Create and save message
         const message = new Message({
           senderId: socket.userId,
           receiverId,
@@ -53,30 +77,36 @@ const initializeSocket = (io) => {
         });
         await message.save();
 
-        // Populate sender info
+        // 5️⃣ Populate sender info
         const populatedMessage = await Message.findById(message._id)
           .populate('senderId', 'name email role')
           .populate('receiverId', 'name email role');
 
-        // Emit to sender (confirmation)
+        // 6️⃣ Emit to sender (confirmation)
         socket.emit('message:sent', populatedMessage);
 
-        // Emit to receiver if online
+        // 7️⃣ Emit to receiver if online
         const receiverSocketId = connectedUsers[receiverId];
         if (receiverSocketId) {
           io.to(receiverSocketId).emit('message:received', populatedMessage);
-        }
-
-        // Emit unread count update to receiver
-        const unreadCount = await Message.countDocuments({
-          receiverId,
-          isRead: false,
-        });
-        if (receiverSocketId) {
+          
+          // Send unread count update to receiver
+          const unreadCount = await Message.countDocuments({
+            receiverId,
+            isRead: false,
+          });
           io.to(receiverSocketId).emit('message:unread', { count: unreadCount });
         }
+
+        // 8️⃣ Update sender's unread count (optional)
+        const senderUnreadCount = await Message.countDocuments({
+          receiverId: socket.userId,
+          isRead: false,
+        });
+        socket.emit('message:unread', { count: senderUnreadCount });
+
       } catch (error) {
-        console.error(error);
+        console.error('❌ Error sending message:', error);
         socket.emit('message:error', { error: 'Failed to send message' });
       }
     });
@@ -87,9 +117,49 @@ const initializeSocket = (io) => {
     socket.on('message:read', async (data) => {
       try {
         const { senderId } = data;
-        await Message.updateMany(
+        
+        // Mark all messages from sender as read
+        const result = await Message.updateMany(
           {
             senderId,
+            receiverId: socket.userId,
+            isRead: false,
+          },
+          {
+            $set: { isRead: true, readAt: new Date() },
+          }
+        );
+
+        // Get updated unread count
+        const unreadCount = await Message.countDocuments({
+          receiverId: socket.userId,
+          isRead: false,
+        });
+
+        // Notify sender that messages were read
+        const senderSocketId = connectedUsers[senderId];
+        if (senderSocketId) {
+          io.to(senderSocketId).emit('message:read', { 
+            userId: socket.userId,
+            count: unreadCount 
+          });
+        }
+
+        // Update unread count for receiver
+        socket.emit('message:unread', { count: unreadCount });
+
+      } catch (error) {
+        console.error('❌ Error marking messages as read:', error);
+      }
+    });
+
+    // ============================================
+    // 📌 MARK ALL MESSAGES AS READ
+    // ============================================
+    socket.on('message:read-all', async () => {
+      try {
+        const result = await Message.updateMany(
+          {
             receiverId: socket.userId,
             isRead: false,
           },
@@ -103,16 +173,10 @@ const initializeSocket = (io) => {
           isRead: false,
         });
 
-        // Notify sender that messages were read
-        const senderSocketId = connectedUsers[senderId];
-        if (senderSocketId) {
-          io.to(senderSocketId).emit('message:read', { userId: socket.userId });
-        }
-
-        // Update unread count
         socket.emit('message:unread', { count: unreadCount });
+
       } catch (error) {
-        console.error(error);
+        console.error('❌ Error marking all as read:', error);
       }
     });
 
@@ -125,6 +189,7 @@ const initializeSocket = (io) => {
       if (receiverSocketId) {
         io.to(receiverSocketId).emit('typing:start', {
           userId: socket.userId,
+          userName: socket.userName || 'Someone',
         });
       }
     });
@@ -136,6 +201,21 @@ const initializeSocket = (io) => {
         io.to(receiverSocketId).emit('typing:stop', {
           userId: socket.userId,
         });
+      }
+    });
+
+    // ============================================
+    // 📌 GET USER NAME (for typing indicator)
+    // ============================================
+    socket.on('user:get-name', async () => {
+      try {
+        const user = await User.findById(socket.userId);
+        if (user) {
+          socket.userName = user.name;
+          socket.emit('user:name', { name: user.name });
+        }
+      } catch (error) {
+        console.error('❌ Error getting user name:', error);
       }
     });
 

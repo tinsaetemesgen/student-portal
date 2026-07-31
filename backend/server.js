@@ -1,4 +1,5 @@
-// server.js - Add Socket.io
+
+
 require('dotenv').config();
 const cors = require('cors');
 const express = require('express');
@@ -20,6 +21,9 @@ const timetableRoutes = require('./routes/timetableRoutes');
 const attendanceRoutes = require('./routes/attendanceRoutes');
 const registrarRoutes = require('./routes/registrarRoutes');
 const financeOfficerRoutes = require('./routes/financeOfficerRoutes');
+const announcementRoutes = require('./routes/announcementRoutes');
+const worksheetRoutes = require('./routes/worksheetRoutes');
+const paymentRoutes = require('./routes/paymentRoutes');
 
 connectDB();
 
@@ -65,6 +69,9 @@ app.use('/api/timetable', timetableRoutes);
 app.use('/api/attendance', attendanceRoutes);
 app.use('/api/registrar', registrarRoutes);
  app.use('/api/finance', financeOfficerRoutes);
+ app.use('/api/announcements', announcementRoutes);
+ app.use('/api/worksheets', worksheetRoutes);
+ app.use('/api/payments', paymentRoutes);
 // Home route
 app.get('/', (req, res) => {
   res.send('Hello World! 🚀 High School Portal with Real-time Messaging!');
