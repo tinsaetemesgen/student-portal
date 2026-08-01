@@ -99,7 +99,7 @@ const Grades = () => {
     const fetchGradeData = async () => {
         try {
             const token = localStorage.getItem('token');
-            
+
             let classId = formData.classId;
             if (!classId) {
                 const classesRes = await axios.get('http://localhost:7000/api/classes', {
@@ -112,20 +112,20 @@ const Grades = () => {
                     setFormData(prev => ({ ...prev, classId }));
                 }
             }
-            
+
             if (!classId) {
                 console.log("❌ No class found");
                 setLoading(false);
                 return;
             }
-            
+
             const academicYear = formData.academicYear || "2024/25";
-            
+
             const gradesRes = await axios.get(
                 `http://localhost:7000/api/grades/class/${classId}?semester=Semester%201&academicYear=${academicYear}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-            
+
             setGradeRecords(gradesRes.data.data || []);
             setLoading(false);
         } catch (error) {
@@ -137,7 +137,7 @@ const Grades = () => {
     const fetchStudentsAndClasses = async () => {
         try {
             const token = localStorage.getItem('token');
-            
+
             const studentsRes = await axios.get('http://localhost:7000/api/users?role=student', {
                 headers: { Authorization: `Bearer ${token}` }
             });
@@ -147,7 +147,7 @@ const Grades = () => {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setClasses(classesRes.data.data || []);
-            
+
             if (classesRes.data.data && classesRes.data.data.length > 0) {
                 setFormData(prev => ({ ...prev, classId: classesRes.data.data[0]._id }));
             }
@@ -174,7 +174,7 @@ const Grades = () => {
         try {
             const token = localStorage.getItem('token');
             let classId = formData.classId;
-            
+
             if (!classId) {
                 if (classes.length > 0) {
                     classId = classes[0]._id;
@@ -183,14 +183,14 @@ const Grades = () => {
                     return;
                 }
             }
-            
+
             const academicYear = formData.academicYear || "2024/25";
-            
+
             const gradesRes = await axios.get(
                 `http://localhost:7000/api/grades/class/${classId}?semester=Semester%201&academicYear=${academicYear}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-            
+
             setGradeRecords(gradesRes.data.data || []);
         } catch (error) {
             console.error("❌ Error refreshing grades:", error);
@@ -199,10 +199,10 @@ const Grades = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         try {
             const token = localStorage.getItem('token');
-            
+
             const gradeData = {
                 studentId: formData.studentId,
                 subject: formData.subject,
@@ -247,9 +247,9 @@ const Grades = () => {
                     groupWork: { score: 0, maxScore: 20, weight: 20 },
                 },
             });
-            
+
             await forceRefreshGrades();
-            
+
         } catch (error: any) {
             console.error("❌ Error adding grade:", error);
             alert(error.response?.data?.error || "Failed to add grade");
@@ -305,7 +305,7 @@ const Grades = () => {
 
         const assessments = grade.assessments;
         const keys = ['quiz', 'homework', 'classTest', 'finalTest', 'groupWork'];
-        
+
         return (
             <div className="mt-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
                 <h4 className="text-sm font-semibold text-gray-700 mb-3">📊 Assessment Breakdown</h4>

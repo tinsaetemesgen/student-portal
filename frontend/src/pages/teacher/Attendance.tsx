@@ -49,7 +49,7 @@ const Attendance = () => {
     const fetchAttendanceData = async () => {
         try {
             const token = localStorage.getItem('token');
-            
+
             // Get teacher's classes first
             const classesRes = await axios.get('http://localhost:7000/api/classes', {
                 headers: { Authorization: `Bearer ${token}` }
@@ -57,14 +57,14 @@ const Attendance = () => {
 
             if (classesRes.data.data.length > 0) {
                 const classId = classesRes.data.data[0]._id;
-                
+
                 // Get attendance for the first class
                 const attendanceRes = await axios.get(
                     `http://localhost:7000/api/attendance/class/${classId}?semester=Semester%201&academicYear=2024/25`,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
-                
-                setAttendanceRecords(attendanceRes.data.data.flatMap((record: any) => 
+
+                setAttendanceRecords(attendanceRes.data.data.flatMap((record: any) =>
                     record.records.map((r: any) => ({
                         ...r,
                         _id: record._id,
@@ -73,7 +73,7 @@ const Attendance = () => {
                     }))
                 ));
             }
-            
+
             setLoading(false);
         } catch (error) {
             console.error("Error fetching attendance:", error);
@@ -84,7 +84,7 @@ const Attendance = () => {
     const fetchStudentsAndClasses = async () => {
         try {
             const token = localStorage.getItem('token');
-            
+
             // Get students
             const studentsRes = await axios.get('http://localhost:7000/api/users?role=student', {
                 headers: { Authorization: `Bearer ${token}` }
@@ -96,7 +96,7 @@ const Attendance = () => {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setClasses(classesRes.data.data);
-            
+
             if (classesRes.data.data.length > 0) {
                 setFormData(prev => ({ ...prev, classId: classesRes.data.data[0]._id }));
             }
@@ -108,10 +108,10 @@ const Attendance = () => {
     // ✅ Mark attendance (POST to backend)
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         try {
             const token = localStorage.getItem('token');
-            
+
             const attendanceData = {
                 classId: formData.classId,
                 date: formData.date,
@@ -136,10 +136,10 @@ const Attendance = () => {
                 classId: formData.classId,
                 remarks: "",
             });
-            
+
             // Refresh attendance data
             await fetchAttendanceData();
-            
+
         } catch (error: any) {
             console.error("Error marking attendance:", error);
             alert(error.response?.data?.error || "Failed to mark attendance");

@@ -31,7 +31,7 @@ const ParentChildGrades = () => {
     const fetchData = async () => {
         try {
             const token = localStorage.getItem('token');
-            
+
             // Fetch child info
             const userRes = await axios.get(`http://localhost:7000/api/users/${childId}`, {
                 headers: { Authorization: `Bearer ${token}` }

@@ -50,7 +50,7 @@ const MyGrades = () => {
     const fetchMyGrades = async () => {
         try {
             const token = localStorage.getItem('token');
-            
+
             const response = await axios.get('http://localhost:7000/api/grades/my-grades', {
                 headers: { Authorization: `Bearer ${token}` }
             });
@@ -143,7 +143,7 @@ const MyGrades = () => {
 
         const assessments = grade.assessments;
         const keys = ['quiz', 'homework', 'classTest', 'finalTest', 'groupWork'];
-        
+
         return (
             <div className="mt-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
                 <h4 className="text-sm font-semibold text-gray-700 mb-3">📊 Assessment Breakdown</h4>
@@ -293,8 +293,8 @@ const MyGrades = () => {
                                 {filteredGrades.length === 0 ? (
                                     <tr>
                                         <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
-                                            {gradeRecords.length === 0 
-                                                ? "No grades available yet." 
+                                            {gradeRecords.length === 0
+                                                ? "No grades available yet."
                                                 : "No grades match your filters."}
                                         </td>
                                     </tr>

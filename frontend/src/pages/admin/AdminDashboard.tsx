@@ -7,7 +7,7 @@ import axios from "axios";
 const AdminDashboard = () => {
     const [modalOpen, setModalOpen] = useState(false);
     const [modalRole, setModalRole] = useState<"student" | "teacher">("student");
-    
+
     const [stats, setStats] = useState([
         { title: "Total Students", value: "0" },
         { title: "Total Teachers", value: "0" },
@@ -24,7 +24,7 @@ const AdminDashboard = () => {
     const fetchDashboardData = async () => {
         try {
             const token = localStorage.getItem('token');
-            
+
             const statsRes = await axios.get('http://localhost:7000/api/users/stats/roles', {
                 headers: { Authorization: `Bearer ${token}` }
             });
@@ -59,7 +59,7 @@ const AdminDashboard = () => {
     const handleSave = async (data: UserData) => {
         try {
             const token = localStorage.getItem('token');
-            
+
             // ✅ Map frontend fields to backend schema
             const userData: any = {
                 name: `${data.firstName} ${data.lastName}`.trim(),
@@ -102,11 +102,11 @@ const AdminDashboard = () => {
             setModalOpen(false);
             await fetchDashboardData();
             alert(`${modalRole.charAt(0).toUpperCase() + modalRole.slice(1)} added successfully!`);
-            
+
         } catch (error: any) {
             console.error("❌ Error saving user:", error);
-            const errorMsg = error.response?.data?.error || 
-                             error.response?.data?.errors?.join(', ') || 
+            const errorMsg = error.response?.data?.error ||
+                             error.response?.data?.errors?.join(', ') ||
                              "Failed to add user";
             alert(errorMsg);
         }

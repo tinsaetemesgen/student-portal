@@ -15,6 +15,7 @@ import {
     DollarSign,
     BarChart3,
     MessageCircle,
+    FileQuestion
 } from "lucide-react";
 
 type Role = "admin" | "registrar" | "finance_officer" | "teacher" | "student" | "parent";
@@ -54,19 +55,80 @@ const menuItems = {
     ],
 
     teacher: [
-        { name: "Dashboard", path: "/teacher", icon: <LayoutDashboard size={20} /> },
-        { name: "Attendance", path: "/teacher/attendance", icon: <ClipboardCheck size={20} /> },
-        { name: "Grades", path: "/teacher/grades", icon: <BookOpen size={20} /> },
-        { name: "Announcements", path: "/teacher/announcements", icon: <Megaphone size={20} /> },
-        { name: "Chat", path: "/chat", icon: <MessageCircle size={20} /> },
+        {
+            name: "Dashboard",
+            path: "/teacher",
+            icon: <LayoutDashboard size={20} />
+        },
+
+        {
+            name: "Attendance",
+            path: "/teacher/attendance",
+            icon: <ClipboardCheck size={20} />
+        },
+
+        {
+            name: "Grades",
+            path: "/teacher/grades",
+            icon: <BookOpen size={20} />
+        },
+
+        {
+            name: "Worksheets",
+            path: "/teacher/worksheets",
+            icon: <FileQuestion size={20} />
+        },
+
+        {
+            name: "Announcements",
+            path: "/teacher/announcements",
+            icon: <Megaphone size={20} />
+        },
+
+        {
+            name: "Chat",
+            path: "/chat",
+            icon: <MessageCircle size={20} />
+        },
     ],
 
+
     student: [
-        { name: "Dashboard", path: "/student", icon: <LayoutDashboard size={20} /> },
-        { name: "Attendance", path: "/student/attendance", icon: <ClipboardCheck size={20} /> },
-        { name: "Grades", path: "/student/grades", icon: <GraduationCap size={20} /> },
-        { name: "Fees", path: "/student/fees", icon: <Banknote size={20} /> },
-        { name: "Announcements", path: "/student/announcements", icon: <Megaphone size={20} /> },
+        {
+            name: "Dashboard",
+            path: "/student",
+            icon: <LayoutDashboard size={20} />
+        },
+
+        {
+            name: "Attendance",
+            path: "/student/attendance",
+            icon: <ClipboardCheck size={20} />
+        },
+
+        {
+            name: "Grades",
+            path: "/student/grades",
+            icon: <GraduationCap size={20} />
+        },
+
+        {
+            name: "Worksheets",
+            path: "/student/worksheets",
+            icon: <FileQuestion size={20} />
+        },
+
+        {
+            name: "Fees",
+            path: "/student/fees",
+            icon: <Banknote size={20} />
+        },
+
+        {
+            name: "Announcements",
+            path: "/student/announcements",
+            icon: <Megaphone size={20} />
+        },
     ],
 
     parent: [

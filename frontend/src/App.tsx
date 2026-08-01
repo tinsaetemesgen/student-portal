@@ -4,8 +4,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 
-//ForgotPassword Page
+//ForgotPassword and ResetPassword Page
 import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 // Admin Pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -26,6 +27,8 @@ import RegistrarParents from './pages/registrar/RegistrarParents';
 
 
 
+
+
 // Finance Officer Pages
 import FinanceDashboard from "./pages/finance/FinanceDashboard";
 import FinancePayments from './pages/finance/FinancePayments';
@@ -36,6 +39,8 @@ import TeacherDashboard from "./pages/teacher/TeacherDashboard";
 import TeacherAttendance from "./pages/teacher/Attendance";
 import TeacherGrades from "./pages/teacher/Grades";
 import TeacherAnnouncements from "./pages/teacher/Announcements";
+import Worksheets from "./pages/teacher/Worksheet";
+import CreateWorksheet from "./pages/teacher/CreateWorksheet";
 
 // Student Pages
 import StudentDashboard from "./pages/student/StudentDashboard";
@@ -43,6 +48,8 @@ import StudentMyGrades from "./pages/student/MyGrades";
 import StudentMyAttendance from "./pages/student/MyAttendance";
 import StudentFees from "./pages/student/Fees";
 import StudentAnnouncements from "./pages/student/Announcements";
+import StudentWorksheets from "./pages/student/StudentWorksheet";
+import TakeWorksheet from "./pages/student/TakeWorksheet";
 
 // Parent Pages
 import ParentDashboard from "./pages/parent/ParentDashboard";
@@ -206,6 +213,14 @@ function App() {
             <TeacherAnnouncements />
           </PrivateRoute>
         } />
+        <Route
+          path="/teacher/worksheets"
+          element={<Worksheets />}
+        />
+        <Route
+          path="/teacher/create-worksheet"
+          element={<CreateWorksheet />}
+        />
 
         {/* ============================================
             STUDENT ROUTES
@@ -235,7 +250,14 @@ function App() {
             <StudentAnnouncements />
           </PrivateRoute>
         } />
-
+        <Route
+          path="/student/worksheets"
+          element={<StudentWorksheets />}
+        />
+        <Route
+          path="/student/worksheet/:id"
+          element={<TakeWorksheet />}
+        />
         {/* ============================================
             PARENT ROUTES
             ============================================ */}
@@ -286,10 +308,16 @@ function App() {
         } />
 
 
-         //Forgot Password
+         //Forgot Password and Reset Password
 
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-
+        <Route
+          path="/forgot-password"
+          element={<ForgotPassword />}
+        />
+        <Route
+          path="/reset-password"
+          element={<ResetPassword />}
+        />
       </Routes>
 
 

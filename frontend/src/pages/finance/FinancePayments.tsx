@@ -66,7 +66,7 @@ const FinancePayments = () => {
     const handleReject = async (id: string) => {
         const reason = prompt("Reason for rejection:");
         if (reason === null) return;
-        
+
         try {
             const token = localStorage.getItem('token');
             await axios.put(`http://localhost:7000/api/finance/payments/${id}/reject`, { reason }, {

@@ -160,7 +160,7 @@ const MyFees = () => {
 
                 {/* Info Note */}
                 <div className="bg-blue-50 rounded-xl p-4 border border-blue-200 text-sm text-blue-700">
-                    💡 Note: Fee amounts are not displayed to students to help you focus on your studies. 
+                    💡 Note: Fee amounts are not displayed to students to help you focus on your studies.
                     Please contact the finance office for any payment-related questions.
                 </div>
             </div>

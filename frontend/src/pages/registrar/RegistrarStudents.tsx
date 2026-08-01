@@ -28,7 +28,7 @@ const RegistrarStudents = () => {
         age: "",
         parentName: "",
         parentPhone: "",
-        parentEmail: "", 
+        parentEmail: "",
     });
 
     useEffect(() => {
@@ -201,7 +201,7 @@ const RegistrarStudents = () => {
                                     className="w-full border rounded-lg px-4 py-2"
                                     required
                                 />
-                              
+
 <input
     type="password"
     placeholder="Password (default: password123)"

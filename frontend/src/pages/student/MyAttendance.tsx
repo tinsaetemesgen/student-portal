@@ -197,7 +197,7 @@ const MyAttendance = () => {
                                         const rate = item.summary.attendanceRate;
                                         const statusColor = rate >= 90 ? 'text-green-600' : rate >= 75 ? 'text-yellow-600' : 'text-red-600';
                                         const statusText = rate >= 90 ? 'Good' : rate >= 75 ? 'Fair' : 'Needs Improvement';
-                                        
+
                                         return (
                                             <tr key={item._id} className="hover:bg-gray-50">
                                                 <td className="px-6 py-4 font-medium">{getPeriodLabel(item)}</td>

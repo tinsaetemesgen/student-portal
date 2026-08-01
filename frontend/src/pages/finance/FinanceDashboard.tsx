@@ -34,7 +34,7 @@ const FinanceDashboard = () => {
     const fetchDashboardData = async () => {
         try {
             const token = localStorage.getItem('token');
-            
+
             // Fetch revenue summary
             const revenueRes = await axios.get('http://localhost:7000/api/finance/revenue', {
                 headers: { Authorization: `Bearer ${token}` }

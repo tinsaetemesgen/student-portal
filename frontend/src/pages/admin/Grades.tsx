@@ -41,12 +41,12 @@ const AdminGrades = () => {
     const [stats, setStats] = useState<GradeStats | null>(null);
     const [grades, setGrades] = useState<GradeRecord[]>([]);
     const [filteredGrades, setFilteredGrades] = useState<GradeRecord[]>([]);
-    
+
     const [selectedClass, setSelectedClass] = useState<string>("");
     const [selectedSubject, setSelectedSubject] = useState<string>("");
     const [selectedSemester, setSelectedSemester] = useState<string>("");
     const [selectedAcademicYear, setSelectedAcademicYear] = useState<string>("");
-    
+
     const [classes, setClasses] = useState<ClassData[]>([]);
     const [subjects, setSubjects] = useState<string[]>([]);
 
@@ -186,8 +186,8 @@ const AdminGrades = () => {
                         <div className="bg-white p-5 rounded-xl shadow-sm text-center">
                             <p className="text-gray-500 text-sm">Most Common Grade</p>
                             <h3 className="text-2xl font-bold text-gray-800">
-                                {stats.gradeDistribution?.length > 0 
-                                    ? stats.gradeDistribution.reduce((a, b) => a.count > b.count ? a : b)._id 
+                                {stats.gradeDistribution?.length > 0
+                                    ? stats.gradeDistribution.reduce((a, b) => a.count > b.count ? a : b)._id
                                     : 'N/A'}
                             </h3>
                         </div>

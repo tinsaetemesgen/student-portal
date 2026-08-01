@@ -143,13 +143,13 @@ const Announcements = () => {
     const fetchAnnouncements = async () => {
         try {
             const token = localStorage.getItem('token');
-            
+
             // TODO: Replace with actual API when backend is ready
             // const response = await axios.get('http://localhost:7000/api/announcements', {
             //     headers: { Authorization: `Bearer ${token}` }
             // });
             // setAnnouncements(response.data.data || []);
-            
+
             // Mock data for now
             setAnnouncements([
                 {
@@ -173,7 +173,7 @@ const Announcements = () => {
                     createdAt: "2026-09-15T14:30:00Z"
                 },
             ]);
-            
+
             setLoading(false);
         } catch (error) {
             console.error("Error fetching announcements:", error);
@@ -186,20 +186,20 @@ const Announcements = () => {
         setTimetableLoading(true);
         try {
             const token = localStorage.getItem('token');
-            
+
             // Use the semester and academicYear from the form
             const semester = slotFormData.semester || "Semester 1";
             const academicYear = slotFormData.academicYear || "2024/25";
-            
+
             console.log(`🔄 Fetching timetable for ${semester} - ${academicYear}`);
-            
+
             const slotsRes = await axios.get(
                 `http://localhost:7000/api/timetable/slots?semester=${semester}&academicYear=${academicYear}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-            
+
             console.log("📊 Timetable slots received:", slotsRes.data.data);
-            
+
             // Fetch teachers and classes for dropdowns
             const teachersRes = await axios.get('http://localhost:7000/api/users?role=teacher', {
                 headers: { Authorization: `Bearer ${token}` }
@@ -224,7 +224,7 @@ const Announcements = () => {
         e.preventDefault();
         try {
             const token = localStorage.getItem('token');
-            
+
             const slotData = {
                 ...slotFormData,
                 teacherId: slotFormData.teacherId || undefined,
@@ -241,10 +241,10 @@ const Announcements = () => {
 
             setShowSlotModal(false);
             resetSlotForm();
-            
+
             // ✅ Force refresh the timetable
             await fetchTimetable();
-            
+
             alert('✅ Time slot created successfully!');
         } catch (error: any) {
             console.error("❌ Error creating time slot:", error);
@@ -257,7 +257,7 @@ const Announcements = () => {
         e.preventDefault();
         try {
             const token = localStorage.getItem('token');
-            
+
             const slotData = {
                 ...slotFormData,
                 teacherId: slotFormData.teacherId || undefined,
@@ -274,10 +274,10 @@ const Announcements = () => {
 
             setShowSlotModal(false);
             resetSlotForm();
-            
+
             // ✅ Force refresh the timetable
             await fetchTimetable();
-            
+
             alert('✅ Time slot updated successfully!');
         } catch (error: any) {
             console.error("❌ Error updating time slot:", error);
@@ -355,10 +355,10 @@ const Announcements = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         try {
             const token = localStorage.getItem('token');
-            
+
             const announcementData = {
                 title: formData.title,
                 content: formData.content,
@@ -371,16 +371,16 @@ const Announcements = () => {
             // await axios.post('http://localhost:7000/api/announcements', announcementData, {
             //     headers: { Authorization: `Bearer ${token}` }
             // });
-            
+
             const newAnnouncement: Announcement = {
                 _id: Date.now().toString(),
                 ...announcementData,
                 createdBy: { _id: user?._id || 'current', name: user?.name || 'You' },
                 createdAt: new Date().toISOString(),
             };
-            
+
             if (editingId) {
-                setAnnouncements(announcements.map(a => 
+                setAnnouncements(announcements.map(a =>
                     a._id === editingId ? { ...a, ...announcementData } : a
                 ));
             } else {
@@ -396,7 +396,7 @@ const Announcements = () => {
                 status: "Published",
             });
             setEditingId(null);
-            
+
         } catch (error: any) {
             console.error("Error saving announcement:", error);
             alert(error.response?.data?.error || "Failed to save announcement");
@@ -405,13 +405,13 @@ const Announcements = () => {
 
     const handleDelete = async (id: string) => {
         if (!window.confirm("Are you sure you want to delete this announcement?")) return;
-        
+
         try {
             // TODO: Replace with actual API
             // await axios.delete(`http://localhost:7000/api/announcements/${id}`, {
             //     headers: { Authorization: `Bearer ${token}` }
             // });
-            
+
             setAnnouncements(announcements.filter(a => a._id !== id));
         } catch (error) {
             console.error("Error deleting announcement:", error);
@@ -453,8 +453,8 @@ const Announcements = () => {
         let filtered = announcements;
 
         if (userRole) {
-            filtered = filtered.filter(a => 
-                a.audience === "All" || 
+            filtered = filtered.filter(a =>
+                a.audience === "All" ||
                 a.audience === userRole.charAt(0).toUpperCase() + userRole.slice(1)
             );
         }
@@ -529,9 +529,9 @@ const Announcements = () => {
                             // Find slots for this period
                             const periodSlots = timetableSlots.filter(s => s.periodNumber === period);
                             if (periodSlots.length === 0) return null;
-                            
+
                             const timeDisplay = `${periodSlots[0].startTime} - ${periodSlots[0].endTime}`;
-                            
+
                             return (
                                 <tr key={period} className="hover:bg-gray-50">
                                     <td className="px-4 py-3 text-sm font-medium text-gray-600 whitespace-nowrap">
@@ -896,8 +896,8 @@ const Announcements = () => {
                             {activeTab === "announcements" ? "Announcements" : "Timetable"}
                         </h1>
                         <p className="text-gray-500">
-                            {activeTab === "announcements" 
-                                ? "View and manage school announcements" 
+                            {activeTab === "announcements"
+                                ? "View and manage school announcements"
                                 : "Manage class timetables and schedules"}
                         </p>
                     </div>

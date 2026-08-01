@@ -123,7 +123,7 @@ const ParentChildren = () => {
                                     >
                                         <GraduationCap size={14} /> View Grades
                                     </button>
-                                    
+
                                     {/* ✅ View Attendance Button - Navigates to attendance page */}
                                     <button
                                         onClick={(e) => {

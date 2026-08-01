@@ -56,7 +56,7 @@ const AdminAttendance = () => {
             });
 
             const data = reportRes.data.data;
-            
+
             // 3️⃣ Set summary
             if (data && data.summary) {
                 setSummary({
@@ -84,14 +84,14 @@ const AdminAttendance = () => {
 
     const fetchClassAttendance = async (classId: string) => {
         if (!classId) return;
-        
+
         try {
             const token = localStorage.getItem('token');
             const res = await axios.get(
                 `http://localhost:7000/api/attendance/class/${classId}?semester=Semester%201&academicYear=2024/25`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-            
+
             setRecentRecords(res.data.data.slice(0, 5));
         } catch (error) {
             console.error("Error fetching class attendance:", error);

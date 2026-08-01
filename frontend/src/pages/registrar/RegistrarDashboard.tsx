@@ -36,7 +36,7 @@ const RegistrarDashboard = () => {
     const fetchDashboardData = async () => {
         try {
             const token = localStorage.getItem('token');
-            
+
             // Fetch students
             const studentsRes = await axios.get('http://localhost:7000/api/registrar/students', {
                 headers: { Authorization: `Bearer ${token}` }
