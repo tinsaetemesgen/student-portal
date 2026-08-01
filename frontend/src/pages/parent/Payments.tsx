@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, ChangeEvent } from "react";
+import { UploadCloud } from "lucide-react";
 import { X, Check } from "lucide-react";
 import DashboardLayout from "../../layout/DashboardLayout";
 
@@ -23,6 +24,9 @@ const paymentMethods = [
 const ParentPayments = () => {
     const [showModal, setShowModal] = useState(false);
     const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
+    const [transactionId, setTransactionId] = useState("");
+    const [receipt, setReceipt] = useState<File | null>(null);
+    const [preview, setPreview] = useState<string | null>(null);
 
     useEffect(() => {
         const handleEscape = (e: KeyboardEvent) => {
@@ -32,16 +36,39 @@ const ParentPayments = () => {
         return () => document.removeEventListener("keydown", handleEscape);
     }, [showModal]);
 
+    const handleReceiptUpload = (e: ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+
+        if (!file) return;
+
+        setReceipt(file);
+        setPreview(URL.createObjectURL(file));
+    };
+
     const handleClose = () => {
         setShowModal(false);
         setSelectedMethod(null);
+        setTransactionId("");
+        setReceipt(null);
+        setPreview(null);
     };
 
     const handleContinuePayment = () => {
-        if (selectedMethod) {
-            console.log("Proceeding with payment via:", selectedMethod);
-            handleClose();
-        }
+        if (!selectedMethod) return;
+
+        console.log({
+            paymentMethod: selectedMethod,
+            transactionId,
+            receipt,
+        });
+
+        alert("Payment submitted for verification.");
+
+        handleClose();
+
+        setTransactionId("");
+        setReceipt(null);
+        setPreview(null);
     };
 
     const modalContent = showModal && (
@@ -60,29 +87,109 @@ const ParentPayments = () => {
                     </button>
                 </div>
 
-                <div className="p-5 space-y-3">
-                    <p className="text-sm text-gray-500 mb-4">Choose your preferred payment method to continue.</p>
-                    {paymentMethods.map((method) => (
-                        <button
-                            key={method.id}
-                            onClick={() => setSelectedMethod(method.id)}
-                            className={`w-full flex items-center gap-4 p-4 rounded-lg border-2 transition-all duration-150 ${selectedMethod === method.id
-                                ? "border-blue-500 bg-blue-50"
-                                : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
-                                }`}
-                        >
-                            <span className="text-2xl">{method.icon}</span>
-                            <span className={`flex-1 text-left font-medium ${selectedMethod === method.id ? "text-blue-700" : "text-gray-700"
-                                }`}>
-                                {method.name}
-                            </span>
-                            {selectedMethod === method.id && (
-                                <span className="bg-blue-600 text-white rounded-full p-1">
-                                    <Check size={14} />
+                <div className="p-5">
+
+                    <p className="text-sm text-gray-500 mb-5">
+                        Select your payment method.
+                    </p>
+
+                    <div className="space-y-3 mb-6">
+                        {paymentMethods.map((method) => (
+                            <button
+                                key={method.id}
+                                onClick={() => setSelectedMethod(method.id)}
+                                className={`w-full flex items-center gap-4 p-4 rounded-lg border-2 transition ${selectedMethod === method.id
+                                    ? "border-blue-500 bg-blue-50"
+                                    : "border-gray-200 hover:bg-gray-50"
+                                    }`}
+                            >
+                                <span className="text-2xl">{method.icon}</span>
+
+                                <span className="flex-1 text-left font-medium">
+                                    {method.name}
                                 </span>
-                            )}
-                        </button>
-                    ))}
+
+                                {selectedMethod === method.id && (
+                                    <Check size={18} className="text-blue-600" />
+                                )}
+                            </button>
+                        ))}
+                    </div>
+
+                    {selectedMethod && (
+                        <div className="space-y-4 border-t pt-5">
+
+                            <div className="rounded-lg bg-gray-50 p-4 border">
+                                <p className="text-sm text-gray-500">
+                                    Transfer payment using the selected method, then submit the details below.
+                                </p>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium mb-1">
+                                    Transaction ID
+                                </label>
+
+                                <input
+                                    type="text"
+                                    value={transactionId}
+                                    onChange={(e) => setTransactionId(e.target.value)}
+                                    placeholder="Enter transaction ID"
+                                    className="w-full rounded-lg border px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium mb-2">
+                                    Payment Screenshot
+                                </label>
+
+                                <label
+                                    htmlFor="receipt-upload"
+                                    className="flex flex-col items-center justify-center w-full h-52 border-2 border-dashed border-blue-300 rounded-xl cursor-pointer bg-blue-50 hover:bg-blue-100 hover:border-blue-500 transition"
+                                >
+                                    {!preview ? (
+                                        <>
+                                            <UploadCloud
+                                                size={52}
+                                                className="text-blue-500 mb-3"
+                                            />
+
+                                            <p className="font-semibold text-gray-700">
+                                                Click to upload receipt
+                                            </p>
+
+                                            <p className="text-sm text-gray-500 mt-1">
+                                                PNG, JPG or JPEG
+                                            </p>
+                                        </>
+                                    ) : (
+                                        <img
+                                            src={preview}
+                                            alt="Receipt Preview"
+                                            className="w-full h-full object-contain rounded-xl"
+                                        />
+                                    )}
+                                </label>
+
+                                <input
+                                    id="receipt-upload"
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleReceiptUpload}
+                                    className="hidden"
+                                />
+
+                                {preview && (
+                                    <p className="mt-2 text-sm text-green-600 font-medium">
+                                        ✓ Receipt uploaded successfully. Click the image to change it.
+                                    </p>
+                                )}
+                            </div>
+
+                        </div>
+                    )}
+
                 </div>
 
                 <div className="flex justify-end gap-3 p-5 border-t">
@@ -94,13 +201,17 @@ const ParentPayments = () => {
                     </button>
                     <button
                         onClick={handleContinuePayment}
-                        disabled={!selectedMethod}
+                        disabled={
+                            !selectedMethod ||
+                            !transactionId.trim() ||
+                            !receipt
+                        }
                         className={`px-4 py-2 rounded-lg transition font-medium ${selectedMethod
                             ? "bg-blue-600 text-white hover:bg-blue-700"
                             : "bg-gray-200 text-gray-400 cursor-not-allowed"
                             }`}
                     >
-                        Continue Payment
+                        Submit for Verification
                     </button>
                 </div>
             </div>
