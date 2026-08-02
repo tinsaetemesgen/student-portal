@@ -1,4 +1,5 @@
-// routes/authRoutes.js - COMPLETE UPDATED
+// routes/authRoutes.js - COMPLETE FIXED VERSION
+
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
@@ -36,7 +37,7 @@ router.post('/register', async (req, res) => {
   try {
     const { name, email, password, role, class: className, age, parentName, parentPhone, subject, hireDate } = req.body;
 
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ email: email.toLowerCase() });
     if (existingUser) {
       return res.status(400).json({
         success: false,
@@ -49,7 +50,7 @@ router.post('/register', async (req, res) => {
 
     const userData = {
       name,
-      email,
+      email: email.toLowerCase(),
       password: hashedPassword,
       role: role || 'student',
     };
@@ -92,28 +93,48 @@ router.post('/register', async (req, res) => {
 });
 
 // ============================================
-// 📌 LOGIN
+// 📌 LOGIN - FIXED
 // ============================================
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email });
+    console.log('📥 Login attempt for email:', email);
+
+    // ✅ Validate input
+    if (!email || !password) {
+      console.log('❌ Missing email or password');
+      return res.status(400).json({
+        success: false,
+        error: 'Email and password are required',
+      });
+    }
+
+    // ✅ Find user with case-insensitive email
+    const user = await User.findOne({ email: email.toLowerCase() });
+    console.log('👤 User found:', user ? 'Yes' : 'No');
+
     if (!user) {
+      console.log('❌ User not found:', email);
       return res.status(401).json({
         success: false,
         error: 'Invalid email or password.',
       });
     }
 
+    // ✅ Check password
     const isMatch = await bcrypt.compare(password, user.password);
+    console.log('🔑 Password match:', isMatch ? 'Yes' : 'No');
+
     if (!isMatch) {
+      console.log('❌ Invalid password for:', email);
       return res.status(401).json({
         success: false,
         error: 'Invalid email or password.',
       });
     }
 
+    // ✅ Generate token
     const payload = {
       user: {
         id: user._id,
@@ -123,6 +144,8 @@ router.post('/login', async (req, res) => {
     };
 
     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' });
+
+    console.log('✅ Login successful for:', email);
 
     res.json({
       success: true,
@@ -136,11 +159,15 @@ router.post('/login', async (req, res) => {
         class: user.class,
         age: user.age,
         subject: user.subject,
+        children: user.children,
       },
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, error: 'Server Error' });
+    console.error('❌ Login error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Server Error: ' + error.message,
+    });
   }
 });
 
@@ -175,7 +202,7 @@ router.post('/forgot-password', async (req, res) => {
       });
     }
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: email.toLowerCase() });
     if (!user) {
       return res.status(404).json({
         success: false,

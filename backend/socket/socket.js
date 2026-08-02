@@ -1,4 +1,5 @@
-// socket/socket.js - Complete with role-based messaging and self-message prevention
+// socket/socket.js - COMPLETE FIXED
+
 const Message = require('../models/Message');
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
@@ -54,7 +55,6 @@ const initializeSocket = (io) => {
         // 3️⃣ Validate role-based chat permissions
         const sender = await User.findById(socket.userId);
         
-        // Define allowed chat partners
         const allowedRoles = {
           admin: ['admin', 'teacher', 'parent', 'student'],
           teacher: ['admin', 'parent', 'student'],
@@ -98,12 +98,21 @@ const initializeSocket = (io) => {
           io.to(receiverSocketId).emit('message:unread', { count: unreadCount });
         }
 
-        // 8️⃣ Update sender's unread count (optional)
+        // 8️⃣ Update sender's unread count
         const senderUnreadCount = await Message.countDocuments({
           receiverId: socket.userId,
           isRead: false,
         });
         socket.emit('message:unread', { count: senderUnreadCount });
+
+        // 9️⃣ Broadcast to all that a message was sent (for notification badges)
+        io.emit('message:new', {
+          senderId: socket.userId,
+          receiverId: receiverId,
+          content: content,
+          senderName: sender.name,
+          receiverName: receiver.name,
+        });
 
       } catch (error) {
         console.error('❌ Error sending message:', error);

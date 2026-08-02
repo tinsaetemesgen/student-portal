@@ -1,174 +1,133 @@
-// services/receiptService.js - PDF Receipt Generation
-const PDFDocument = require('pdfkit');
+// backend/services/receiptService.js - Simple receipt generator
+
 const fs = require('fs');
 const path = require('path');
+const PDFDocument = require('pdfkit');
 
-// Ensure receipts directory exists
+// ✅ Ensure receipts directory exists
 const receiptsDir = path.join(__dirname, '../uploads/receipts');
 if (!fs.existsSync(receiptsDir)) {
   fs.mkdirSync(receiptsDir, { recursive: true });
 }
 
+/**
+ * Generate a PDF receipt for a confirmed payment
+ */
 const generateReceipt = async (payment, student, schoolInfo, confirmedBy) => {
-  return new Promise((resolve, reject) => {
-    try {
-      const doc = new PDFDocument({ size: 'A4', margin: 50 });
-      const filename = `receipt-${payment.receiptNumber}.pdf`;
-      const filePath = path.join(receiptsDir, filename);
-      
-      const stream = fs.createWriteStream(filePath);
-      doc.pipe(stream);
+  try {
+    const filename = `receipt-${payment.receiptNumber || payment._id}.pdf`;
+    const filePath = path.join(receiptsDir, filename);
+    const url = `/uploads/receipts/${filename}`;
 
-      // ============================================
-      // 📌 HEADER
-      // ============================================
-      doc
-        .fontSize(22)
-        .font('Helvetica-Bold')
-        .text('🏫 ' + (schoolInfo.name || 'School Portal'), { align: 'center' })
-        .fontSize(12)
-        .font('Helvetica')
-        .text(schoolInfo.address || 'Adama, Ethiopia', { align: 'center' })
-        .text('Phone: ' + (schoolInfo.phone || 'N/A'), { align: 'center' })
-        .moveDown();
+    // ✅ Create PDF
+    const doc = new PDFDocument({ margin: 50 });
+    const writeStream = fs.createWriteStream(filePath);
+    doc.pipe(writeStream);
 
-      // ============================================
-      // 📌 RECEIPT TITLE
-      // ============================================
-      doc
-        .fontSize(18)
-        .font('Helvetica-Bold')
-        .text('PAYMENT RECEIPT', { align: 'center', underline: true })
-        .moveDown(1.5);
+    // ✅ Header
+    doc
+      .fontSize(20)
+      .font('Helvetica-Bold')
+      .text(schoolInfo.name, { align: 'center' })
+      .fontSize(12)
+      .font('Helvetica')
+      .text(schoolInfo.address, { align: 'center' })
+      .text(`Phone: ${schoolInfo.phone}`, { align: 'center' })
+      .moveDown(1);
 
-      // ============================================
-      // 📌 RECEIPT DETAILS
-      // ============================================
-      const leftCol = 50;
-      const rightCol = 300;
-      let y = doc.y;
+    // ✅ Receipt Title
+    doc
+      .fontSize(16)
+      .font('Helvetica-Bold')
+      .text('PAYMENT RECEIPT', { align: 'center' })
+      .moveDown(0.5);
 
-      // Receipt Number
-      doc
-        .fontSize(11)
-        .font('Helvetica-Bold')
-        .text('Receipt Number:', leftCol, y)
-        .font('Helvetica')
-        .text(payment.receiptNumber || 'N/A', rightCol, y);
+    // ✅ Receipt Number
+    doc
+      .fontSize(10)
+      .font('Helvetica')
+      .text(`Receipt No: ${payment.receiptNumber || 'N/A'}`, { align: 'right' })
+      .text(`Date: ${new Date(payment.confirmedAt || Date.now()).toLocaleDateString()}`, { align: 'right' })
+      .moveDown(1);
 
-      y += 22;
-      doc
-        .font('Helvetica-Bold')
-        .text('Student Name:', leftCol, y)
-        .font('Helvetica')
-        .text(student.name || 'N/A', rightCol, y);
+    // ✅ Divider
+    doc
+      .strokeColor('#cccccc')
+      .lineWidth(1)
+      .moveTo(50, doc.y)
+      .lineTo(550, doc.y)
+      .stroke()
+      .moveDown(1);
 
-      y += 22;
-      doc
-        .font('Helvetica-Bold')
-        .text('Student Email:', leftCol, y)
-        .font('Helvetica')
-        .text(student.email || 'N/A', rightCol, y);
+    // ✅ Payment Details
+    const startY = doc.y;
+    const col1X = 50;
+    const col2X = 300;
 
-      y += 22;
-      doc
-        .font('Helvetica-Bold')
-        .text('Payment Date:', leftCol, y)
-        .font('Helvetica')
-        .text(new Date(payment.paymentDate).toLocaleDateString(), rightCol, y);
+    doc
+      .fontSize(11)
+      .font('Helvetica-Bold');
 
-      y += 22;
-      doc
-        .font('Helvetica-Bold')
-        .text('Method:', leftCol, y)
-        .font('Helvetica')
-        .text('Bank Transfer', rightCol, y);
+    // Student Info
+    doc
+      .text('Student Name:', col1X, startY)
+      .text('Student Class:', col1X, startY + 25)
+      .text('Fee Name:', col1X, startY + 50)
+      .text('Amount Paid:', col1X, startY + 75)
+      .text('Payment Method:', col1X, startY + 100)
+      .text('Reference:', col1X, startY + 125)
+      .text('Status:', col1X, startY + 150);
 
-      y += 22;
-      doc
-        .font('Helvetica-Bold')
-        .text('Bank:', leftCol, y)
-        .font('Helvetica')
-        .text(payment.bankName || 'N/A', rightCol, y);
+    doc
+      .font('Helvetica')
+      .text(student?.name || 'N/A', col2X, startY)
+      .text(student?.class || 'N/A', col2X, startY + 25)
+      .text(payment.studentFeeId?.feeName || 'N/A', col2X, startY + 50)
+      .text(`ETB ${payment.amount || 0}`, col2X, startY + 75)
+      .text(payment.bankName || 'N/A', col2X, startY + 100)
+      .text(payment.referenceNumber || 'N/A', col2X, startY + 125)
+      .text('CONFIRMED', col2X, startY + 150);
 
-      y += 22;
-      doc
-        .font('Helvetica-Bold')
-        .text('Reference Number:', leftCol, y)
-        .font('Helvetica')
-        .text(payment.referenceNumber || 'N/A', rightCol, y);
+    // ✅ Status badge
+    doc
+      .fillColor('#22c55e')
+      .fontSize(10)
+      .font('Helvetica-Bold')
+      .text('✅ PAID', { align: 'center' })
+      .fillColor('#000000');
 
-      y += 22;
-      doc
-        .font('Helvetica-Bold')
-        .text('Confirmed By:', leftCol, y)
-        .font('Helvetica')
-        .text(confirmedBy?.name || 'System', rightCol, y);
+    // ✅ Footer
+    doc.moveDown(2);
+    doc
+      .strokeColor('#cccccc')
+      .lineWidth(1)
+      .moveTo(50, doc.y)
+      .lineTo(550, doc.y)
+      .stroke()
+      .moveDown(1);
 
-      y += 30;
+    doc
+      .fontSize(10)
+      .font('Helvetica')
+      .text(`Confirmed by: ${confirmedBy?.name || 'Finance Officer'}`, { align: 'center' })
+      .text('This is a computer-generated receipt.', { align: 'center' })
+      .text(`Generated on: ${new Date().toLocaleString()}`, { align: 'center' });
 
-      // ============================================
-      // 📌 AMOUNT BOX
-      // ============================================
-      doc
-        .rect(50, y, 500, 45)
-        .stroke()
-        .fontSize(14)
-        .font('Helvetica-Bold')
-        .text('Amount Paid:', 60, y + 12)
-        .fontSize(16)
-        .font('Helvetica-Bold')
-        .text(payment.amount + ' ETB', 400, y + 12, { align: 'right' });
+    // ✅ Finalize PDF
+    doc.end();
 
-      y += 75;
+    // ✅ Wait for file to be written
+    await new Promise((resolve) => {
+      writeStream.on('finish', resolve);
+    });
 
-      // ============================================
-      // 📌 STATUS
-      // ============================================
-      doc
-        .fontSize(12)
-        .font('Helvetica-Bold')
-        .text('Status:', leftCol, y)
-        .font('Helvetica')
-        .text('✅ CONFIRMED', 120, y, { color: 'green' });
+    console.log(`✅ Receipt generated: ${filename}`);
+    return { url, filePath, filename };
 
-      y += 40;
-
-      // ============================================
-      // 📌 FOOTER
-      // ============================================
-      doc
-        .fontSize(10)
-        .font('Helvetica')
-        .text('This receipt is system-generated and does not require a signature.', {
-          align: 'center',
-          color: 'gray'
-        })
-        .moveDown(0.5)
-        .text('Thank you for your payment!', { align: 'center', color: 'blue' });
-
-      // ============================================
-      // 📌 TIMESTAMP
-      // ============================================
-      doc
-        .fontSize(8)
-        .font('Helvetica')
-        .text(
-          `Generated on: ${new Date().toLocaleString()}`,
-          { align: 'right', color: 'gray' }
-        );
-
-      doc.end();
-
-      stream.on('finish', () => {
-        resolve({ filename, filePath, url: `/uploads/receipts/${filename}` });
-      });
-
-      stream.on('error', reject);
-    } catch (error) {
-      reject(error);
-    }
-  });
+  } catch (error) {
+    console.error('❌ Error generating receipt:', error);
+    throw error;
+  }
 };
 
 module.exports = { generateReceipt };

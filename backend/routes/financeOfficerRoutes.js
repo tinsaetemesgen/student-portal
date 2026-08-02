@@ -1,5 +1,4 @@
-// routes/financeOfficerRoutes.js - COMPLETE UPDATE
-// Replaces the entire file with new fields support
+// routes/financeOfficerRoutes.js - COMPLETE WITH ALL FIXES
 
 const express = require('express');
 const router = express.Router();
@@ -10,12 +9,14 @@ const Payment = require('../models/Payment');
 const auth = require('../middleware/auth');
 const roleCheck = require('../middleware/roleCheck');
 const bcrypt = require('bcryptjs');
+const path = require('path');
+const fs = require('fs');
+const { generateReceipt } = require('../services/receiptService');
 
 // ============================================
 // 📌 HELPER FUNCTIONS
 // ============================================
 
-// Check if a fee is overdue
 const isFeeOverdue = (fee) => {
   const now = new Date();
   const deadline = new Date(fee.endDate || fee.dueDate);
@@ -23,7 +24,6 @@ const isFeeOverdue = (fee) => {
   return now > deadline;
 };
 
-// Calculate total amount with late fee
 const calculateTotalAmount = (fee) => {
   let total = fee.amount || 0;
   if (isFeeOverdue(fee)) {
@@ -33,10 +33,137 @@ const calculateTotalAmount = (fee) => {
 };
 
 // ============================================
-// 📌 FINANCE OFFICER ROUTES - Fee Management
+// 📌 GET STUDENT FEES FOR PARENT
 // ============================================
 
-// ✅ CREATE FEE STRUCTURE - UPDATED with new fields
+router.get('/parent/student-fees', auth, async (req, res) => {
+  try {
+    const { studentId } = req.query;
+    
+    console.log('📥 Parent fetching fees for student:', studentId);
+    
+    if (!studentId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Student ID is required'
+      });
+    }
+
+    const user = await User.findById(req.user.id);
+    
+    if (user.role === 'student' && user._id.toString() !== studentId) {
+      return res.status(403).json({
+        success: false,
+        error: 'You can only view your own fees'
+      });
+    }
+    
+    if (user.role === 'parent') {
+      const isChild = user.children.some((child) => child.toString() === studentId);
+      if (!isChild) {
+        return res.status(403).json({
+          success: false,
+          error: 'You can only view your children\'s fees'
+        });
+      }
+    }
+
+    const studentFees = await StudentFee.find({ studentId })
+      .populate('feeStructureId', 'name description feeType')
+      .sort({ dueDate: 1 });
+
+    console.log(`📊 Found ${studentFees.length} fees for student`);
+
+    const feesWithStatus = studentFees.map(fee => {
+      const now = new Date();
+      const deadline = new Date(fee.endDate || fee.dueDate);
+      deadline.setDate(deadline.getDate() + (fee.gracePeriodDays || 0));
+      const isOverdue = now > deadline;
+      
+      return {
+        _id: fee._id,
+        feeName: fee.feeName,
+        amount: fee.amount,
+        status: fee.status,
+        dueDate: fee.dueDate,
+        startDate: fee.startDate,
+        endDate: fee.endDate,
+        lateFeeAmount: fee.lateFeeAmount || 0,
+        gracePeriodDays: fee.gracePeriodDays || 0,
+        isOverdue: isOverdue,
+        totalAmount: fee.amount + (isOverdue ? (fee.lateFeeAmount || 0) : 0),
+        isLateFeeApplied: isOverdue && (fee.lateFeeAmount || 0) > 0,
+      };
+    });
+
+    res.json({
+      success: true,
+      count: feesWithStatus.length,
+      data: feesWithStatus,
+    });
+
+  } catch (error) {
+    console.error('❌ Error fetching student fees for parent:', error);
+    res.status(500).json({ success: false, error: 'Server Error: ' + error.message });
+  }
+});
+
+// ============================================
+// 📌 GET PAYMENTS FOR PARENT
+// ============================================
+
+router.get('/parent/payments', auth, async (req, res) => {
+  try {
+    const { studentId } = req.query;
+    
+    if (!studentId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Student ID is required'
+      });
+    }
+
+    const user = await User.findById(req.user.id);
+    
+    if (user.role === 'parent') {
+      const isChild = user.children.some((child) => child.toString() === studentId);
+      if (!isChild) {
+        return res.status(403).json({
+          success: false,
+          error: 'You can only view your children\'s payments'
+        });
+      }
+    } else if (user.role === 'student' && user._id.toString() !== studentId) {
+      return res.status(403).json({
+        success: false,
+        error: 'You can only view your own payments'
+      });
+    }
+
+    const payments = await Payment.find({ studentId })
+      .populate({
+        path: 'studentId',
+        select: 'name email class'
+      })
+      .populate('studentFeeId', 'feeName amount')
+      .populate('confirmedBy', 'name')
+      .sort({ createdAt: -1 });
+
+    res.json({
+      success: true,
+      count: payments.length,
+      data: payments,
+    });
+  } catch (error) {
+    console.error('❌ Error fetching parent payments:', error);
+    res.status(500).json({ success: false, error: 'Server Error' });
+  }
+});
+
+// ============================================
+// 📌 CREATE FEE STRUCTURE
+// ============================================
+
 router.post('/fee-structures', auth, roleCheck('admin', 'finance_officer'), async (req, res) => {
   try {
     const { 
@@ -53,18 +180,15 @@ router.post('/fee-structures', auth, roleCheck('admin', 'finance_officer'), asyn
       gracePeriodDays,
     } = req.body;
 
-    // ✅ Log incoming data for debugging
     console.log('📥 Creating fee with data:', req.body);
 
-    // ✅ Validate required fields
     if (!name || !amount || !feeType || !classLevel || !semester || !academicYear) {
       return res.status(400).json({
         success: false,
-        error: 'Please provide all required fields: name, amount, feeType, classLevel, semester, academicYear'
+        error: 'Please provide all required fields'
       });
     }
 
-    // ✅ Validate new date fields
     if (!startDate || !endDate) {
       return res.status(400).json({
         success: false,
@@ -72,7 +196,6 @@ router.post('/fee-structures', auth, roleCheck('admin', 'finance_officer'), asyn
       });
     }
 
-    // ✅ Validate date logic
     if (new Date(endDate) <= new Date(startDate)) {
       return res.status(400).json({
         success: false,
@@ -80,7 +203,6 @@ router.post('/fee-structures', auth, roleCheck('admin', 'finance_officer'), asyn
       });
     }
 
-    // ✅ Create fee structure with ALL fields
     const feeStructure = new FeeStructure({
       name,
       description: description || '',
@@ -91,6 +213,7 @@ router.post('/fee-structures', auth, roleCheck('admin', 'finance_officer'), asyn
       academicYear,
       startDate: new Date(startDate),
       endDate: new Date(endDate),
+      dueDate: new Date(endDate),
       lateFeeAmount: parseFloat(lateFeeAmount) || 0,
       gracePeriodDays: parseInt(gracePeriodDays) || 0,
       isActive: true,
@@ -99,12 +222,71 @@ router.post('/fee-structures', auth, roleCheck('admin', 'finance_officer'), asyn
     });
 
     await feeStructure.save();
+    console.log('✅ Fee structure created:', feeStructure._id);
+
+    // ✅ Auto-assign to students
+    let assignedCount = 0;
+    const assignedStudents = [];
+
+    console.log(`🔍 Finding students in class level: ${classLevel}`);
     
+    const students = await User.find({
+      role: 'student',
+      classLevel: classLevel,
+    });
+
+    console.log(`👨‍🎓 Found ${students.length} students in ${classLevel}`);
+
+    if (students.length > 0) {
+      for (const student of students) {
+        const existing = await StudentFee.findOne({
+          studentId: student._id,
+          feeStructureId: feeStructure._id,
+          semester: semester,
+          academicYear: academicYear,
+        });
+
+        if (existing) {
+          console.log(`⏭️ Fee already assigned to ${student.name}`);
+          continue;
+        }
+
+        const studentFee = new StudentFee({
+          studentId: student._id,
+          feeStructureId: feeStructure._id,
+          amount: parseFloat(amount),
+          feeName: name,
+          feeType: feeType,
+          classLevel: classLevel,
+          startDate: new Date(startDate),
+          endDate: new Date(endDate),
+          dueDate: new Date(endDate),
+          lateFeeAmount: parseFloat(lateFeeAmount) || 0,
+          gracePeriodDays: parseInt(gracePeriodDays) || 0,
+          semester: semester,
+          academicYear: academicYear,
+          status: 'pending',
+        });
+
+        await studentFee.save();
+        assignedCount++;
+        assignedStudents.push({ id: student._id, name: student.name });
+        console.log(`✅ Assigned fee to ${student.name}`);
+      }
+    }
+
+    console.log(`✅ Assigned to ${assignedCount} students`);
+
     res.status(201).json({ 
       success: true, 
-      message: 'Fee structure created successfully!', 
-      data: feeStructure 
+      message: `Fee structure created successfully! Assigned to ${assignedCount} students.`, 
+      data: {
+        feeStructure,
+        assignedCount: assignedCount,
+        assignedStudents: assignedStudents,
+      }
     });
+    
   } catch (error) {
     console.error('❌ Error creating fee:', error);
     
@@ -117,7 +299,10 @@ router.post('/fee-structures', auth, roleCheck('admin', 'finance_officer'), asyn
   }
 });
 
-// ✅ GET ALL FEE STRUCTURES - UPDATED (returns new fields automatically)
+// ============================================
+// 📌 GET ALL FEE STRUCTURES
+// ============================================
+
 router.get('/fee-structures', auth, roleCheck('admin', 'finance_officer'), async (req, res) => {
   try {
     const { classLevel, isActive } = req.query;
@@ -134,100 +319,354 @@ router.get('/fee-structures', auth, roleCheck('admin', 'finance_officer'), async
   }
 });
 
-// ✅ GET SINGLE FEE STRUCTURE - NEW ROUTE
-router.get('/fee-structures/:id', auth, roleCheck('admin', 'finance_officer'), async (req, res) => {
+// ============================================
+// 📌 GET STUDENT FEES (Admin/Finance)
+// ============================================
+
+router.get('/student-fees', auth, roleCheck('admin', 'finance_officer'), async (req, res) => {
   try {
-    const { id } = req.params;
-    const feeStructure = await FeeStructure.findById(id);
+    const { studentId, status } = req.query;
+    const filter = {};
     
-    if (!feeStructure) {
-      return res.status(404).json({ success: false, error: 'Fee structure not found' });
-    }
-    
-    res.json({ success: true, data: feeStructure });
+    if (studentId) filter.studentId = studentId;
+    if (status) filter.status = status;
+
+    const studentFees = await StudentFee.find(filter)
+      .populate('studentId', 'name email class')
+      .populate('feeStructureId', 'name amount feeType startDate endDate lateFeeAmount gracePeriodDays')
+      .sort({ createdAt: -1 });
+
+    res.json({ success: true, count: studentFees.length, data: studentFees });
   } catch (error) {
-    console.error('❌ Error fetching fee:', error);
+    console.error('❌ Error fetching student fees:', error);
     res.status(500).json({ success: false, error: 'Server Error' });
   }
 });
 
-// ✅ UPDATE FEE STRUCTURE - UPDATED with new fields
-router.put('/fee-structures/:id', auth, roleCheck('admin', 'finance_officer'), async (req, res) => {
+// ============================================
+// 📌 GET ALL PAYMENTS - FIXED
+// ============================================
+
+router.get('/payments', auth, roleCheck('admin', 'finance_officer'), async (req, res) => {
+  try {
+    const { status, studentId } = req.query;
+    const filter = {};
+    
+    if (status) filter.status = status;
+    if (studentId) filter.studentId = studentId;
+
+    const payments = await Payment.find(filter)
+      .populate({
+        path: 'studentId',
+        select: 'name email class role',
+        populate: {
+          path: 'parentId',
+          select: 'name email phone'
+        }
+      })
+      .populate('paidBy', 'name email')
+      .populate('studentFeeId', 'feeName amount')
+      .populate('confirmedBy', 'name email')
+      .sort({ createdAt: -1 });
+      
+    const transformedPayments = payments.map(payment => {
+      const paymentObj = payment.toObject();
+      const student = payment.studentId;
+      const payer = payment.paidBy;
+      
+      const paidFor = student?.name || 'Unknown';
+      let paidBy = payer?.name || student?.name || 'Unknown';
+      
+      if (payer?.role === 'parent') {
+        paidBy = payer.name;
+      }
+      
+      return {
+        ...paymentObj,
+        paidBy,
+        paidFor,
+        studentName: student?.name || 'N/A',
+        parentName: student?.parentId?.name || null,
+        payerName: payer?.name || null,
+      };
+    });
+    
+    res.json({ 
+      success: true, 
+      count: transformedPayments.length, 
+      data: transformedPayments 
+    });
+  } catch (error) {
+    console.error('❌ Error fetching payments:', error);
+    res.status(500).json({ success: false, error: 'Server Error' });
+  }
+});
+
+// ============================================
+// 📌 GET SINGLE PAYMENT - FIXED
+// ============================================
+
+router.get('/payments/:id', auth, roleCheck('admin', 'finance_officer'), async (req, res) => {
   try {
     const { id } = req.params;
-    const {
-      name,
-      description,
-      amount,
-      feeType,
-      classLevel,
-      semester,
-      academicYear,
-      startDate,
-      endDate,
-      lateFeeAmount,
-      gracePeriodDays,
-      isActive,
-    } = req.body;
-
-    // ✅ Build update object
-    const updateData = {
-      name,
-      description: description || '',
-      amount: parseFloat(amount),
-      feeType,
-      classLevel,
-      semester,
-      academicYear,
-      startDate: new Date(startDate),
-      endDate: new Date(endDate),
-      lateFeeAmount: parseFloat(lateFeeAmount) || 0,
-      gracePeriodDays: parseInt(gracePeriodDays) || 0,
-      isActive: isActive !== undefined ? isActive : true,
-      updatedAt: new Date(),
-    };
-
-    // ✅ Validate date logic
-    if (startDate && endDate && new Date(endDate) <= new Date(startDate)) {
-      return res.status(400).json({
+    
+    const payment = await Payment.findById(id)
+      .populate({
+        path: 'studentId',
+        select: 'name email class role',
+        populate: {
+          path: 'parentId',
+          select: 'name email phone'
+        }
+      })
+      .populate('paidBy', 'name email') // ✅ ADD THIS
+      .populate('studentFeeId', 'feeName amount')
+      .populate('confirmedBy', 'name email');
+    
+    if (!payment) {
+      return res.status(404).json({
         success: false,
-        error: 'End date must be after start date'
+        error: 'Payment not found'
       });
     }
-
-    const feeStructure = await FeeStructure.findByIdAndUpdate(
-      id,
-      updateData,
-      { new: true, runValidators: true }
-    );
-
-    if (!feeStructure) {
-      return res.status(404).json({ success: false, error: 'Fee structure not found' });
+    
+    const paymentObj = payment.toObject();
+    const student = payment.studentId;
+    const payer = payment.paidBy;
+    
+    const paidFor = student?.name || 'Unknown';
+    let paidBy = payer?.name || student?.name || 'Unknown';
+    
+    if (payer?.role === 'parent') {
+      paidBy = payer.name;
     }
+    
+    res.json({
+      success: true,
+      data: {
+        ...paymentObj,
+        paidBy,
+        paidFor,
+        studentName: student?.name || 'N/A',
+        parentName: student?.parentId?.name || null,
+        payerName: payer?.name || null,
+      },
+    });
+  } catch (error) {
+    console.error('❌ Error fetching payment:', error);
+    res.status(500).json({ success: false, error: 'Server Error' });
+  }
+});
+
+// ============================================
+// 📌 CONFIRM PAYMENT - FIXED
+
+
+
+// 📌 CONFIRM PAYMENT - WITH RECEIPT GENERATION
+router.put('/payments/:id/confirm', auth, roleCheck('admin', 'finance_officer'), async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { notes } = req.body;
+
+    const payment = await Payment.findById(id)
+      .populate('studentId', 'name email class')
+      .populate('studentFeeId', 'feeName amount');
+
+    if (!payment) {
+      return res.status(404).json({ success: false, error: 'Payment not found' });
+    }
+    
+    if (payment.status === 'confirmed') {
+      return res.status(400).json({ success: false, error: 'Payment already confirmed' });
+    }
+
+    // ✅ Generate receipt number
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+    payment.receiptNumber = `REC-${year}${month}${day}-${random}`;
+
+    payment.status = 'confirmed';
+    payment.confirmedBy = req.user.id;
+    payment.confirmedAt = new Date();
+    if (notes) payment.notes = notes;
+
+    // ✅ Generate receipt file
+    const schoolInfo = {
+      name: 'Adama Science and Technology University',
+      address: 'Adama, Ethiopia',
+      phone: '+251-XXX-XXXX',
+    };
+
+    try {
+      const confirmedBy = await User.findById(req.user.id);
+      const receipt = await generateReceipt(payment, payment.studentId, schoolInfo, confirmedBy);
+      payment.receiptUrl = receipt.url;
+    } catch (receiptError) {
+      console.error('⚠️ Receipt generation failed:', receiptError.message);
+      // ✅ Continue even if receipt fails - we'll still confirm the payment
+    }
+
+    await payment.save();
+
+    // ✅ Update student fee status
+    const studentFee = await StudentFee.findById(payment.studentFeeId);
+    if (studentFee) {
+      studentFee.status = 'paid';
+      studentFee.paidAt = new Date();
+      await studentFee.save();
+    }
+
+    // ✅ Get updated stats
+    const pendingCount = await Payment.countDocuments({ status: 'pending' });
+    const confirmedCount = await Payment.countDocuments({ status: 'confirmed' });
+    const rejectedCount = await Payment.countDocuments({ status: 'rejected' });
+    const totalCollected = await Payment.aggregate([
+      { $match: { status: 'confirmed' } },
+      { $group: { _id: null, total: { $sum: '$amount' } } }
+    ]);
+
+    res.json({ 
+      success: true, 
+      message: 'Payment confirmed!', 
+      data: {
+        payment,
+        stats: {
+          pending: pendingCount,
+          confirmed: confirmedCount,
+          rejected: rejectedCount,
+          totalCollected: totalCollected[0]?.total || 0,
+        }
+      }
+    });
+  } catch (error) {
+    console.error('❌ Error confirming payment:', error);
+    res.status(500).json({ success: false, error: 'Server Error: ' + error.message });
+  }
+});
+
+// ============================================
+// 📌 REJECT PAYMENT - FIXED
+// ============================================
+
+router.put('/payments/:id/reject', auth, roleCheck('admin', 'finance_officer'), async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body;
+
+    const payment = await Payment.findById(id);
+    if (!payment) {
+      return res.status(404).json({ success: false, error: 'Payment not found' });
+    }
+    
+    if (payment.status === 'confirmed') {
+      return res.status(400).json({ success: false, error: 'Cannot reject a confirmed payment' });
+    }
+
+    payment.status = 'rejected';
+    payment.rejectionReason = reason || 'Payment rejected';
+    await payment.save();
+
+    const pendingCount = await Payment.countDocuments({ status: 'pending' });
+    const confirmedCount = await Payment.countDocuments({ status: 'confirmed' });
+    const rejectedCount = await Payment.countDocuments({ status: 'rejected' });
+    const totalCollected = await Payment.aggregate([
+      { $match: { status: 'confirmed' } },
+      { $group: { _id: null, total: { $sum: '$amount' } } }
+    ]);
+
+    res.json({ 
+      success: true, 
+      message: 'Payment rejected!', 
+      data: {
+        payment,
+        stats: {
+          pending: pendingCount,
+          confirmed: confirmedCount,
+          rejected: rejectedCount,
+          totalCollected: totalCollected[0]?.total || 0,
+        }
+      }
+    });
+  } catch (error) {
+    console.error('❌ Error rejecting payment:', error);
+    res.status(500).json({ success: false, error: 'Server Error' });
+  }
+});
+
+// ============================================
+// 📌 GET REVENUE SUMMARY
+// ============================================
+
+router.get('/revenue', auth, roleCheck('admin', 'finance_officer'), async (req, res) => {
+  try {
+    const pendingCount = await Payment.countDocuments({ status: 'pending' });
+    const confirmedCount = await Payment.countDocuments({ status: 'confirmed' });
+    const rejectedCount = await Payment.countDocuments({ status: 'rejected' });
+    const totalCollected = await Payment.aggregate([
+      { $match: { status: 'confirmed' } },
+      { $group: { _id: null, total: { $sum: '$amount' } } }
+    ]);
 
     res.json({
       success: true,
-      message: 'Fee structure updated successfully!',
-      data: feeStructure,
+      data: {
+        pending: pendingCount,
+        confirmed: confirmedCount,
+        rejected: rejectedCount,
+        totalCollected: totalCollected[0]?.total || 0,
+      }
     });
   } catch (error) {
-    console.error('❌ Error updating fee:', error);
-    
-    if (error.name === 'ValidationError') {
-      const errors = Object.values(error.errors).map(err => err.message);
-      return res.status(400).json({ success: false, errors });
-    }
-    
+    console.error('❌ Error fetching revenue:', error);
     res.status(500).json({ success: false, error: 'Server Error' });
   }
 });
 
-// ✅ DELETE FEE STRUCTURE
+// ============================================
+// 📌 TOGGLE FEE ACTIVE STATUS
+// ============================================
+
+router.patch('/fee-structures/:id/toggle', auth, roleCheck('admin', 'finance_officer'), async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const feeStructure = await FeeStructure.findById(id);
+    if (!feeStructure) {
+      return res.status(404).json({ success: false, error: 'Fee structure not found' });
+    }
+
+    feeStructure.isActive = !feeStructure.isActive;
+    feeStructure.updatedAt = new Date();
+    
+    if (!feeStructure.dueDate) {
+      feeStructure.dueDate = feeStructure.endDate || new Date();
+    }
+    
+    await feeStructure.save();
+
+    res.json({
+      success: true,
+      message: `Fee ${feeStructure.isActive ? 'activated' : 'deactivated'} successfully!`,
+      data: feeStructure,
+    });
+  } catch (error) {
+    console.error('❌ Error toggling fee:', error);
+    res.status(500).json({ success: false, error: 'Server Error: ' + error.message });
+  }
+});
+
+// ============================================
+// 📌 DELETE FEE STRUCTURE
+// ============================================
+
 router.delete('/fee-structures/:id', auth, roleCheck('admin', 'finance_officer'), async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Check if any students are assigned this fee
     const assignedFees = await StudentFee.findOne({ feeStructureId: id });
     if (assignedFees) {
       return res.status(400).json({
@@ -252,465 +691,36 @@ router.delete('/fee-structures/:id', auth, roleCheck('admin', 'finance_officer')
   }
 });
 
-// ✅ TOGGLE FEE ACTIVE STATUS - NEW ROUTE
-router.patch('/fee-structures/:id/toggle', auth, roleCheck('admin', 'finance_officer'), async (req, res) => {
-  try {
-    const { id } = req.params;
-    
-    const feeStructure = await FeeStructure.findById(id);
-    if (!feeStructure) {
-      return res.status(404).json({ success: false, error: 'Fee structure not found' });
-    }
-
-    feeStructure.isActive = !feeStructure.isActive;
-    feeStructure.updatedAt = new Date();
-    await feeStructure.save();
-
-    res.json({
-      success: true,
-      message: `Fee ${feeStructure.isActive ? 'activated' : 'deactivated'} successfully!`,
-      data: feeStructure,
-    });
-  } catch (error) {
-    console.error('❌ Error toggling fee:', error);
-    res.status(500).json({ success: false, error: 'Server Error' });
-  }
-});
-
 // ============================================
-// 📌 FINANCE OFFICER ROUTES - Assign Fees
+// 📌 DASHBOARD STATS - FIXED
 // ============================================
 
-// ✅ ASSIGN FEES TO STUDENTS - UPDATED with new fields
-router.post('/assign-fees', auth, roleCheck('admin', 'finance_officer'), async (req, res) => {
-  try {
-    const { feeStructureId, studentIds } = req.body;
-    
-    if (!studentIds || studentIds.length === 0) {
-      return res.status(400).json({
-        success: false,
-        error: 'Please provide at least one student ID',
-      });
-    }
-
-    const feeStructure = await FeeStructure.findById(feeStructureId);
-    if (!feeStructure) {
-      return res.status(404).json({ success: false, error: 'Fee structure not found' });
-    }
-
-    // Check if fee is active
-    if (!feeStructure.isActive) {
-      return res.status(400).json({
-        success: false,
-        error: 'Cannot assign: Fee structure is inactive',
-      });
-    }
-
-    const results = { successful: [], failed: [] };
-    
-    for (const studentId of studentIds) {
-      try {
-        const student = await User.findById(studentId);
-        if (!student || student.role !== 'student') {
-          results.failed.push({ studentId, reason: 'Student not found or not a student' });
-          continue;
-        }
-
-        const existing = await StudentFee.findOne({ 
-          studentId, 
-          feeStructureId,
-          semester: feeStructure.semester,
-          academicYear: feeStructure.academicYear,
-        });
-        
-        if (existing) {
-          results.failed.push({ studentId, reason: 'Fee already assigned' });
-          continue;
-        }
-
-        // ✅ Create student fee with ALL fields
-        const studentFee = new StudentFee({
-          studentId,
-          feeStructureId,
-          amount: feeStructure.amount,
-          feeName: feeStructure.name,
-          feeType: feeStructure.feeType,
-          startDate: feeStructure.startDate,
-          endDate: feeStructure.endDate,
-          dueDate: feeStructure.endDate, // Keep for backward compatibility
-          lateFeeAmount: feeStructure.lateFeeAmount,
-          gracePeriodDays: feeStructure.gracePeriodDays,
-          semester: feeStructure.semester,
-          academicYear: feeStructure.academicYear,
-          classLevel: feeStructure.classLevel,
-          status: 'pending',
-        });
-        
-        await studentFee.save();
-        results.successful.push({ 
-          studentId, 
-          studentName: student.name,
-          studentFee: studentFee._id,
-        });
-      } catch (error) {
-        results.failed.push({ studentId, reason: error.message });
-      }
-    }
-
-    res.json({
-      success: true,
-      message: `Assigned to ${results.successful.length} student(s)`,
-      data: results,
-    });
-  } catch (error) {
-    console.error('❌ Error assigning fees:', error);
-    res.status(500).json({ success: false, error: 'Server Error' });
-  }
-});
-
-// ✅ GET ALL STUDENT FEES - UPDATED with population
-router.get('/student-fees', auth, roleCheck('admin', 'finance_officer'), async (req, res) => {
-  try {
-    const { status, classLevel, academicYear } = req.query;
-    const filter = {};
-    
-    if (status) filter.status = status;
-    if (academicYear) filter.academicYear = academicYear;
-
-    let studentFees = await StudentFee.find(filter)
-      .populate('studentId', 'name email class')
-      .populate('feeStructureId', 'name amount feeType startDate endDate lateFeeAmount gracePeriodDays')
-      .sort({ createdAt: -1 });
-
-    // Filter by class level if provided
-    if (classLevel) {
-      const students = await User.find({
-        role: 'student',
-        class: { $regex: new RegExp(`^Grade ${classLevel}`, 'i') }
-      });
-      const studentIds = students.map(s => s._id.toString());
-      studentFees = studentFees.filter(fee =>
-        studentIds.includes(fee.studentId._id.toString())
-      );
-    }
-
-    res.json({ success: true, count: studentFees.length, data: studentFees });
-  } catch (error) {
-    console.error('❌ Error fetching student fees:', error);
-    res.status(500).json({ success: false, error: 'Server Error' });
-  }
-});
-
-// ✅ GET STUDENT FEE DETAIL - NEW ROUTE
-router.get('/student-fees/:id', auth, roleCheck('admin', 'finance_officer'), async (req, res) => {
-  try {
-    const { id } = req.params;
-    
-    const studentFee = await StudentFee.findById(id)
-      .populate('studentId', 'name email class')
-      .populate('feeStructureId', 'name amount feeType startDate endDate lateFeeAmount gracePeriodDays');
-
-    if (!studentFee) {
-      return res.status(404).json({ success: false, error: 'Student fee record not found' });
-    }
-
-    const isOverdue = isFeeOverdue(studentFee);
-    const totalAmount = calculateTotalAmount(studentFee);
-
-    res.json({
-      success: true,
-      data: {
-        ...studentFee.toObject(),
-        isOverdue,
-        totalAmount,
-        isLateFeeApplied: isOverdue && studentFee.lateFeeAmount > 0,
-      },
-    });
-  } catch (error) {
-    console.error('❌ Error fetching student fee:', error);
-    res.status(500).json({ success: false, error: 'Server Error' });
-  }
-});
-
-// ============================================
-// 📌 FINANCE OFFICER ROUTES - Payment Processing
-// ============================================
-
-// ✅ GET ALL PAYMENTS - UPDATED
-router.get('/payments', auth, roleCheck('admin', 'finance_officer'), async (req, res) => {
-  try {
-    const { status } = req.query;
-    const filter = {};
-    if (status) filter.status = status;
-
-    const payments = await Payment.find(filter)
-      .populate('studentId', 'name email class')
-      .populate('studentFeeId', 'feeName amount')
-      .populate('confirmedBy', 'name')
-      .sort({ createdAt: -1 });
-      
-    res.json({ success: true, count: payments.length, data: payments });
-  } catch (error) {
-    console.error('❌ Error fetching payments:', error);
-    res.status(500).json({ success: false, error: 'Server Error' });
-  }
-});
-
-// ✅ GET PENDING PAYMENTS - NEW ROUTE
-router.get('/payments/pending', auth, roleCheck('admin', 'finance_officer'), async (req, res) => {
-  try {
-    const payments = await Payment.find({ status: 'pending' })
-      .populate('studentId', 'name email')
-      .populate('studentFeeId', 'feeName amount')
-      .sort({ createdAt: -1 });
-
-    res.json({
-      success: true,
-      count: payments.length,
-      data: payments,
-    });
-  } catch (error) {
-    console.error('❌ Error fetching pending payments:', error);
-    res.status(500).json({ success: false, error: 'Server Error' });
-  }
-});
-
-// ✅ CONFIRM PAYMENT - UPDATED with receipt generation
-router.put('/payments/:id/confirm', auth, roleCheck('admin', 'finance_officer'), async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { notes } = req.body;
-
-    const payment = await Payment.findById(id);
-    if (!payment) {
-      return res.status(404).json({ success: false, error: 'Payment not found' });
-    }
-    
-    if (payment.status === 'confirmed') {
-      return res.status(400).json({ success: false, error: 'Payment already confirmed' });
-    }
-
-    // Update payment
-    payment.status = 'confirmed';
-    payment.confirmedBy = req.user.id;
-    payment.confirmedAt = new Date();
-    if (notes) payment.notes = notes;
-
-    // Generate receipt number
-    const date = new Date();
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-    payment.receiptNumber = `REC-${year}${month}${day}-${random}`;
-
-    await payment.save();
-
-    // Update student fee status
-    const studentFee = await StudentFee.findById(payment.studentFeeId);
-    if (studentFee) {
-      studentFee.status = 'paid';
-      studentFee.paidAt = new Date();
-      await studentFee.save();
-    }
-
-    res.json({ 
-      success: true, 
-      message: 'Payment confirmed!', 
-      data: payment 
-    });
-  } catch (error) {
-    console.error('❌ Error confirming payment:', error);
-    res.status(500).json({ success: false, error: 'Server Error' });
-  }
-});
-
-// ✅ REJECT PAYMENT - UPDATED
-router.put('/payments/:id/reject', auth, roleCheck('admin', 'finance_officer'), async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { reason } = req.body;
-
-    const payment = await Payment.findById(id);
-    if (!payment) {
-      return res.status(404).json({ success: false, error: 'Payment not found' });
-    }
-    
-    if (payment.status === 'confirmed') {
-      return res.status(400).json({ success: false, error: 'Cannot reject a confirmed payment' });
-    }
-
-    payment.status = 'rejected';
-    payment.rejectionReason = reason || 'Payment rejected';
-    await payment.save();
-
-    res.json({ 
-      success: true, 
-      message: 'Payment rejected!', 
-      data: payment 
-    });
-  } catch (error) {
-    console.error('❌ Error rejecting payment:', error);
-    res.status(500).json({ success: false, error: 'Server Error' });
-  }
-});
-
-// ============================================
-// 📌 FINANCE OFFICER ROUTES - Revenue & Reports
-// ============================================
-
-// ✅ GET REVENUE SUMMARY - UPDATED with late fees
-router.get('/revenue', auth, roleCheck('admin', 'finance_officer'), async (req, res) => {
-  try {
-    const totalCollected = await Payment.aggregate([
-      { $match: { status: 'confirmed' } },
-      { $group: { _id: null, total: { $sum: '$amount' } } }
-    ]);
-
-    const totalLateFees = await Payment.aggregate([
-      { $match: { status: 'confirmed' } },
-      { $group: { _id: null, total: { $sum: '$lateFee' } } }
-    ]);
-
-    const totalPending = await Payment.aggregate([
-      { $match: { status: 'pending' } },
-      { $group: { _id: null, total: { $sum: '$amount' } } }
-    ]);
-
-    const totalOverdue = await StudentFee.aggregate([
-      { $match: { status: 'overdue' } },
-      { $group: { _id: null, total: { $sum: '$amount' } } }
-    ]);
-
-    const totalPaidStudents = await StudentFee.distinct('studentId', { status: 'paid' });
-    const totalStudents = await User.countDocuments({ role: 'student' });
-
-    res.json({
-      success: true,
-      data: {
-        totalCollected: totalCollected[0]?.total || 0,
-        totalLateFees: totalLateFees[0]?.total || 0,
-        totalPending: totalPending[0]?.total || 0,
-        totalOverdue: totalOverdue[0]?.total || 0,
-        paidStudents: totalPaidStudents.length,
-        totalStudents,
-        collectionRate: totalStudents > 0 ? Math.round((totalPaidStudents.length / totalStudents) * 100) : 0,
-      }
-    });
-  } catch (error) {
-    console.error('❌ Error fetching revenue:', error);
-    res.status(500).json({ success: false, error: 'Server Error' });
-  }
-});
-
-// ✅ GET PAYMENT HISTORY - UPDATED
-router.get('/payment-history', auth, roleCheck('admin', 'finance_officer'), async (req, res) => {
-  try {
-    const { startDate, endDate } = req.query;
-    const filter = { status: 'confirmed' };
-    
-    if (startDate && endDate) {
-      filter.createdAt = { 
-        $gte: new Date(startDate), 
-        $lte: new Date(endDate) 
-      };
-    }
-
-    const payments = await Payment.find(filter)
-      .populate('studentId', 'name email class')
-      .populate('studentFeeId', 'feeName amount')
-      .populate('confirmedBy', 'name')
-      .sort({ createdAt: -1 });
-      
-    res.json({ success: true, count: payments.length, data: payments });
-  } catch (error) {
-    console.error('❌ Error fetching payment history:', error);
-    res.status(500).json({ success: false, error: 'Server Error' });
-  }
-});
-
-// ✅ GET OVERDUE FEES REPORT - NEW ROUTE
-router.get('/reports/overdue', auth, roleCheck('admin', 'finance_officer'), async (req, res) => {
-  try {
-    const studentFees = await StudentFee.find({ status: { $ne: 'paid' } })
-      .populate('studentId', 'name email class')
-      .populate('feeStructureId', 'name');
-
-    const overdueFees = studentFees.filter(fee => isFeeOverdue(fee));
-
-    const totalOverdue = overdueFees.reduce((sum, fee) => sum + fee.amount, 0);
-    const totalLateFees = overdueFees.reduce((sum, fee) => sum + (fee.lateFeeAmount || 0), 0);
-
-    res.json({
-      success: true,
-      data: {
-        count: overdueFees.length,
-        totalOverdue,
-        totalLateFees,
-        totalWithLateFees: totalOverdue + totalLateFees,
-        fees: overdueFees.map(fee => ({
-          ...fee.toObject(),
-          daysOverdue: Math.floor((new Date() - new Date(fee.endDate || fee.dueDate)) / (1000 * 60 * 60 * 24)),
-          totalAmount: fee.amount + (isFeeOverdue(fee) ? (fee.lateFeeAmount || 0) : 0),
-        })),
-      },
-    });
-  } catch (error) {
-    console.error('❌ Error fetching overdue fees:', error);
-    res.status(500).json({ success: false, error: 'Server Error' });
-  }
-});
-
-// ✅ GET FINANCE DASHBOARD STATS - NEW ROUTE
 router.get('/dashboard/stats', auth, roleCheck('admin', 'finance_officer'), async (req, res) => {
   try {
-    const allFees = await StudentFee.find();
+    const confirmedPayments = await Payment.find({ status: 'confirmed' });
+    const totalCollected = confirmedPayments.reduce((sum, p) => sum + (p.amount || 0), 0);
     
-    let totalDue = 0;
-    let totalCollected = 0;
-    let totalLateFees = 0;
-    let overdueCount = 0;
-    let pendingCount = 0;
-
-    for (const fee of allFees) {
-      if (fee.status === 'paid') {
-        totalCollected += fee.amount;
-      } else {
-        totalDue += fee.amount;
-        pendingCount++;
-        
-        if (isFeeOverdue(fee)) {
-          overdueCount++;
-          totalLateFees += (fee.lateFeeAmount || 0);
-        }
-      }
-    }
-
-    const totalFees = allFees.length;
-    const paidCount = totalFees - pendingCount;
-
-    const recentPayments = await Payment.find({ status: 'confirmed' })
-      .populate('studentId', 'name')
-      .populate('studentFeeId', 'feeName')
-      .sort({ confirmedAt: -1 })
-      .limit(10);
+    const pendingPayments = await Payment.find({ status: 'pending' });
+    const pendingAmount = pendingPayments.reduce((sum, p) => sum + (p.amount || 0), 0);
+    
+    const overdueFees = await StudentFee.find({ status: 'overdue' });
+    const overdueAmount = overdueFees.reduce((sum, f) => sum + (f.amount || 0), 0);
+    
+    const totalFees = await StudentFee.countDocuments();
+    const paidFees = await StudentFee.countDocuments({ status: 'paid' });
+    const collectionRate = totalFees > 0 ? (paidFees / totalFees) * 100 : 0;
 
     res.json({
       success: true,
       data: {
-        summary: {
-          totalFees,
-          totalDue,
-          totalCollected,
-          totalLateFees,
-          outstandingBalance: totalDue + totalLateFees,
-          paidCount,
-          pendingCount,
-          overdueCount,
-          collectionRate: totalFees > 0 ? (totalCollected / (totalFees * (totalDue / totalFees || 1))) * 100 : 0,
-        },
-        recentPayments,
-      },
+        totalCollected: totalCollected || 0,
+        pendingAmount: pendingAmount || 0,
+        overdueAmount: overdueAmount || 0,
+        collectionRate: Math.round(collectionRate * 100) / 100 || 0,
+        totalFees,
+        paidFees,
+        pendingCount: await Payment.countDocuments({ status: 'pending' }),
+      }
     });
   } catch (error) {
     console.error('❌ Error fetching dashboard stats:', error);
@@ -718,4 +728,64 @@ router.get('/dashboard/stats', auth, roleCheck('admin', 'finance_officer'), asyn
   }
 });
 
+
+// 📌 DOWNLOAD RECEIPT - FIXED
+router.get('/payments/:id/receipt', auth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const payment = await Payment.findById(id);
+    if (!payment) {
+      return res.status(404).json({ success: false, error: 'Payment not found' });
+    }
+    
+    if (!payment.receiptNumber) {
+      return res.status(404).json({ success: false, error: 'Receipt not available for this payment' });
+    }
+
+    // ✅ Check if user has access
+    const user = await User.findById(req.user.id);
+    if (user.role === 'student' && user._id.toString() !== payment.studentId.toString()) {
+      return res.status(403).json({ success: false, error: 'Access denied' });
+    }
+    if (user.role === 'parent') {
+      const isChild = user.children.some(child => child.toString() === payment.studentId.toString());
+      if (!isChild && user.role !== 'admin' && user.role !== 'finance_officer') {
+        return res.status(403).json({ success: false, error: 'Access denied' });
+      }
+    }
+
+    // ✅ Try to find the receipt file
+    const filename = `receipt-${payment.receiptNumber}.pdf`;
+    let filePath = path.join(__dirname, '../uploads/receipts', filename);
+    
+    // ✅ If not found with receipt number, try with payment ID
+    if (!fs.existsSync(filePath)) {
+      const altFilename = `receipt-${payment._id}.pdf`;
+      const altPath = path.join(__dirname, '../uploads/receipts', altFilename);
+      if (fs.existsSync(altPath)) {
+        filePath = altPath;
+      } else {
+        // ✅ If still not found, check if receiptUrl exists in database
+        if (payment.receiptUrl) {
+          const dbPath = path.join(__dirname, '..', payment.receiptUrl);
+          if (fs.existsSync(dbPath)) {
+            filePath = dbPath;
+          } else {
+            return res.status(404).json({ success: false, error: 'Receipt file not found' });
+          }
+        } else {
+          return res.status(404).json({ success: false, error: 'Receipt file not found' });
+        }
+      }
+    }
+    
+    // ✅ Send the file
+    res.download(filePath, `receipt-${payment.receiptNumber || payment._id}.pdf`);
+    
+  } catch (error) {
+    console.error('❌ Error downloading receipt:', error);
+    res.status(500).json({ success: false, error: 'Server Error: ' + error.message });
+  }
+});
 module.exports = router;

@@ -24,6 +24,8 @@ const financeOfficerRoutes = require('./routes/financeOfficerRoutes');
 const announcementRoutes = require('./routes/announcementRoutes');
 const worksheetRoutes = require('./routes/worksheetRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
+const passwordResetRoutes = require('./routes/passwordResetRoutes');
+
 
 connectDB();
 
@@ -49,7 +51,8 @@ initializeSocket(io);
 
 // Middleware
 app.use(express.json());
-
+const path = require('path');
+const fs = require('fs');
 // Logger
 app.use((req, res, next) => {
   console.log(`📝 [${new Date().toLocaleTimeString()}] ${req.method} ${req.url}`);
@@ -72,6 +75,16 @@ app.use('/api/registrar', registrarRoutes);
  app.use('/api/announcements', announcementRoutes);
  app.use('/api/worksheets', worksheetRoutes);
  app.use('/api/payments', paymentRoutes);
+ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+ app.use('/api/password-reset', passwordResetRoutes);
+
+// ✅ Ensure uploads directory exists
+const uploadDir = path.join(__dirname, 'uploads/screenshots');
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+    console.log('✅ Created uploads/screenshots directory');
+}
+
 // Home route
 app.get('/', (req, res) => {
   res.send('Hello World! 🚀 High School Portal with Real-time Messaging!');

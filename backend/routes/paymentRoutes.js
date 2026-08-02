@@ -49,80 +49,79 @@ const upload = multer({
 // ============================================
 // 📌 SUBMIT PAYMENT (Parent/Student)
 // ============================================
-router.post(
-  '/submit',
-  auth,
-  roleCheck('student', 'parent'),
-  upload.single('screenshot'),
-  async (req, res) => {
-    try {
-      const { studentFeeId, bankName, referenceNumber, amount, paymentDate } = req.body;
-      
-      // ✅ 1. Validate student fee exists
-      const studentFee = await StudentFee.findById(studentFeeId);
-      if (!studentFee) {
-        return res.status(404).json({ success: false, error: 'Student fee not found' });
-      }
+// routes/paymentRoutes.js - Fix submit payment
 
-      // ✅ 2. Check if fee is already paid
-      if (studentFee.status === 'paid') {
-        return res.status(400).json({ success: false, error: 'This fee is already paid' });
-      }
-
-      // ✅ 3. Check if reference number already exists
-      const existingPayment = await Payment.findOne({ referenceNumber });
-      if (existingPayment) {
-        return res.status(400).json({
-          success: false,
-          error: 'Reference number already used. Please enter a valid reference number.',
-        });
-      }
-
-      // ✅ 4. Check if screenshot was uploaded
-      if (!req.file) {
-        return res.status(400).json({ success: false, error: 'Please upload a screenshot of the payment' });
-      }
-
-      // ✅ 5. Create payment
-      const payment = new Payment({
-        studentFeeId,
-        studentId: req.user.id,
-        amount: amount || studentFee.amount,
-        bankName,
-        referenceNumber,
-        screenshotUrl: `/uploads/screenshots/${req.file.filename}`,
-        paymentDate: paymentDate || new Date(),
-        status: 'pending',
-      });
-
-      await payment.save();
-
-      res.status(201).json({
-        success: true,
-        message: 'Payment submitted successfully! Awaiting confirmation.',
-        data: payment,
-      });
-    } catch (error) {
-      console.error(error);
-      
-      // ✅ Handle duplicate reference number error
-      if (error.code === 11000 && error.keyPattern?.referenceNumber) {
-        return res.status(400).json({
-          success: false,
-          error: 'Reference number already used. Please enter a valid reference number.',
-        });
-      }
-
-      if (error.name === 'ValidationError') {
-        const errors = Object.values(error.errors).map(err => err.message);
-        return res.status(400).json({ success: false, errors });
-      }
-
-      res.status(500).json({ success: false, error: 'Server Error' });
+router.post('/submit', auth, roleCheck('student', 'parent'), upload.single('screenshot'), async (req, res) => {
+  try {
+    const { studentFeeId, bankName, referenceNumber, amount, paymentDate } = req.body;
+    
+    // ✅ Get the student fee to find the student ID
+    const studentFee = await StudentFee.findById(studentFeeId);
+    if (!studentFee) {
+      return res.status(404).json({ success: false, error: 'Student fee not found' });
     }
-  }
-);
 
+    // ✅ Check if fee is already paid
+    if (studentFee.status === 'paid') {
+      return res.status(400).json({ success: false, error: 'This fee is already paid' });
+    }
+
+    // ✅ Check reference number
+    const existingPayment = await Payment.findOne({ referenceNumber });
+    if (existingPayment) {
+      return res.status(400).json({
+        success: false,
+        error: 'Reference number already used. Please enter a valid reference number.',
+      });
+    }
+
+    // ✅ Check screenshot
+    if (!req.file) {
+      return res.status(400).json({ success: false, error: 'Please upload a screenshot of the payment' });
+    }
+
+    // ✅ Get the actual student ID from the studentFee
+    const actualStudentId = studentFee.studentId; // ✅ THIS IS THE STUDENT'S ID!
+
+    // ✅ Create payment with the STUDENT'S ID
+    const payment = new Payment({
+      studentFeeId,
+      studentId: actualStudentId, // ✅ Use student's ID, not parent's
+      amount: amount || studentFee.amount,
+      bankName,
+      referenceNumber,
+      screenshotUrl: `/uploads/screenshots/${req.file.filename}`,
+      paymentDate: paymentDate || new Date(),
+      status: 'pending',
+      // ✅ Store who made the payment (for reference)
+      paidBy: req.user.id, // Parent or student who paid
+    });
+
+    await payment.save();
+
+    res.status(201).json({
+      success: true,
+      message: 'Payment submitted successfully! Awaiting confirmation.',
+      data: payment,
+    });
+  } catch (error) {
+    console.error('❌ Error submitting payment:', error);
+    
+    if (error.code === 11000 && error.keyPattern?.referenceNumber) {
+      return res.status(400).json({
+        success: false,
+        error: 'Reference number already used. Please enter a valid reference number.',
+      });
+    }
+
+    if (error.name === 'ValidationError') {
+      const errors = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({ success: false, errors });
+    }
+
+    res.status(500).json({ success: false, error: 'Server Error: ' + error.message });
+  }
+});
 // ============================================
 // 📌 GET PENDING PAYMENTS (Admin/Finance)
 // ============================================

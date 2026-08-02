@@ -46,6 +46,11 @@ const ClassSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  classLevel: {
+        type: String,
+        enum: ['primary', 'middle', 'secondary'],
+        required: true,
+    },
 });
 
 module.exports = mongoose.model('Class', ClassSchema);

@@ -1,4 +1,5 @@
-// routes/messageRoutes.js - FIXED role-based chatting
+// routes/messageRoutes.js - COMPLETE FIXED
+
 const express = require('express');
 const router = express.Router();
 const Message = require('../models/Message');
@@ -11,17 +12,14 @@ router.get('/users/available', auth, async (req, res) => {
     const user = await User.findById(req.user.id);
     let targetUsers = [];
 
-    // ✅ ROLE-BASED FILTERING
     switch (user.role) {
       case 'admin':
-        // Admin can chat with everyone
         targetUsers = await User.find({
           _id: { $ne: req.user.id }
         }).select('name email role');
         break;
 
       case 'teacher':
-        // Teacher can chat with parents, admins, and students
         targetUsers = await User.find({
           _id: { $ne: req.user.id },
           role: { $in: ['parent', 'admin', 'student'] }
@@ -29,19 +27,13 @@ router.get('/users/available', auth, async (req, res) => {
         break;
 
       case 'parent':
-        // Parent can chat with teachers, admins, and their children's teachers
-        // For simplicity, teachers and admins
         targetUsers = await User.find({
           _id: { $ne: req.user.id },
           role: { $in: ['teacher', 'admin'] }
         }).select('name email role');
-        
-        // Also, get the teachers of their children
-        // This is a simplified version - in production, you'd fetch teachers of linked students
         break;
 
       case 'student':
-        // Student can chat with teachers and admins
         targetUsers = await User.find({
           _id: { $ne: req.user.id },
           role: { $in: ['teacher', 'admin'] }
@@ -62,7 +54,67 @@ router.get('/users/available', auth, async (req, res) => {
   }
 });
 
-// ✅ GET UNREAD COUNT (with role-based filtering)
+// ✅ GET MESSAGES BETWEEN TWO USERS
+router.get('/:userId', auth, async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const currentUserId = req.user.id;
+
+    const messages = await Message.find({
+      $or: [
+        { senderId: currentUserId, receiverId: userId },
+        { senderId: userId, receiverId: currentUserId }
+      ]
+    })
+    .populate('senderId', 'name email role')
+    .populate('receiverId', 'name email role')
+    .sort({ createdAt: 1 });
+
+    // ✅ Mark messages as read when fetched
+    await Message.updateMany(
+      {
+        senderId: userId,
+        receiverId: currentUserId,
+        isRead: false,
+      },
+      {
+        $set: { isRead: true, readAt: new Date() },
+      }
+    );
+
+    res.json({
+      success: true,
+      data: messages,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, error: 'Server Error' });
+  }
+});
+
+// ✅ GET RECENT MESSAGES (for notifications)
+router.get('/recent', auth, async (req, res) => {
+  try {
+    const { limit = 5 } = req.query;
+    
+    const messages = await Message.find({
+      receiverId: req.user.id,
+    })
+    .populate('senderId', 'name email role')
+    .sort({ createdAt: -1 })
+    .limit(parseInt(limit));
+
+    res.json({
+      success: true,
+      data: messages,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, error: 'Server Error' });
+  }
+});
+
+// ✅ GET UNREAD COUNT
 router.get('/unread/count', auth, async (req, res) => {
   try {
     const count = await Message.countDocuments({
@@ -79,8 +131,43 @@ router.get('/unread/count', auth, async (req, res) => {
     res.status(500).json({ success: false, error: 'Server Error' });
   }
 });
+router.get('/unread/per-user', auth, async (req, res) => {
+  try {
+    const userId = req.user.id;
 
-// ✅ MARK ALL AS READ (for notification badge)
+    // ✅ Aggregate unread counts per sender
+    const unreadAggregation = await Message.aggregate([
+      {
+        $match: {
+          receiverId: userId,
+          isRead: false,
+        },
+      },
+      {
+        $group: {
+          _id: '$senderId',
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    // ✅ Convert to object { senderId: count }
+    const unreadCounts = {};
+    unreadAggregation.forEach((item) => {
+      unreadCounts[item._id.toString()] = item.count;
+    });
+
+    res.json({
+      success: true,
+      data: { unreadCounts },
+    });
+  } catch (error) {
+    console.error('Error fetching per-user unread counts:', error);
+    res.status(500).json({ success: false, error: 'Server Error' });
+  }
+});
+
+// ✅ MARK ALL AS READ
 router.put('/read-all', auth, async (req, res) => {
   try {
     const result = await Message.updateMany(

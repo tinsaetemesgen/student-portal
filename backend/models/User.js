@@ -1,10 +1,9 @@
-// models/User.js 
+// models/User.js - COMPLETE UPDATE with classLevel
+
 const mongoose = require('mongoose');
 
 const UserSchema = new mongoose.Schema({
-  
   // CORE FIELDS
-  
   name: {
     type: String,
     required: [true, 'Name is required'],
@@ -23,29 +22,21 @@ const UserSchema = new mongoose.Schema({
     minlength: [6, 'Password must be at least 6 characters'],
   },
   role: {
-  type: String,
-  enum: ['admin', 'registrar', 'finance_officer', 'teacher', 'student', 'parent'],
-  required: true,
-  default: 'student',
-},
+    type: String,
+    enum: ['admin', 'registrar', 'finance_officer', 'teacher', 'student', 'parent'],
+    required: true,
+    default: 'student',
+  },
   phone: {
     type: String,
     trim: true,
-},
-gender: {
+  },
+  gender: {
     type: String,
     enum: ['Male', 'Female', 'Other'],
-},
-
-  
-  //  STUDENT-SPECIFIC FIELDS
- classLevel: {
-    type: String,
-    enum: ['primary', 'middle', 'secondary'],
-    required: function () {
-      return this.role === 'student';
-    },
   },
+
+  // STUDENT-SPECIFIC FIELDS
   class: {
     type: String,
     required: function () {
@@ -53,6 +44,16 @@ gender: {
     },
     trim: true,
   },
+  
+  
+  classLevel: {
+    type: String,
+    enum: ['primary', 'middle', 'secondary'],
+    required: function () {
+      return this.role === 'student';
+    },
+  },
+  
   age: {
     type: Number,
     min: 0,
@@ -61,10 +62,9 @@ gender: {
   parentId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    
     validate: {
       validator: async function(value) {
-        if (!value) return true; // null is allowed (student can be added later)
+        if (!value) return true;
         const parent = await mongoose.model('User').findById(value);
         return parent && parent.role === 'parent';
       },
@@ -72,9 +72,7 @@ gender: {
     },
   },
 
-  
-  //  TEACHER-SPECIFIC FIELDS
- 
+  // TEACHER-SPECIFIC FIELDS
   subject: {
     type: String,
     required: function () {
@@ -88,50 +86,45 @@ gender: {
       return this.role === 'teacher' ? Date.now() : null;
     },
   },
-
- 
-  //  PARENT-SPECIFIC FIELDS
-  
+  assignedClasses: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Class',
+    }],
+  // PARENT-SPECIFIC FIELDS
   children: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
   }],
 
-
-resetPasswordToken: {
-  type: String,
-  default: null
-},
-resetPasswordExpires: {
-  type: Date,
-  default: null
-},
-resetRequestedAt: {
-  type: Date,
-  default: null
-},
-resetRequestedBy: {
-  type: String, // email of user who requested
-  default: null
-},
-  //  COMMON FIELDS
-
+  resetPasswordToken: {
+    type: String,
+    default: null
+  },
+  resetPasswordExpires: {
+    type: Date,
+    default: null
+  },
+  resetRequestedAt: {
+    type: Date,
+    default: null
+  },
+  resetRequestedBy: {
+    type: String,
+    default: null
+  },
+  
+  // COMMON FIELDS
   createdAt: {
     type: Date,
     default: Date.now,
   },
 });
 
-
-//  Remove role-specific fields before sending response
-
+// Remove role-specific fields before sending response
 UserSchema.methods.toJSON = function () {
   const user = this.toObject();
-
-  //  Always remove password
   delete user.password;
 
-  //  Remove role-specific fields based on user role
   switch (user.role) {
     case 'student':
       delete user.children;
@@ -139,14 +132,12 @@ UserSchema.methods.toJSON = function () {
       delete user.subject;
       delete user.phone;
       break;
-
     case 'teacher':
       delete user.children;
       delete user.class;
       delete user.age;
       delete user.parentId;
       break;
-
     case 'parent':
       delete user.class;
       delete user.age;
@@ -154,23 +145,22 @@ UserSchema.methods.toJSON = function () {
       delete user.subject;
       delete user.hireDate;
       break;
-      case 'finance_officer':
-        delete user.class;
+    case 'finance_officer':
+      delete user.class;
       delete user.age;
       delete user.parentId;
       delete user.subject;
       delete user.hireDate;
       delete user.children;
       break;
-      case 'registrar':
-        delete user.class;
+    case 'registrar':
+      delete user.class;
       delete user.age;
       delete user.parentId;
       delete user.subject;
       delete user.hireDate;
       delete user.children;
       break;
-
     case 'admin':
       delete user.class;
       delete user.age;
@@ -179,7 +169,6 @@ UserSchema.methods.toJSON = function () {
       delete user.hireDate;
       delete user.children;
       break;
-
     default:
       break;
   }

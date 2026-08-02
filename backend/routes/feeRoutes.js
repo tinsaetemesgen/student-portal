@@ -20,6 +20,80 @@ const isFeeOverdue = (fee) => {
 };
 
 // ============================================
+// 📌 GET STUDENT FEES (Parent Dashboard)
+// ============================================
+
+router.get('/student-fees', auth, async (req, res) => {
+  try {
+    const { studentId } = req.query;
+    
+    console.log('📥 Fetching fees for student:', studentId);
+    
+    if (!studentId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Student ID is required'
+      });
+    }
+
+    // ✅ Check authorization
+    const user = await User.findById(req.user.id);
+    console.log('👤 User role:', user.role);
+    
+    // If user is student, only allow their own fees
+    if (user.role === 'student' && user._id.toString() !== studentId) {
+      return res.status(403).json({
+        success: false,
+        error: 'You can only view your own fees'
+      });
+    }
+    
+    // If user is parent, check if student is their child
+    if (user.role === 'parent') {
+      console.log('👨‍👧 Parent children:', user.children);
+      const isChild = user.children.some(child => child.toString() === studentId);
+      if (!isChild) {
+        return res.status(403).json({
+          success: false,
+          error: 'You can only view your children\'s fees'
+        });
+      }
+    }
+
+    // ✅ Fetch student fees
+    const studentFees = await StudentFee.find({ studentId })
+      .populate('feeStructureId', 'name description feeType')
+      .sort({ dueDate: 1 });
+
+    console.log(`📊 Found ${studentFees.length} fees for student`);
+
+    // ✅ Add overdue status
+    const feesWithStatus = studentFees.map(fee => {
+      const isOverdue = isFeeOverdue(fee);
+      return {
+        ...fee.toObject(),
+        isOverdue,
+        totalAmount: fee.amount + (isOverdue ? (fee.lateFeeAmount || 0) : 0),
+        isLateFeeApplied: isOverdue && (fee.lateFeeAmount || 0) > 0,
+      };
+    });
+
+    res.json({
+      success: true,
+      count: feesWithStatus.length,
+      data: feesWithStatus,
+    });
+
+  } catch (error) {
+    console.error('❌ Error fetching student fees:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Server Error: ' + error.message 
+    });
+  }
+});
+
+// ============================================
 // 📌 CREATE FEE WITH AUTO-ASSIGN
 // ============================================
 
@@ -98,6 +172,7 @@ router.post('/structures', auth, roleCheck('admin', 'finance_officer'), async (r
       console.log(`👨‍🎓 Found ${students.length} students in ${classLevel}`);
 
       for (const student of students) {
+        // ✅ Check if already assigned
         const existing = await StudentFee.findOne({
           studentId: student._id,
           feeStructureId: feeStructure._id,
@@ -110,6 +185,7 @@ router.post('/structures', auth, roleCheck('admin', 'finance_officer'), async (r
           continue;
         }
 
+        // ✅ Create student fee
         const studentFee = new StudentFee({
           studentId: student._id,
           feeStructureId: feeStructure._id,
@@ -120,6 +196,7 @@ router.post('/structures', auth, roleCheck('admin', 'finance_officer'), async (r
           startDate: new Date(startDate),
           endDate: new Date(endDate),
           dueDate: new Date(endDate),
+      
           lateFeeAmount: parseFloat(lateFeeAmount) || 0,
           gracePeriodDays: parseInt(gracePeriodDays) || 0,
           semester: semester,
@@ -129,7 +206,7 @@ router.post('/structures', auth, roleCheck('admin', 'finance_officer'), async (r
 
         await studentFee.save();
         assignedCount++;
-        assignedStudents.push(student.name);
+        assignedStudents.push({ id: student._id, name: student.name });
       }
 
       console.log(`✅ Assigned to ${assignedCount} students`);
@@ -156,68 +233,6 @@ router.post('/structures', auth, roleCheck('admin', 'finance_officer'), async (r
 });
 
 // ============================================
-// 📌 GET STUDENT FEES (Parent Dashboard)
-// ============================================
-
-router.get('/student-fees', auth, async (req, res) => {
-  try {
-    const { studentId } = req.query;
-    
-    if (!studentId) {
-      return res.status(400).json({
-        success: false,
-        error: 'Student ID is required'
-      });
-    }
-
-    // ✅ Check authorization
-    const user = await User.findById(req.user.id);
-    
-    if (user.role === 'student' && user._id.toString() !== studentId) {
-      return res.status(403).json({
-        success: false,
-        error: 'You can only view your own fees'
-      });
-    }
-    
-    if (user.role === 'parent') {
-      const isChild = user.children.some(child => child.toString() === studentId);
-      if (!isChild) {
-        return res.status(403).json({
-          success: false,
-          error: 'You can only view your children\'s fees'
-        });
-      }
-    }
-
-    const studentFees = await StudentFee.find({ studentId })
-      .populate('feeStructureId', 'name description feeType')
-      .sort({ dueDate: 1 });
-
-    // ✅ Add overdue status
-    const feesWithStatus = studentFees.map(fee => {
-      const isOverdue = isFeeOverdue(fee);
-      return {
-        ...fee.toObject(),
-        isOverdue,
-        totalAmount: fee.amount + (isOverdue ? (fee.lateFeeAmount || 0) : 0),
-        isLateFeeApplied: isOverdue && (fee.lateFeeAmount || 0) > 0,
-      };
-    });
-
-    res.json({
-      success: true,
-      count: feesWithStatus.length,
-      data: feesWithStatus,
-    });
-
-  } catch (error) {
-    console.error('❌ Error fetching student fees:', error);
-    res.status(500).json({ success: false, error: 'Server Error' });
-  }
-});
-
-// ============================================
 // 📌 GET ALL FEE STRUCTURES
 // ============================================
 
@@ -231,6 +246,32 @@ router.get('/structures', auth, roleCheck('admin', 'finance_officer'), async (re
     });
   } catch (error) {
     console.error('❌ Error fetching fee structures:', error);
+    res.status(500).json({ success: false, error: 'Server Error' });
+  }
+});
+
+// ============================================
+// 📌 GET SINGLE FEE STRUCTURE
+// ============================================
+
+router.get('/structures/:id', auth, roleCheck('admin', 'finance_officer'), async (req, res) => {
+  try {
+    const { id } = req.params;
+    const feeStructure = await FeeStructure.findById(id);
+    
+    if (!feeStructure) {
+      return res.status(404).json({
+        success: false,
+        error: 'Fee structure not found'
+      });
+    }
+    
+    res.json({
+      success: true,
+      data: feeStructure,
+    });
+  } catch (error) {
+    console.error('❌ Error fetching fee structure:', error);
     res.status(500).json({ success: false, error: 'Server Error' });
   }
 });

@@ -1,4 +1,5 @@
-// models/Payment.js - Enhanced with receipt support
+// models/Payment.js - FIXED receiptNumber duplicate error
+
 const mongoose = require('mongoose');
 
 const PaymentSchema = new mongoose.Schema({
@@ -18,7 +19,22 @@ const PaymentSchema = new mongoose.Schema({
     required: true,
     min: 0,
   },
-  
+  baseAmount: {
+    type: Number,
+    default: 0,
+  },
+  lateFee: {
+    type: Number,
+    default: 0,
+  },
+  isLate: {
+    type: Boolean,
+    default: false,
+  },
+   paidBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+  },
   // 🏦 Bank Information
   bankName: {
     type: String,
@@ -29,7 +45,7 @@ const PaymentSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
-    unique: true, // ✅ Ensures uniqueness at database level
+    unique: true,
     validate: {
       validator: function(v) {
         return /^[a-zA-Z0-9]{6,30}$/.test(v);
@@ -60,11 +76,11 @@ const PaymentSchema = new mongoose.Schema({
     default: 'pending',
   },
   
-  // 🧾 Receipt
+  // 🧾 Receipt - FIXED: allow multiple null values
   receiptNumber: {
     type: String,
     unique: true,
-    sparse: true,
+    sparse: true, 
   },
   receiptUrl: {
     type: String,
@@ -95,7 +111,9 @@ const PaymentSchema = new mongoose.Schema({
   },
 });
 
+// ✅ Indexes
 PaymentSchema.index({ studentId: 1, status: 1 });
 PaymentSchema.index({ status: 1, createdAt: -1 });
+
 
 module.exports = mongoose.model('Payment', PaymentSchema);

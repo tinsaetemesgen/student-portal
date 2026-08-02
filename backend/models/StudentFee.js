@@ -31,14 +31,14 @@ const StudentFeeSchema = new mongoose.Schema({
     required: [true, 'Fee type is required'],
   },
   
-  // ✅ NEW: Class Level
+  // ✅ Class Level
   classLevel: {
     type: String,
     enum: ['primary', 'middle', 'secondary'],
     required: [true, 'Class level is required'],
   },
   
-  // ✅ NEW: Date Range
+  // ✅ Date Range
   startDate: {
     type: Date,
     required: [true, 'Start date is required'],
@@ -52,7 +52,7 @@ const StudentFeeSchema = new mongoose.Schema({
     required: [true, 'Due date is required'],
   },
   
-  // ✅ NEW: Penalty System
+  // ✅ Penalty System
   lateFeeAmount: {
     type: Number,
     default: 0,
