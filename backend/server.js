@@ -25,7 +25,9 @@ const announcementRoutes = require('./routes/announcementRoutes');
 const worksheetRoutes = require('./routes/worksheetRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const passwordResetRoutes = require('./routes/passwordResetRoutes');
+const resourceRoutes = require('./routes/resourceRoutes');
 
+const reportCardRoutes = require('./routes/reportCardRoutes');
 
 connectDB();
 
@@ -77,6 +79,8 @@ app.use('/api/registrar', registrarRoutes);
  app.use('/api/payments', paymentRoutes);
  app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
  app.use('/api/password-reset', passwordResetRoutes);
+ app.use('/api/resources', resourceRoutes);
+ app.use('/api/report-cards', reportCardRoutes);
 
 // ✅ Ensure uploads directory exists
 const uploadDir = path.join(__dirname, 'uploads/screenshots');

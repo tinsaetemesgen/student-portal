@@ -495,8 +495,8 @@ router.put('/payments/:id/confirm', auth, roleCheck('admin', 'finance_officer'),
     if (notes) payment.notes = notes;
 
     // ✅ Generate receipt file
-    const schoolInfo = {
-      name: 'Adama Science and Technology University',
+  const schoolInfo = {
+      name: 'Kamara School',
       address: 'Adama, Ethiopia',
       phone: '+251-XXX-XXXX',
     };
@@ -507,7 +507,6 @@ router.put('/payments/:id/confirm', auth, roleCheck('admin', 'finance_officer'),
       payment.receiptUrl = receipt.url;
     } catch (receiptError) {
       console.error('⚠️ Receipt generation failed:', receiptError.message);
-      // ✅ Continue even if receipt fails - we'll still confirm the payment
     }
 
     await payment.save();

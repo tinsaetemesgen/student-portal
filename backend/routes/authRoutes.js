@@ -174,20 +174,25 @@ router.post('/login', async (req, res) => {
 // ============================================
 // 📌 GET CURRENT USER
 // ============================================
+// routes/authRoutes.js - Update the /me route
+
+// ✅ GET CURRENT USER - WITH POPULATED assignedClasses
 router.get('/me', auth, async (req, res) => {
   try {
     const user = await User.findById(req.user.id)
-      .select('-password -resetPasswordToken -resetPasswordExpires');
+      .select('-password -resetPasswordToken -resetPasswordExpires')
+      .populate('assignedClasses', 'name grade section classLevel'); // ✅ POPULATE assignedClasses
+    
     if (!user) {
       return res.status(404).json({ success: false, error: 'User not found' });
     }
+    
     res.json({ success: true, data: user });
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, error: 'Server Error' });
   }
 });
-
 // ============================================
 // 📌 FORGOT PASSWORD
 // ============================================
