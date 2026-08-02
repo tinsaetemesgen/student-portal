@@ -1,10 +1,25 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { type ReactElement } from "react";
+
+// ============================================
+// 📌 AUTH PAGES
+// ============================================
 import Login from "./pages/Login";
+import Register from "./pages/Register";
+import ForgotPassword from "./pages/ForgotPassword";
+
+// ============================================
+// 📌 CHAT PAGES
+// ============================================
 import Chat from './pages/Chat';
+import ParentChat from "./pages/parent/ParentChat";
+import AdminChat from "./pages/admin/AdminChat";
+import TeacherChat from "./pages/teacher/TeacherChat";
 
-
-// Admin Pages
+// ============================================
+// 📌 ADMIN PAGES
+// ============================================
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import Students from "./pages/admin/Students";
 import Teachers from "./pages/admin/Teachers";
@@ -14,34 +29,53 @@ import AdminGrades from "./pages/admin/Grades";
 import AdminPayments from "./pages/admin/Payments";
 import Settings from "./pages/admin/Settings";
 
-// Registrar Pages
+// ============================================
+// 📌 REGISTRAR PAGES
+// ============================================
 import RegistrarDashboard from "./pages/registrar/RegistrarDashboard";
 import RegistrarStudents from './pages/registrar/RegistrarStudents';
 import RegistrarTeachers from './pages/registrar/RegistrarTeachers';
 import RegistrarClasses from './pages/registrar/RegistrarClasses';
 import RegistrarParents from './pages/registrar/RegistrarParents';
+import RegistrarPasswordReset from "./pages/registrar/RegistrarPasswordReset"; // ✅ ADD THIS
 
-
-
-// Finance Officer Pages
+// ============================================
+// 📌 FINANCE OFFICER PAGES
+// ============================================
 import FinanceDashboard from "./pages/finance/FinanceDashboard";
 import FinancePayments from './pages/finance/FinancePayments';
 import FinanceFees from './pages/finance/FinanceFees';
 
-// Teacher Pages
+// ============================================
+// 📌 TEACHER PAGES
+// ============================================
 import TeacherDashboard from "./pages/teacher/TeacherDashboard";
 import TeacherAttendance from "./pages/teacher/Attendance";
 import TeacherGrades from "./pages/teacher/Grades";
 import TeacherAnnouncements from "./pages/teacher/TeacherAnnouncement";
+import TeacherWorksheets from './pages/teacher/Worksheets';
+import TeacherWorksheetResults from './pages/teacher/TeacherWorksheetResults';
+import TeacherReportCards from "./pages/teacher/ReportCards";
+import TeacherResources from "./pages/teacher/Resources";
 
-// Student Pages
+// ============================================
+// 📌 STUDENT PAGES
+// ============================================
 import StudentDashboard from "./pages/student/StudentDashboard";
 import StudentMyGrades from "./pages/student/MyGrades";
 import StudentMyAttendance from "./pages/student/MyAttendance";
 import StudentFees from "./pages/student/Fees";
 import StudentAnnouncements from "./pages/student/Announcements";
+import StudentAvailableWorksheets from './pages/student/AvailableWorksheets';
+import WorksheetAttempt from './pages/student/StudentWorksheets';
+import WorksheetReview from "./pages/student/WorksheetReview";
+import StudentResources from "./pages/student/Resources";
+import StudentReportCards from "./pages/student/ReportCards";
 
-// Parent Pages
+
+// ============================================
+// 📌 PARENT PAGES
+// ============================================
 import ParentDashboard from "./pages/parent/ParentDashboard";
 import ParentAttendance from "./pages/parent/ParentAttendance";
 import ParentGrades from "./pages/parent/ParentGrades";
@@ -50,14 +84,11 @@ import ParentAnnouncements from "./pages/parent/ParentAnnouncements";
 import ParentChildren from "./pages/parent/ParentChildren";
 import ParentChildGrades from './pages/parent/ParentChildGrades';
 import ParentChildAttendance from './pages/parent/ParentChildAttendance';
-//worksheet routes
-import TeacherWorksheets from './pages/teacher/Worksheets';
-import StudentAvailableWorksheets from './pages/student/AvailableWorksheets';
-import WorksheetAttempt from './pages/student/WorksheetAttempt';
-import TeacherWorksheetResults from './pages/teacher/TeacherWorksheetResults';
 
-// Auth Guard Component
-const PrivateRoute = ({ children, allowedRoles }: { children: JSX.Element, allowedRoles?: string[] }) => {
+// ============================================
+// 📌 AUTH GUARD COMPONENT
+// ============================================
+const PrivateRoute = ({ children, allowedRoles }: { children: ReactElement, allowedRoles?: string[] }) => {
   const token = localStorage.getItem('token');
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
@@ -74,12 +105,25 @@ const PrivateRoute = ({ children, allowedRoles }: { children: JSX.Element, allow
   return children;
 };
 
+// ============================================
+// 📌 APP COMPONENT
+// ============================================
 function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* ============================================
+            PUBLIC ROUTES
+            ============================================ */}
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+
+        {/* ============================================
+            STUDENT WORKSHEET REVIEW (Public/Shared)
+            ============================================ */}
+        <Route path="/student/worksheets/:id/review" element={<WorksheetReview />} />
 
         {/* ============================================
             ADMIN ROUTES
@@ -124,59 +168,71 @@ function App() {
             <Settings />
           </PrivateRoute>
         } />
+        <Route path="/admin/chat" element={
+          <PrivateRoute allowedRoles={['admin']}>
+            <AdminChat />
+          </PrivateRoute>
+        } />
 
         {/* ============================================
             REGISTRAR ROUTES
             ============================================ */}
-       <Route path="/registrar" element={
-  <PrivateRoute allowedRoles={['admin', 'registrar']}>
-    <RegistrarDashboard />
-  </PrivateRoute>
-} />
-<Route path="/registrar/students" element={
-  <PrivateRoute allowedRoles={['admin', 'registrar']}>
-    <RegistrarStudents />
-  </PrivateRoute>
-} />
-<Route path="/registrar/teachers" element={
-  <PrivateRoute allowedRoles={['admin', 'registrar']}>
-    <RegistrarTeachers />
-  </PrivateRoute>
-} />
-<Route path="/registrar/classes" element={
-  <PrivateRoute allowedRoles={['admin', 'registrar']}>
-    <RegistrarClasses />
-  </PrivateRoute>
-} />
-<Route path="/registrar/parents" element={
-  <PrivateRoute allowedRoles={['admin', 'registrar']}>
-    <RegistrarParents />
-  </PrivateRoute>
-} />
+        <Route path="/registrar" element={
+          <PrivateRoute allowedRoles={['admin', 'registrar']}>
+            <RegistrarDashboard />
+          </PrivateRoute>
+        } />
+        <Route path="/registrar/students" element={
+          <PrivateRoute allowedRoles={['admin', 'registrar']}>
+            <RegistrarStudents />
+          </PrivateRoute>
+        } />
+        <Route path="/registrar/teachers" element={
+          <PrivateRoute allowedRoles={['admin', 'registrar']}>
+            <RegistrarTeachers />
+          </PrivateRoute>
+        } />
+        <Route path="/registrar/classes" element={
+          <PrivateRoute allowedRoles={['admin', 'registrar']}>
+            <RegistrarClasses />
+          </PrivateRoute>
+        } />
+        <Route path="/registrar/parents" element={
+          <PrivateRoute allowedRoles={['admin', 'registrar']}>
+            <RegistrarParents />
+          </PrivateRoute>
+        } />
+        {/* ✅ ADD THIS - Registrar Password Reset */}
+        <Route path="/registrar/password-reset" element={
+          <PrivateRoute allowedRoles={['admin', 'registrar']}>
+            <RegistrarPasswordReset />
+          </PrivateRoute>
+        } />
 
         {/* ============================================
             FINANCE OFFICER ROUTES
             ============================================ */}
         <Route path="/finance" element={
-  <PrivateRoute allowedRoles={['admin', 'finance_officer']}>
-    <FinanceDashboard />
-  </PrivateRoute>
-} />
-<Route path="/finance/payments" element={
-  <PrivateRoute allowedRoles={['admin', 'finance_officer']}>
-    <FinancePayments />
-  </PrivateRoute>
-} />
-<Route path="/finance/fees" element={
-  <PrivateRoute allowedRoles={['admin', 'finance_officer']}>
-    <FinanceFees />
-  </PrivateRoute>
-} />
-<Route path="/finance/reports" element={
-  <PrivateRoute allowedRoles={['admin', 'finance_officer']}>
-    <FinanceDashboard />
-  </PrivateRoute>
-} />
+          <PrivateRoute allowedRoles={['admin', 'finance_officer']}>
+            <FinanceDashboard />
+          </PrivateRoute>
+        } />
+        <Route path="/finance/payments" element={
+          <PrivateRoute allowedRoles={['admin', 'finance_officer']}>
+            <FinancePayments />
+          </PrivateRoute>
+        } />
+        <Route path="/finance/fees" element={
+          <PrivateRoute allowedRoles={['admin', 'finance_officer']}>
+            <FinanceFees />
+          </PrivateRoute>
+        } />
+        <Route path="/finance/reports" element={
+          <PrivateRoute allowedRoles={['admin', 'finance_officer']}>
+            <FinanceDashboard />
+          </PrivateRoute>
+        } />
+
         {/* ============================================
             TEACHER ROUTES
             ============================================ */}
@@ -201,17 +257,30 @@ function App() {
           </PrivateRoute>
         } />
         <Route path="/teacher/worksheets" element={
-  <PrivateRoute allowedRoles={['admin', 'teacher']}>
-    <TeacherWorksheets />
-  </PrivateRoute>
+          <PrivateRoute allowedRoles={['admin', 'teacher']}>
+            <TeacherWorksheets />
+          </PrivateRoute>
+        } />
+        <Route path="/teacher/worksheets/:id/results" element={
+          <PrivateRoute allowedRoles={['admin', 'teacher']}>
+            <TeacherWorksheetResults />
+          </PrivateRoute>
+        } />
+<Route path="/teacher/chat" element={
+    <PrivateRoute allowedRoles={['admin', 'teacher']}>
+        <TeacherChat />
+    </PrivateRoute>
 } />
-<Route path="/teacher/worksheets/:id/results" element={
-  <PrivateRoute allowedRoles={['admin', 'teacher']}>
-    <TeacherWorksheetResults />
-  </PrivateRoute>
+<Route path="/teacher/resources" element={
+    <PrivateRoute allowedRoles={['admin', 'teacher']}>
+        <TeacherResources />
+    </PrivateRoute>
 } />
-
-
+<Route path="/teacher/report-cards" element={
+    <PrivateRoute allowedRoles={['admin', 'teacher']}>
+        <TeacherReportCards />
+    </PrivateRoute>
+} />
         {/* ============================================
             STUDENT ROUTES
             ============================================ */}
@@ -241,16 +310,30 @@ function App() {
           </PrivateRoute>
         } />
         <Route path="/student/worksheets" element={
-  <PrivateRoute allowedRoles={['admin', 'student']}>
-    <StudentAvailableWorksheets />
-  </PrivateRoute>
+          <PrivateRoute allowedRoles={['admin', 'student']}>
+            <StudentAvailableWorksheets />
+          </PrivateRoute>
+        } />
+        <Route path="/student/worksheet/:id/attempt" element={
+          <PrivateRoute allowedRoles={['admin', 'student']}>
+            <WorksheetAttempt />
+          </PrivateRoute>
+        } />
+        <Route path="/student/worksheets/:id/review" element={
+          <PrivateRoute allowedRoles={['admin', 'student']}>
+            <WorksheetReview />
+          </PrivateRoute>
+        } />
+<Route path="/student/resources" element={
+    <PrivateRoute allowedRoles={['admin', 'student']}>
+        <StudentResources />
+    </PrivateRoute>
 } />
-<Route path="/student/worksheet/:id/attempt" element={
-  <PrivateRoute allowedRoles={['admin', 'student']}>
-    <WorksheetAttempt />
-  </PrivateRoute>
-} />
-
+<Route path="/student/report-cards" element={
+    <PrivateRoute allowedRoles={['admin', 'student']}>
+        <StudentReportCards />
+    </PrivateRoute>
+} />  
         {/* ============================================
             PARENT ROUTES
             ============================================ */}
@@ -280,25 +363,34 @@ function App() {
           </PrivateRoute>
         } />
         <Route path="/parent/children" element={
-  <PrivateRoute allowedRoles={['admin', 'parent']}>
-    <ParentChildren />
-  </PrivateRoute>
-} />
-<Route path="/parent/child/:childId/grades" element={
-  <PrivateRoute allowedRoles={['admin', 'parent']}>
-    <ParentChildGrades />
-  </PrivateRoute>
-} />
-<Route path="/parent/child/:childId/attendance" element={
-  <PrivateRoute allowedRoles={['admin', 'parent']}>
-    <ParentChildAttendance />
-  </PrivateRoute>
-} />
-<Route path="/chat" element={
-  <PrivateRoute allowedRoles={['admin', 'teacher', 'parent', 'student']}>
-    <Chat />
-  </PrivateRoute>
-} />
+          <PrivateRoute allowedRoles={['admin', 'parent']}>
+            <ParentChildren />
+          </PrivateRoute>
+        } />
+        <Route path="/parent/child/:childId/grades" element={
+          <PrivateRoute allowedRoles={['admin', 'parent']}>
+            <ParentChildGrades />
+          </PrivateRoute>
+        } />
+        <Route path="/parent/child/:childId/attendance" element={
+          <PrivateRoute allowedRoles={['admin', 'parent']}>
+            <ParentChildAttendance />
+          </PrivateRoute>
+        } />
+        <Route path="/parent/chat" element={
+          <PrivateRoute allowedRoles={['admin', 'parent']}>
+            <ParentChat />
+          </PrivateRoute>
+        } />
+
+        {/* ============================================
+            CHAT ROUTES (General)
+            ============================================ */}
+        <Route path="/chat" element={
+          <PrivateRoute allowedRoles={['admin', 'teacher', 'parent', 'student']}>
+            <Chat />
+          </PrivateRoute>
+        } />
       </Routes>
     </BrowserRouter>
   );

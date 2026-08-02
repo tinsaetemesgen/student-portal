@@ -93,14 +93,7 @@ const RegistrarDashboard = () => {
         <DashboardLayout role="registrar">
             <div className="space-y-6">
                 {/* Header */}
-                <div>
-                    <h1 className="text-2xl font-bold text-gray-800">Registrar Dashboard</h1>
-                    <p className="text-gray-500">Manage students, teachers, and class enrollment</p>
-                    <div className="mt-2 text-sm text-blue-600 bg-blue-50 p-2 rounded-lg inline-block">
-                        ℹ️ Financial data is not visible in this dashboard
-                    </div>
-                </div>
-
+                
                 {/* Stats Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     {stats.map((stat) => (
@@ -114,44 +107,8 @@ const RegistrarDashboard = () => {
                     ))}
                 </div>
 
-                {/* Quick Actions */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="bg-white rounded-xl shadow-sm p-6">
-                        <h3 className="text-lg font-semibold text-gray-800 mb-4">📋 Student Management</h3>
-                        <div className="space-y-3">
-                            <button className="w-full text-left px-4 py-2 bg-blue-50 hover:bg-blue-100 rounded-lg transition flex items-center gap-3">
-                                <Plus size={18} className="text-blue-600" />
-                                <span>Register New Student</span>
-                            </button>
-                            <button className="w-full text-left px-4 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg transition flex items-center gap-3">
-                                <Users size={18} className="text-gray-600" />
-                                <span>View All Students</span>
-                            </button>
-                            <button className="w-full text-left px-4 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg transition flex items-center gap-3">
-                                <Edit2 size={18} className="text-gray-600" />
-                                <span>Update Student Records</span>
-                            </button>
-                        </div>
-                    </div>
+               
 
-                    <div className="bg-white rounded-xl shadow-sm p-6">
-                        <h3 className="text-lg font-semibold text-gray-800 mb-4">👨‍🏫 Teacher & Class Management</h3>
-                        <div className="space-y-3">
-                            <button className="w-full text-left px-4 py-2 bg-green-50 hover:bg-green-100 rounded-lg transition flex items-center gap-3">
-                                <Plus size={18} className="text-green-600" />
-                                <span>Add New Teacher</span>
-                            </button>
-                            <button className="w-full text-left px-4 py-2 bg-purple-50 hover:bg-purple-100 rounded-lg transition flex items-center gap-3">
-                                <School size={18} className="text-purple-600" />
-                                <span>Create New Class</span>
-                            </button>
-                            <button className="w-full text-left px-4 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg transition flex items-center gap-3">
-                                <BookOpen size={18} className="text-gray-600" />
-                                <span>Assign Students to Classes</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
 
                 {/* Recent Students & Teachers */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

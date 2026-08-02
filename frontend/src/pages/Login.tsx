@@ -1,164 +1,181 @@
-// Login.tsx - Update the role type and dropdown options
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import { useAppContext } from "../context/AppContext";
+// src/pages/Login.tsx - WITH LARGER LOGO, CENTERED, SCHOOL NAME UPDATED
 
-// ✅ Add all roles
-type Role = "admin" | "registrar" | "finance_officer" | "teacher" | "student" | "parent";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Mail, Lock, AlertCircle, Sparkles } from "lucide-react";
+import axios from "axios";
+
+// ✅ IMPORT LOGO
+import schoolLogo from '../assets/logo.png';
+
+const SCHOOL_NAME = 'Kamara School';
+const SCHOOL_TAGLINE = 'Empowering Ethiopian Futures';
 
 const Login = () => {
     const navigate = useNavigate();
-    const { schoolInfo, setCurrentRole } = useAppContext();
-    const [role, setRole] = useState<Role>("student");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
 
-    const handleLogin = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setError("");
         setLoading(true);
+        setError("");
 
         try {
-            const response = await axios.post("http://localhost:7000/api/auth/login", {
+            const response = await axios.post('http://localhost:7000/api/auth/login', {
                 email,
-                password,
+                password
             });
 
             if (response.data.success) {
-                localStorage.setItem("token", response.data.token);
-                localStorage.setItem("user", JSON.stringify(response.data.data));
+                const { token, data, mustChangePassword } = response.data;
+                
+                localStorage.setItem('token', token);
+                localStorage.setItem('user', JSON.stringify(data));
 
-                const userRole = response.data.data.role;
-                setCurrentRole(userRole);
-
-                // Redirect based on role
-                switch (userRole) {
-                    case "admin":
-                        navigate("/admin");
-                        break;
-                    case "registrar":
-                        navigate("/registrar");
-                        break;
-                    case "finance_officer":
-                        navigate("/finance");
-                        break;
-                    case "teacher":
-                        navigate("/teacher");
-                        break;
-                    case "student":
-                        navigate("/student");
-                        break;
-                    case "parent":
-                        navigate("/parent");
-                        break;
-                    default:
-                        navigate("/");
+                if (mustChangePassword) {
+                    navigate('/change-password');
+                    return;
                 }
+
+                const role = data.role;
+                if (role === 'admin') navigate('/admin');
+                else if (role === 'registrar') navigate('/registrar');
+                else if (role === 'finance_officer') navigate('/finance');
+                else if (role === 'teacher') navigate('/teacher');
+                else if (role === 'student') navigate('/student');
+                else if (role === 'parent') navigate('/parent');
+                else navigate('/dashboard');
+            } else {
+                setError(response.data.error || "Login failed");
             }
         } catch (err: any) {
-            setError(err.response?.data?.error || "Invalid email or password");
+            if (err.response) {
+                setError(err.response.data?.error || "Login failed. Please try again.");
+            } else if (err.request) {
+                setError("Cannot connect to server. Please check if backend is running.");
+            } else {
+                setError("Login failed. Please try again.");
+            }
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-md w-full max-w-md mx-auto">
-                {/* School Logo and Name */}
-                <div className="flex flex-col items-center mb-6">
-                    {schoolInfo.logo ? (
-                        <img
-                            src={schoolInfo.logo}
-                            alt={schoolInfo.name}
-                            className="w-20 h-20 sm:w-24 sm:h-24 object-contain rounded-full border-2 border-blue-200 mb-3"
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-4">
+            <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl max-w-md w-full p-8 border border-white/20">
+                {/* ✅ School Logo & Branding - CENTERED & LARGER */}
+                <div className="text-center mb-8">
+                    <div className="flex flex-col items-center justify-center gap-4 mb-4">
+                        {/* ✅ Larger Logo */}
+                        <img 
+                            src={schoolLogo} 
+                            alt={SCHOOL_NAME} 
+                            className="w-28 h-28 rounded-2xl object-cover shadow-xl border-2 border-blue-100"
+                            onError={(e) => {
+                                (e.target as HTMLImageElement).style.display = 'none';
+                                const parent = (e.target as HTMLImageElement).parentElement;
+                                if (parent) {
+                                    const fallback = document.createElement('div');
+                                    fallback.className = 'w-28 h-28 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center shadow-xl text-3xl font-bold text-white';
+                                    fallback.textContent = 'KS';
+                                    parent.appendChild(fallback);
+                                }
+                            }}
                         />
-                    ) : (
-                        <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-blue-600 text-white flex items-center justify-center text-2xl sm:text-3xl font-bold mb-3">
-                            {schoolInfo.name.charAt(0).toUpperCase()}
+                        <div className="text-center">
+                            <h1 className="text-3xl font-bold text-gray-800 leading-tight">
+                                {SCHOOL_NAME}
+                            </h1>
+                            <p className="text-sm text-blue-600 font-medium flex items-center justify-center gap-1 mt-1">
+                                <Sparkles size={14} className="text-yellow-500" />
+                                {SCHOOL_TAGLINE}
+                                <Sparkles size={14} className="text-yellow-500" />
+                            </p>
                         </div>
-                    )}
-                    <h1 className="text-xl sm:text-2xl font-bold text-gray-800 text-center">
-                        {schoolInfo.name}
-                    </h1>
-                    <p className="text-sm text-gray-500 mt-1">{schoolInfo.address}</p>
+                    </div>
+                    <div className="h-px w-24 bg-gradient-to-r from-transparent via-blue-300 to-transparent mx-auto my-3"></div>
+                    <p className="text-gray-500 text-sm">Sign in to your account</p>
                 </div>
 
-                {/* Error Message */}
                 {error && (
-                    <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm text-center">
-                        {error}
+                    <div className="bg-red-50 border border-red-200 rounded-xl p-3 flex items-start gap-2 mb-4">
+                        <AlertCircle size={18} className="text-red-500 flex-shrink-0 mt-0.5" />
+                        <p className="text-sm text-red-600">{error}</p>
                     </div>
                 )}
 
-                {/* Role Selection */}
-                <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Login as
-                    </label>
-                    <select
-                        value={role}
-                        onChange={(e) => setRole(e.target.value as Role)}
-                        className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                        <option value="admin">Admin</option>
-                        <option value="registrar">Registrar</option>
-                        <option value="finance_officer">Finance Officer</option>
-                        <option value="teacher">Teacher</option>
-                        <option value="student">Student</option>
-                        <option value="parent">Parent</option>
-                    </select>
-                </div>
-
-                {/* Email */}
-                <input
-                    type="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full border border-gray-300 p-3 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-
-                {/* Password */}
-                <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full border border-gray-300 p-3 rounded-lg mb-6 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-
-                {/* Login Button */}
-                <button
-                    onClick={handleLogin}
-                    disabled={loading}
-                    className={`w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold ${
-                        loading ? "opacity-50 cursor-not-allowed" : ""
-                    }`}
-                >
-                    {loading ? "Logging in..." : `Continue as ${role.charAt(0).toUpperCase() + role.slice(1)}`}
-                </button>
-
-                {/* Demo Credentials */}
-                <div className="mt-6 p-4 bg-gray-50 rounded-lg text-sm text-gray-600 text-center">
-                    <p className="font-medium">🔑 Demo Credentials</p>
-                    <div className="grid grid-cols-2 gap-1 mt-2 text-xs">
-                        <div className="text-left">Admin:</div>
-                        <div className="text-right">admin@gmail.com / password123</div>
-                        <div className="text-left">Registrar:</div>
-                        <div className="text-right">reg@gmail.com / password123</div>
-                        <div className="text-left">Finance:</div>
-                        <div className="text-right">fin@gmail.com / password123</div>
-                        <div className="text-left">Teacher:</div>
-                        <div className="text-right">helen@school.com / password123</div>
-                        <div className="text-left">Student:</div>
-                        <div className="text-right">abebe@school.com / password123</div>
-                        <div className="text-left">Parent:</div>
-                        <div className="text-right">kebede@email.com / password123</div>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <div className="relative">
+                            <Mail size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                            <input
+                                type="email"
+                                placeholder="you@school.com"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                className="w-full border border-gray-200 rounded-xl pl-10 pr-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/50"
+                                required
+                            />
+                        </div>
                     </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                        <div className="relative">
+                            <Lock size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                            <input
+                                type="password"
+                                placeholder="••••••••"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                className="w-full border border-gray-200 rounded-xl pl-10 pr-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/50"
+                                required
+                            />
+                        </div>
+                    </div>
+
+                    <div className="flex items-center justify-end">
+                        <Link 
+                            to="/forgot-password" 
+                            className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+                        >
+                            Forgot password?
+                        </Link>
+                    </div>
+
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 transition font-medium shadow-lg shadow-blue-200 disabled:opacity-50"
+                    >
+                        {loading ? (
+                            <span className="flex items-center justify-center gap-2">
+                                <span className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></span>
+                                Signing in...
+                            </span>
+                        ) : (
+                            'Sign In'
+                        )}
+                    </button>
+                </form>
+
+                <p className="text-center text-sm text-gray-500 mt-6">
+                    Don't have an account?{' '}
+                    <Link to="/register" className="text-blue-600 hover:underline font-medium">
+                        Create one
+                    </Link>
+                </p>
+
+                <div className="mt-6 text-center">
+                    <p className="text-xs text-gray-400">
+                        © {new Date().getFullYear()} {SCHOOL_NAME}. All rights reserved.
+                    </p>
+                   
                 </div>
             </div>
         </div>

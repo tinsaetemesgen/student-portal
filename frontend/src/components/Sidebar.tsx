@@ -1,193 +1,266 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import {
-    LayoutDashboard,
-    Users,
-    UserCheck,
-    ClipboardCheck,
-    Megaphone,
-    Settings,
-    BookOpen,
-    GraduationCap,
-    X,
-    LogOut,
-    Banknote,
-    School,
-    DollarSign,
-    BarChart3,
-    MessageCircle,
-    FileText,
-} from "lucide-react";
+// src/components/Sidebar.tsx - COMPLETE WITH ALL NAVIGATION
 
-type Role = "admin" | "registrar" | "finance_officer" | "teacher" | "student" | "parent";
+import React from 'react';
+import { 
+    LayoutDashboard, 
+    Users, 
+    BookOpen, 
+    Calendar, 
+    Award, 
+    FileText, 
+    Bell, 
+    Settings, 
+    MessageCircle,
+    DollarSign,
+    ClipboardList,
+    LogOut,
+    ChevronLeft,
+    ChevronRight,
+    Home,
+    UserPlus,
+    School,
+    CreditCard,
+    BarChart,
+    Megaphone,
+    Clock,
+    UserCog,
+    Upload,
+    Download,
+    FileSpreadsheet,
+    GraduationCap,
+    BookMarked,
+    FolderOpen,
+    FileCheck,
+    PieChart,
+    UserCheck,
+    HelpCircle
+} from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+
+// ✅ Import School Logo
+import schoolLogo from '../assets/logo.png';
+
+const SCHOOL_NAME = 'Kamara School';
+const SCHOOL_SHORT_NAME = 'KS';
 
 interface SidebarProps {
-    role: Role;
+    role: 'admin' | 'registrar' | 'finance_officer' | 'teacher' | 'student' | 'parent';
     isOpen: boolean;
-    onClose: () => void;
+    toggleSidebar: () => void;
 }
 
-const menuItems = {
-    admin: [
-        { name: "Dashboard", path: "/admin", icon: <LayoutDashboard size={20} /> },
-        { name: "Students", path: "/admin/students", icon: <Users size={20} /> },
-        { name: "Teachers", path: "/admin/teachers", icon: <UserCheck size={20} /> },
-        { name: "Attendance", path: "/admin/attendance", icon: <ClipboardCheck size={20} /> },
-        { name: "Grades", path: "/admin/grades", icon: <BookOpen size={20} /> },
-        { name: "Announcements", path: "/admin/announcements", icon: <Megaphone size={20} /> },
-        { name: "Payments", path: "/admin/payments", icon: <Banknote size={20} /> },
-        { name: "Settings", path: "/admin/settings", icon: <Settings size={20} /> },
-    ],
+interface NavItem {
+    path: string;
+    label: string;
+    icon: React.ReactNode;
+    badge?: number;
+}
 
-    registrar: [
-        { name: "Dashboard", path: "/registrar", icon: <LayoutDashboard size={20} /> },
-        { name: "Students", path: "/registrar/students", icon: <Users size={20} /> },
-        { name: "Teachers", path: "/registrar/teachers", icon: <UserCheck size={20} /> },
-        { name: "Classes", path: "/registrar/classes", icon: <School size={20} /> },
-        { name: "Parents", path: "/registrar/parents", icon: <Users size={20} /> }, 
-    ],
-
-    finance_officer: [
-        { name: "Dashboard", path: "/finance", icon: <LayoutDashboard size={20} /> },
-        { name: "Fee Structures", path: "/finance/fees", icon: <DollarSign size={20} /> },
-        { name: "Payments", path: "/finance/payments", icon: <Banknote size={20} /> },
-        { name: "Reports", path: "/finance/reports", icon: <BarChart3 size={20} /> },
-    ],
-
-    teacher: [
-        
-        { name: "Attendance", path: "/teacher/attendance", icon: <ClipboardCheck size={20} /> },
-        { name: "Grades", path: "/teacher/grades", icon: <BookOpen size={20} /> },
-        { name: "Announcements", path: "/teacher/announcements", icon: <Megaphone size={20} /> },
-        { name: "Chat", path: "/chat", icon: <MessageCircle size={20} /> }, 
-        
-    { name: "Worksheets", path: "/teacher/worksheets", icon: <FileText size={20} /> },
-    ],
-
-    student: [
-       // { name: "Dashboard", path: "/student", icon: <LayoutDashboard size={20} /> },
-        { name: "Attendance", path: "/student/attendance", icon: <ClipboardCheck size={20} /> },
-        { name: "Grades", path: "/student/grades", icon: <GraduationCap size={20} /> },
-        { name: "Fees", path: "/student/fees", icon: <Banknote size={20} /> },
-        { name: "Announcements", path: "/student/announcements", icon: <Megaphone size={20} /> },
-    { name: "Worksheets", path: "/student/worksheets", icon: <FileText size={20} /> },
-    ],
-
-    parent: [
-       // { name: "Dashboard", path: "/parent", icon: <LayoutDashboard size={20} /> },
-        { name: "Children", path: "/parent/children", icon: <Users size={20} /> },
-        { name: "Attendance", path: "/parent/attendance", icon: <ClipboardCheck size={20} /> },
-        { name: "Grades", path: "/parent/grades", icon: <GraduationCap size={20} /> },
-        { name: "Payments", path: "/parent/payments", icon: <Banknote size={20} /> },
-        { name: "Announcements", path: "/parent/announcements", icon: <Megaphone size={20} /> },
-        { name: "Chat", path: "/chat", icon: <MessageCircle size={20} /> },
-    ],
-};
-
-const Sidebar = ({ role, isOpen, onClose }: SidebarProps) => {
+const Sidebar: React.FC<SidebarProps> = ({ role, isOpen, toggleSidebar }) => {
     const location = useLocation();
     const navigate = useNavigate();
+
+    // ✅ Get user info
+    const userStr = localStorage.getItem('user');
+    const user = userStr ? JSON.parse(userStr) : null;
+    const displayName = user?.name || 'User';
+    const displayRole = user?.role || role;
+
+    // ✅ Navigation items based on role
+    const getNavItems = (): NavItem[] => {
+        const commonItems: NavItem[] = [
+            { path: `/${role}`, label: 'Dashboard', icon: <Home size={20} /> },
+            { path: `/${role}/announcements`, label: 'Announcements', icon: <Megaphone size={20} /> },
+            { path: `/${role}/chat`, label: 'Chat', icon: <MessageCircle size={20} /> },
+        ];
+
+        switch (role) {
+            case 'admin':
+                return [
+                    ...commonItems,
+                    { path: '/admin/students', label: 'Students', icon: <Users size={20} /> },
+                    { path: '/admin/teachers', label: 'Teachers', icon: <UserPlus size={20} /> },
+                    { path: '/admin/classes', label: 'Classes', icon: <School size={20} /> },
+                    { path: '/admin/attendance', label: 'Attendance', icon: <Clock size={20} /> },
+                    { path: '/admin/grades', label: 'Grades', icon: <Award size={20} /> },
+                    { path: '/admin/payments', label: 'Payments', icon: <CreditCard size={20} /> },
+                    { path: '/admin/reports', label: 'Reports', icon: <PieChart size={20} /> },
+                    { path: '/admin/settings', label: 'Settings', icon: <Settings size={20} /> },
+                ];
+            case 'registrar':
+                return [
+                    ...commonItems,
+                    { path: '/registrar/students', label: 'Students', icon: <Users size={20} /> },
+                    { path: '/registrar/teachers', label: 'Teachers', icon: <UserPlus size={20} /> },
+                    { path: '/registrar/classes', label: 'Classes', icon: <School size={20} /> },
+                    { path: '/registrar/parents', label: 'Parents', icon: <UserCog size={20} /> },
+                    { path: '/registrar/password-reset', label: 'Password Reset', icon: <UserCheck size={20} /> },
+                ];
+            case 'finance_officer':
+                return [
+                    ...commonItems,
+                    { path: '/finance/fees', label: 'Fee Structures', icon: <DollarSign size={20} /> },
+                    { path: '/finance/payments', label: 'Payments', icon: <CreditCard size={20} /> },
+                    { path: '/finance/reports', label: 'Reports', icon: <BarChart size={20} /> },
+                ];
+            case 'teacher':
+                return [
+                    ...commonItems,
+                    { path: '/teacher/attendance', label: 'Attendance', icon: <ClipboardList size={20} /> },
+                    { path: '/teacher/grades', label: 'Grades', icon: <Award size={20} /> },
+                    // ✅ NEW: Resources & Report Cards
+                    { path: '/teacher/resources', label: 'Resources', icon: <FolderOpen size={20} /> },
+                    { path: '/teacher/report-cards', label: 'Report Cards', icon: <FileCheck size={20} /> },
+                    { path: '/teacher/worksheets', label: 'Worksheets', icon: <BookMarked size={20} /> },
+                ];
+            case 'student':
+                return [
+                    ...commonItems,
+                    { path: '/student/attendance', label: 'Attendance', icon: <Calendar size={20} /> },
+                    { path: '/student/grades', label: 'Grades', icon: <Award size={20} /> },
+                    { path: '/student/fees', label: 'Fees', icon: <DollarSign size={20} /> },
+                    // ✅ NEW: Resources & Report Cards
+                    { path: '/student/resources', label: 'Resources', icon: <BookOpen size={20} /> },
+                    { path: '/student/report-cards', label: 'Report Cards', icon: <FileText size={20} /> },
+                    { path: '/student/worksheets', label: 'Worksheets', icon: <BookMarked size={20} /> },
+                ];
+            case 'parent':
+                return [
+                    ...commonItems,
+                    { path: '/parent/children', label: 'Children', icon: <Users size={20} /> },
+                    { path: '/parent/attendance', label: 'Attendance', icon: <Calendar size={20} /> },
+                    { path: '/parent/grades', label: 'Grades', icon: <Award size={20} /> },
+                    { path: '/parent/payments', label: 'Payments', icon: <DollarSign size={20} /> },
+                    // ✅ NEW: Resources & Report Cards
+                    { path: '/parent/resources', label: 'Resources', icon: <BookOpen size={20} /> },
+                    { path: '/parent/report-cards', label: 'Report Cards', icon: <FileText size={20} /> },
+                ];
+            default:
+                return commonItems;
+        }
+    };
+
+    const navItems = getNavItems();
 
     const handleLogout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-        onClose();
-        navigate("/");
+        navigate('/');
     };
 
-    const items = menuItems[role] || [];
-
     return (
-        <>
-            {/* Desktop sidebar */}
-            <aside className="hidden md:flex md:flex-col w-64 bg-blue-700 text-white min-h-screen p-5 shrink-0">
-                <h1 className="text-2xl font-bold mb-2">🏫 School Portal</h1>
-                <p className="text-sm text-blue-200 mb-6 capitalize">
-                    Welcome, {role.replace('_', ' ')}
-                </p>
+        <aside 
+            className={`bg-gradient-to-b from-blue-900 to-indigo-900 text-white flex flex-col h-screen transition-all duration-300 shadow-2xl ${
+                isOpen ? 'w-64' : 'w-20'
+            }`}
+        >
+            {/* School Logo & Branding */}
+            <div className={`flex items-center gap-3 p-4 border-b border-blue-800/30 ${isOpen ? 'justify-start' : 'justify-center'}`}>
+                <div className="flex-shrink-0">
+                    <img 
+                        src={schoolLogo} 
+                        alt={SCHOOL_NAME} 
+                        className={`${isOpen ? 'w-14 h-14' : 'w-12 h-12'} rounded-xl object-cover bg-white/10 p-1 border border-blue-400/30 shadow-lg`}
+                        onError={(e) => {
+                            (e.target as HTMLImageElement).style.display = 'none';
+                            const parent = (e.target as HTMLImageElement).parentElement;
+                            if (parent) {
+                                const fallback = document.createElement('div');
+                                fallback.className = `${isOpen ? 'w-14 h-14' : 'w-12 h-12'} rounded-xl bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-2xl font-bold shadow-lg`;
+                                fallback.textContent = SCHOOL_SHORT_NAME;
+                                parent.appendChild(fallback);
+                            }
+                        }}
+                    />
+                </div>
+                {isOpen && (
+                    <div className="flex-1 min-w-0">
+                        <h1 className="text-lg font-bold text-white truncate leading-tight">
+                            {SCHOOL_NAME}
+                        </h1>
+                        <p className="text-xs text-blue-300 truncate capitalize">
+                            {displayRole.replace('_', ' ')} Portal
+                        </p>
+                    </div>
+                )}
+            </div>
 
-                <nav className="space-y-1 flex-1">
-                    {items.map((item) => {
-                        const isActive = location.pathname === item.path;
+            {/* User Profile */}
+            <div className={`flex items-center gap-3 p-4 border-b border-blue-800/30 ${isOpen ? 'justify-start' : 'justify-center'}`}>
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-white font-bold text-sm shadow-lg flex-shrink-0">
+                    {displayName.charAt(0).toUpperCase()}
+                </div>
+                {isOpen && (
+                    <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-white truncate">{displayName}</p>
+                        <p className="text-xs text-blue-300 truncate capitalize">{displayRole.replace('_', ' ')}</p>
+                    </div>
+                )}
+            </div>
 
+            {/* Navigation */}
+            <nav className="flex-1 overflow-y-auto py-4 scrollbar-thin scrollbar-thumb-blue-600/30">
+                <ul className="space-y-1 px-2">
+                    {navItems.map((item) => {
+                        const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + '/');
                         return (
-                            <Link
-                                key={item.name}
-                                to={item.path}
-                                onClick={onClose}
-                                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition ${
-                                    isActive
-                                        ? "bg-white text-blue-700 font-semibold"
-                                        : "hover:bg-blue-800"
-                                }`}
-                            >
-                                {item.icon}
-                                <span>{item.name}</span>
-                            </Link>
+                            <li key={item.path}>
+                                <Link
+                                    to={item.path}
+                                    className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group relative ${
+                                        isActive
+                                            ? 'bg-white/20 text-white shadow-lg shadow-blue-900/20'
+                                            : 'text-blue-200 hover:bg-white/10 hover:text-white'
+                                    }`}
+                                >
+                                    <span className={`flex-shrink-0 ${isActive ? 'text-yellow-400' : 'text-blue-300 group-hover:text-white'}`}>
+                                        {item.icon}
+                                    </span>
+                                    {isOpen && (
+                                        <span className="text-sm font-medium">{item.label}</span>
+                                    )}
+                                    {item.badge && (
+                                        <span className={`ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full ${!isOpen && 'hidden'}`}>
+                                            {item.badge}
+                                        </span>
+                                    )}
+                                    {!isOpen && (
+                                        <span className="absolute left-16 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
+                                            {item.label}
+                                        </span>
+                                    )}
+                                </Link>
+                            </li>
                         );
                     })}
-                </nav>
+                </ul>
+            </nav>
 
+            {/* Footer */}
+            <div className="p-4 border-t border-blue-800/30">
+                {/* Toggle Button */}
+                <button
+                    onClick={toggleSidebar}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-blue-300 hover:bg-white/10 hover:text-white transition-all duration-200 ${
+                        isOpen ? 'justify-start' : 'justify-center'
+                    }`}
+                >
+                    {isOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
+                    {isOpen && <span className="text-sm">Collapse</span>}
+                </button>
+
+                {/* Logout */}
                 <button
                     onClick={handleLogout}
-                    className="flex items-center gap-3 px-4 py-3 rounded-lg transition hover:bg-red-600 w-full mt-4"
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-red-300 hover:bg-red-500/20 hover:text-red-200 transition-all duration-200 mt-2 ${
+                        isOpen ? 'justify-start' : 'justify-center'
+                    }`}
                 >
                     <LogOut size={20} />
-                    <span>Logout</span>
+                    {isOpen && <span className="text-sm">Logout</span>}
                 </button>
-            </aside>
-
-            {/* Mobile sidebar drawer */}
-            <aside
-                className={`fixed top-0 left-0 z-40 h-full w-64 bg-blue-700 text-white p-5 transform transition-transform duration-300 ease-in-out md:hidden ${
-                    isOpen ? "translate-x-0" : "-translate-x-full"
-                }`}
-            >
-                <div className="flex items-center justify-between mb-6">
-                    <h1 className="text-2xl font-bold">🏫 School Portal</h1>
-                    <button
-                        onClick={onClose}
-                        className="p-1 rounded-lg hover:bg-blue-800 transition"
-                    >
-                        <X size={24} />
-                    </button>
-                </div>
-
-                <p className="text-sm text-blue-200 mb-4 capitalize">
-                    Welcome, {role.replace('_', ' ')}
-                </p>
-
-                <nav className="space-y-1">
-                    {items.map((item) => {
-                        const isActive = location.pathname === item.path;
-
-                        return (
-                            <Link
-                                key={item.name}
-                                to={item.path}
-                                onClick={onClose}
-                                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition ${
-                                    isActive
-                                        ? "bg-white text-blue-700 font-semibold"
-                                        : "hover:bg-blue-800"
-                                }`}
-                            >
-                                {item.icon}
-                                <span>{item.name}</span>
-                            </Link>
-                            
-                        );
-                    })}
-
-                    <button
-                        onClick={handleLogout}
-                        className="flex items-center gap-3 px-4 py-3 rounded-lg transition hover:bg-red-600 w-full mt-4"
-                    >
-                        <LogOut size={20} />
-                        <span>Logout</span>
-                    </button>
-                </nav>
-            </aside>
-        </>
+            </div>
+        </aside>
     );
 };
 

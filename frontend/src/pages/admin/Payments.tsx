@@ -1,443 +1,555 @@
-import { useState, useEffect, useRef } from "react";
-import { X, AlertCircle } from "lucide-react";
+// src/pages/finance/FinancePayments.tsx - COMPLETE WITH VIEW MODAL
+
+import { useState, useEffect } from "react";
+import { Check, X, Eye, Download, AlertCircle, Banknote, Users, FileText } from "lucide-react";
 import DashboardLayout from "../../layout/DashboardLayout";
 import axios from "axios";
 
-interface FeeStructure {
+interface Payment {
     _id: string;
-    name: string;
+    studentId: {
+        _id: string;
+        name: string;
+        email: string;
+        class: string;
+    };
+    studentFeeId: {
+        _id: string;
+        feeName: string;
+        amount: number;
+    };
     amount: number;
-    feeType: string;
-    classLevel: string;
-    semester: string;
-    academicYear: string;
-    dueDate: string;
-    isActive: boolean;
+    bankName: string;
+    referenceNumber: string;
+    screenshotUrl: string;
+    status: string;
+    receiptNumber: string;
+    receiptUrl: string;
+    rejectionReason: string;
+    confirmedBy: {
+        _id: string;
+        name: string;
+        email: string;
+    };
+    confirmedAt: string;
+    createdAt: string;
+    notes: string;
+    paymentDate: string;
 }
 
-interface FeeFormData {
-    feeTitle: string;
-    gradeClass: string;
-    amount: string;
-    dueDate: string;
-    academicYear: string;
-    description: string;
-    feeType: string;
-    semester: string;
+interface Stats {
+    pending: number;
+    confirmed: number;
+    rejected: number;
+    totalCollected: number;
 }
 
-const initialFeeForm: FeeFormData = {
-    feeTitle: "",
-    gradeClass: "",
-    amount: "",
-    dueDate: "",
-    academicYear: "",
-    description: "",
-    feeType: "tuition",
-    semester: "Semester 1",
-};
-
-const Payments = () => {
-    const [showModal, setShowModal] = useState(false);
-    const [formData, setFormData] = useState<FeeFormData>(initialFeeForm);
-    const [errors, setErrors] = useState<Partial<FeeFormData>>({});
-    const modalRef = useRef<HTMLDivElement>(null);
-
-    const [stats, setStats] = useState([
-        { title: "Total Revenue", value: "0 ETB" },
-        { title: "Outstanding Fees", value: "0 ETB" },
-        { title: "Paid Students", value: "0" },
-        { title: "Unpaid Students", value: "0" },
-    ]);
-    const [feeStructures, setFeeStructures] = useState<FeeStructure[]>([]);
+const FinancePayments = () => {
+    const [payments, setPayments] = useState<Payment[]>([]);
+    const [stats, setStats] = useState<Stats>({
+        pending: 0,
+        confirmed: 0,
+        rejected: 0,
+        totalCollected: 0,
+    });
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+    const [filter, setFilter] = useState<string>("all");
+    const [success, setSuccess] = useState(false);
+    const [successMessage, setSuccessMessage] = useState("");
+
+    // ✅ View Modal State
+    const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
+    const [showViewModal, setShowViewModal] = useState(false);
+    const [viewLoading, setViewLoading] = useState(false);
 
     useEffect(() => {
-        fetchFeeData();
+        fetchPayments();
+        fetchStats();
     }, []);
 
-    const fetchFeeData = async () => {
+    const fetchPayments = async () => {
         try {
             const token = localStorage.getItem('token');
-
-            const feeRes = await axios.get('http://localhost:7000/api/fees/structures', {
+            const url = filter === 'all' 
+                ? 'http://localhost:7000/api/finance/payments'
+                : `http://localhost:7000/api/finance/payments?status=${filter}`;
+            
+            const response = await axios.get(url, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-
-            const reportRes = await axios.get('http://localhost:7000/api/fees/reports/summary', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-
-            setFeeStructures(feeRes.data.data);
-
-            const report = reportRes.data.data;
-            if (report && report.summary) {
-                setStats([
-                    { title: "Total Revenue", value: `${report.summary.totalAmount || 0} ETB` },
-                    { title: "Outstanding Fees", value: `${report.summary.pending?.amount || 0} ETB` },
-                    { title: "Paid Students", value: `${report.summary.paid?.count || 0}` },
-                    { title: "Unpaid Students", value: `${report.summary.pending?.count || 0}` },
-                ]);
-            }
-
+            setPayments(response.data.data || []);
             setLoading(false);
-        } catch (error) {
-            console.error("Error fetching fee data:", error);
-            setLoading(false);
-        }
-    };
-
-    const validate = (): boolean => {
-        const newErrors: Partial<FeeFormData> = {};
-        if (!formData.feeTitle.trim()) newErrors.feeTitle = "Fee Title is required";
-        if (!formData.gradeClass.trim()) newErrors.gradeClass = "Grade/Class is required";
-        if (!formData.amount.trim()) newErrors.amount = "Amount is required";
-        if (!formData.dueDate.trim()) newErrors.dueDate = "Due Date is required";
-        if (!formData.academicYear.trim()) newErrors.academicYear = "Academic Year is required";
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
-
-    // ✅ UPDATED: Creates fee AND assigns to students
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!validate()) return;
-
-        try {
-            const token = localStorage.getItem('token');
-
-            // 1️⃣ Create fee structure
-            const feeData = {
-                name: formData.feeTitle,
-                description: formData.description,
-                amount: parseFloat(formData.amount.replace(/,/g, '')),
-                feeType: formData.feeType,
-                classLevel: formData.gradeClass,
-                semester: formData.semester,
-                academicYear: formData.academicYear,
-                dueDate: new Date(formData.dueDate).toISOString(),
-                isActive: true,
-            };
-
-            const feeResponse = await axios.post('http://localhost:7000/api/fees/structures', feeData, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-
-            const newFeeId = feeResponse.data.data._id;
-            console.log('✅ Fee structure created:', newFeeId);
-
-            // 2️⃣ Get all students for this class level
-            const studentsRes = await axios.get('http://localhost:7000/api/users?role=student', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-
-            const classLevelMap: Record<string, string[]> = {
-                primary: ['Grade 1', 'Grade 2', 'Grade 3', 'Grade 4'],
-                middle: ['Grade 5', 'Grade 6', 'Grade 7', 'Grade 8'],
-                secondary: ['Grade 9', 'Grade 10', 'Grade 11', 'Grade 12'],
-            };
-
-            const targetClasses = classLevelMap[formData.gradeClass] || [];
-            const students = studentsRes.data.data.filter((student: any) =>
-                targetClasses.includes(student.class)
-            );
-
-            if (students.length === 0) {
-                alert('No students found in this class level. Fee structure created but not assigned.');
-                setShowModal(false);
-                setFormData(initialFeeForm);
-                setErrors({});
-                await fetchFeeData();
-                return;
-            }
-
-            // 3️⃣ Assign fee to all students
-            const studentIds = students.map((s: any) => s._id);
-            await axios.post('http://localhost:7000/api/fees/assign', {
-                feeStructureId: newFeeId,
-                studentIds: studentIds,
-            }, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-
-            console.log(`✅ Fee assigned to ${students.length} students`);
-
-            // 4️⃣ Refresh data
-            await fetchFeeData();
-            setShowModal(false);
-            setFormData(initialFeeForm);
-            setErrors({});
-            alert(`✅ Fee created and assigned to ${students.length} students!`);
-
         } catch (error: any) {
-            console.error('❌ Error:', error);
-            alert(error.response?.data?.error || 'Failed to create or assign fee');
+            console.error("Error fetching payments:", error);
+            setError(error.response?.data?.error || "Failed to load payments");
+            setLoading(false);
         }
     };
 
-    const handleClose = () => {
-        setShowModal(false);
-        setFormData(initialFeeForm);
-        setErrors({});
+    const fetchStats = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await axios.get('http://localhost:7000/api/finance/revenue', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setStats(response.data.data || {
+                pending: 0,
+                confirmed: 0,
+                rejected: 0,
+                totalCollected: 0,
+            });
+        } catch (error) {
+            console.error("Error fetching stats:", error);
+        }
     };
 
-    const modalContent = showModal && (
-        <div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 transition-opacity duration-200"
-            onClick={handleClose}
-        >
-            <div
-                ref={modalRef}
-                className="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto transform transition-all duration-200 scale-100 opacity-100"
-                onClick={(e) => e.stopPropagation()}
-            >
-                <div className="flex items-center justify-between p-5 border-b">
-                    <h2 className="text-lg font-semibold text-gray-800">Create Fee</h2>
-                    <button onClick={handleClose} className="p-1 rounded-lg hover:bg-gray-100 transition">
-                        <X size={20} className="text-gray-500" />
-                    </button>
-                </div>
-                <form onSubmit={handleSubmit} className="p-5 space-y-4">
-                    {/* Fee Title */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Fee Title <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            value={formData.feeTitle}
-                            onChange={(e) => setFormData({ ...formData, feeTitle: e.target.value })}
-                            className={`w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 ${errors.feeTitle ? "border-red-400" : ""}`}
-                            placeholder="e.g. Tuition Fee"
-                        />
-                        {errors.feeTitle && (
-                            <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
-                                <AlertCircle size={12} /> {errors.feeTitle}
-                            </p>
-                        )}
-                    </div>
+    // ✅ View Payment Details
+    const handleViewPayment = async (paymentId: string) => {
+        try {
+            setViewLoading(true);
+            const token = localStorage.getItem('token');
+            const response = await axios.get(
+                `http://localhost:7000/api/finance/payments/${paymentId}`,
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            setSelectedPayment(response.data.data);
+            setShowViewModal(true);
+            setViewLoading(false);
+        } catch (error: any) {
+            console.error("Error fetching payment details:", error);
+            alert(error.response?.data?.error || "Failed to load payment details");
+            setViewLoading(false);
+        }
+    };
 
-                    {/* Fee Type */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Fee Type <span className="text-red-500">*</span>
-                        </label>
-                        <select
-                            value={formData.feeType}
-                            onChange={(e) => setFormData({ ...formData, feeType: e.target.value })}
-                            className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
-                        >
-                            <option value="tuition">Tuition</option>
-                            <option value="registration">Registration</option>
-                            <option value="activity">Activity</option>
-                            <option value="library">Library</option>
-                            <option value="lab">Lab</option>
-                            <option value="sports">Sports</option>
-                            <option value="other">Other</option>
-                        </select>
-                    </div>
+    const handleApprove = async (id: string) => {
+        if (!window.confirm("Are you sure you want to approve this payment?")) return;
+        try {
+            const token = localStorage.getItem('token');
+            await axios.put(`http://localhost:7000/api/finance/payments/${id}/confirm`, {}, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setSuccess(true);
+            setSuccessMessage("✅ Payment approved successfully!");
+            fetchPayments();
+            fetchStats();
+            setTimeout(() => {
+                setSuccess(false);
+                setSuccessMessage("");
+            }, 5000);
+        } catch (error: any) {
+            alert(error.response?.data?.error || "Failed to approve payment");
+        }
+    };
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Grade Level <span className="text-red-500">*</span>
-                            </label>
-                            <select
-                                value={formData.gradeClass}
-                                onChange={(e) => setFormData({ ...formData, gradeClass: e.target.value })}
-                                className={`w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 ${errors.gradeClass ? "border-red-400" : ""}`}
-                            >
-                                <option value="">Select Grade Level</option>
-                                <option value="primary">Primary (Grade 1-4)</option>
-                                <option value="middle">Middle (Grade 5-8)</option>
-                                <option value="secondary">Secondary (Grade 9-12)</option>
-                            </select>
-                            {errors.gradeClass && (
-                                <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
-                                    <AlertCircle size={12} /> {errors.gradeClass}
-                                </p>
-                            )}
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Amount (ETB) <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                                type="text"
-                                value={formData.amount}
-                                onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                                className={`w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 ${errors.amount ? "border-red-400" : ""}`}
-                                placeholder="e.g. 15000"
-                            />
-                            {errors.amount && (
-                                <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
-                                    <AlertCircle size={12} /> {errors.amount}
-                                </p>
-                            )}
-                        </div>
-                    </div>
+    const handleReject = async (id: string) => {
+        const reason = prompt("Please enter rejection reason:");
+        if (reason === null) return;
+        if (!window.confirm("Are you sure you want to reject this payment?")) return;
+        try {
+            const token = localStorage.getItem('token');
+            await axios.put(`http://localhost:7000/api/finance/payments/${id}/reject`, 
+                { reason: reason || "Payment rejected" },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            setSuccess(true);
+            setSuccessMessage("❌ Payment rejected!");
+            fetchPayments();
+            fetchStats();
+            setTimeout(() => {
+                setSuccess(false);
+                setSuccessMessage("");
+            }, 5000);
+        } catch (error: any) {
+            alert(error.response?.data?.error || "Failed to reject payment");
+        }
+    };
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Due Date <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                                type="date"
-                                value={formData.dueDate}
-                                onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
-                                className={`w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 ${errors.dueDate ? "border-red-400" : ""}`}
-                            />
-                            {errors.dueDate && (
-                                <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
-                                    <AlertCircle size={12} /> {errors.dueDate}
-                                </p>
-                            )}
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Academic Year <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                                type="text"
-                                value={formData.academicYear}
-                                onChange={(e) => setFormData({ ...formData, academicYear: e.target.value })}
-                                className={`w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 ${errors.academicYear ? "border-red-400" : ""}`}
-                                placeholder="e.g. 2024/25"
-                            />
-                            {errors.academicYear && (
-                                <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
-                                    <AlertCircle size={12} /> {errors.academicYear}
-                                </p>
-                            )}
-                        </div>
-                    </div>
+    const getStatusBadge = (status: string) => {
+        const styles: Record<string, string> = {
+            pending: 'bg-yellow-100 text-yellow-700',
+            confirmed: 'bg-green-100 text-green-700',
+            rejected: 'bg-red-100 text-red-700',
+            failed: 'bg-gray-100 text-gray-700',
+        };
+        return styles[status] || 'bg-gray-100 text-gray-700';
+    };
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Description (optional)</label>
-                        <textarea
-                            rows={3}
-                            value={formData.description}
-                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                            className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="Additional notes about this fee"
-                        />
-                    </div>
+    const getStatusIcon = (status: string) => {
+        switch (status) {
+            case 'confirmed': return <Check size={16} className="text-green-600" />;
+            case 'pending': return <AlertCircle size={16} className="text-yellow-600" />;
+            case 'rejected': return <X size={16} className="text-red-600" />;
+            default: return null;
+        }
+    };
 
-                    <div className="flex justify-end gap-3 pt-2">
-                        <button
-                            type="button"
-                            onClick={handleClose}
-                            className="px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-50 transition"
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            type="submit"
-                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-                        >
-                            Create & Assign Fee
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    );
+    const formatCurrency = (amount: number) => {
+        return new Intl.NumberFormat('en-ET', { style: 'currency', currency: 'ETB' }).format(amount);
+    };
 
     if (loading) {
         return (
-            <DashboardLayout role="admin">
+            <DashboardLayout role="finance_officer">
                 <div className="flex items-center justify-center min-h-[60vh]">
-                    <div className="text-xl text-gray-500">Loading fee data...</div>
+                    <div className="text-xl text-gray-500">Loading payments...</div>
                 </div>
             </DashboardLayout>
         );
     }
 
     return (
-        <DashboardLayout role="admin">
+        <DashboardLayout role="finance_officer">
             <div className="space-y-6">
-                <div className="flex flex-col gap-2">
-                    <h1 className="text-2xl font-bold text-gray-800">Fee Management</h1>
-                    <p className="text-gray-500">Create, assign, and track school payments from one place.</p>
+                {/* Success Message */}
+                {success && (
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-green-700 flex items-center gap-3 animate-fadeIn">
+                        <Check size={24} />
+                        <p className="font-medium">{successMessage}</p>
+                    </div>
+                )}
+
+                {/* Header */}
+                <div>
+                    <h1 className="text-2xl font-bold text-gray-800">Payment Management</h1>
+                    <p className="text-gray-500">Review and confirm student payments</p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-                    {stats.map((stat) => (
-                        <div key={stat.title} className="bg-white p-6 rounded-xl shadow-sm">
-                            <p className="text-gray-500 text-sm">{stat.title}</p>
-                            <h3 className="text-3xl font-bold mt-2 text-gray-800">{stat.value}</h3>
-                        </div>
-                    ))}
+                {/* Stats Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
+                        <p className="text-sm text-yellow-700 font-medium">Pending</p>
+                        <p className="text-2xl font-bold text-yellow-800">{stats.pending || 0}</p>
+                    </div>
+                    <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+                        <p className="text-sm text-green-700 font-medium">Confirmed</p>
+                        <p className="text-2xl font-bold text-green-800">{stats.confirmed || 0}</p>
+                    </div>
+                    <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+                        <p className="text-sm text-red-700 font-medium">Rejected</p>
+                        <p className="text-2xl font-bold text-red-800">{stats.rejected || 0}</p>
+                    </div>
+                    <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                        <p className="text-sm text-blue-700 font-medium">Total Collected</p>
+                        <p className="text-2xl font-bold text-blue-800">{formatCurrency(stats.totalCollected || 0)}</p>
+                    </div>
                 </div>
 
-                <div className="grid grid-cols-1 xl:grid-cols-[1.3fr_0.7fr] gap-6">
-                    <div className="bg-white rounded-xl shadow-sm p-6">
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
-                            <div>
-                                <h2 className="text-lg font-semibold">Fee Structure</h2>
-                                <p className="text-sm text-gray-500">Admin-managed fees and payment status.</p>
-                            </div>
-                            <button
-                                onClick={() => setShowModal(true)}
-                                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold text-sm"
-                            >
-                                + Create Fee
-                            </button>
-                        </div>
+                {/* Filter */}
+                <div className="bg-white rounded-xl shadow-sm p-4">
+                    <div className="flex flex-wrap gap-2">
+                        <button
+                            onClick={() => setFilter('all')}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                                filter === 'all' 
+                                    ? 'bg-blue-600 text-white' 
+                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            }`}
+                        >
+                            All
+                        </button>
+                        <button
+                            onClick={() => setFilter('pending')}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                                filter === 'pending' 
+                                    ? 'bg-yellow-600 text-white' 
+                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            }`}
+                        >
+                            Pending
+                        </button>
+                        <button
+                            onClick={() => setFilter('confirmed')}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                                filter === 'confirmed' 
+                                    ? 'bg-green-600 text-white' 
+                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            }`}
+                        >
+                            Confirmed
+                        </button>
+                        <button
+                            onClick={() => setFilter('rejected')}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                                filter === 'rejected' 
+                                    ? 'bg-red-600 text-white' 
+                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            }`}
+                        >
+                            Rejected
+                        </button>
+                    </div>
+                </div>
 
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left">
-                                <thead>
-                                    <tr className="border-b text-gray-500 text-sm">
-                                        <th className="pb-3">Fee</th>
-                                        <th className="pb-3">Amount</th>
-                                        <th className="pb-3">Grade Level</th>
-                                        <th className="pb-3">Due Date</th>
-                                        <th className="pb-3">Status</th>
+                {/* Payments Table */}
+                <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+                    <div className="overflow-x-auto">
+                        <table className="w-full border-collapse">
+                            <thead className="bg-gray-50">
+                                <tr>
+                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600">Student</th>
+                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600">Fee</th>
+                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600">Amount</th>
+                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600">Bank</th>
+                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600">Reference</th>
+                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600">Status</th>
+                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100">
+                                {payments.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
+                                            No payments found.
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody className="text-gray-700">
-                                    {feeStructures.length > 0 ? (
-                                        feeStructures.map((fee) => (
-                                            <tr key={fee._id} className="border-b last:border-0">
-                                                <td className="py-4 font-medium">{fee.name}</td>
-                                                <td className="py-4">{fee.amount} ETB</td>
-                                                <td className="py-4 capitalize">{fee.classLevel}</td>
-                                                <td className="py-4">{new Date(fee.dueDate).toLocaleDateString()}</td>
-                                                <td className="py-4">
-                                                    <span className={`px-2 py-1 rounded-full text-xs ${fee.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
-                                                        {fee.isActive ? 'Active' : 'Inactive'}
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                        ))
-                                    ) : (
-                                        <tr>
-                                            <td colSpan={5} className="py-8 text-center text-gray-500">
-                                                No fee structures created yet. Click "Create Fee" to get started.
+                                ) : (
+                                    payments.map((payment) => (
+                                        <tr key={payment._id} className="hover:bg-gray-50">
+                                            <td className="px-4 py-3">
+                                                <div>
+                                                    <p className="font-medium text-gray-800">{payment.studentId?.name || 'N/A'}</p>
+                                                    <p className="text-xs text-gray-500">{payment.studentId?.email || ''}</p>
+                                                </div>
+                                            </td>
+                                            <td className="px-4 py-3">{payment.studentFeeId?.feeName || 'N/A'}</td>
+                                            <td className="px-4 py-3 font-semibold">{formatCurrency(payment.amount)}</td>
+                                            <td className="px-4 py-3">{payment.bankName}</td>
+                                            <td className="px-4 py-3 font-mono text-sm">{payment.referenceNumber}</td>
+                                            <td className="px-4 py-3">
+                                                <span className={`px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1 w-fit ${getStatusBadge(payment.status)}`}>
+                                                    {getStatusIcon(payment.status)}
+                                                    {payment.status.charAt(0).toUpperCase() + payment.status.slice(1)}
+                                                </span>
+                                            </td>
+                                            <td className="px-4 py-3">
+                                                <div className="flex gap-2">
+                                                    {/* ✅ View Button - Opens Modal */}
+                                                    <button
+                                                        onClick={() => handleViewPayment(payment._id)}
+                                                        className="p-1.5 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition"
+                                                        title="View Details"
+                                                    >
+                                                        <Eye size={16} />
+                                                    </button>
+                                                    {payment.status === 'pending' && (
+                                                        <>
+                                                            <button
+                                                                onClick={() => handleApprove(payment._id)}
+                                                                className="p-1.5 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition"
+                                                                title="Approve"
+                                                            >
+                                                                <Check size={16} />
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleReject(payment._id)}
+                                                                className="p-1.5 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition"
+                                                                title="Reject"
+                                                            >
+                                                                <X size={16} />
+                                                            </button>
+                                                        </>
+                                                    )}
+                                                    {payment.receiptUrl && (
+                                                        <button
+                                                            onClick={() => window.open(payment.receiptUrl, '_blank')}
+                                                            className="p-1.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition"
+                                                            title="Download Receipt"
+                                                        >
+                                                            <Download size={16} />
+                                                        </button>
+                                                    )}
+                                                </div>
                                             </td>
                                         </tr>
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div className="bg-white rounded-xl shadow-sm p-6">
-                        <h2 className="text-lg font-semibold">Quick Actions</h2>
-                        <div className="mt-4 space-y-3 text-sm text-gray-700">
-                            <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">Create fee structures for tuition, library, and exams.</div>
-                            <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">Fees are automatically assigned to all students in the selected grade level.</div>
-                            <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">Record cash or bank payments and print receipts.</div>
-                        </div>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
 
-            {modalContent}
+            {/* ✅ VIEW DETAILS MODAL */}
+            {showViewModal && selectedPayment && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+                    onClick={() => setShowViewModal(false)}
+                >
+                    <div
+                        className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="flex items-center justify-between p-5 border-b sticky top-0 bg-white z-10">
+                            <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                                <FileText size={20} />
+                                Payment Details
+                            </h2>
+                            <button
+                                onClick={() => setShowViewModal(false)}
+                                className="p-1 rounded-lg hover:bg-gray-100 transition"
+                            >
+                                <X size={20} className="text-gray-500" />
+                            </button>
+                        </div>
+
+                        <div className="p-5 space-y-4">
+                            {/* Payment Info */}
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <p className="text-sm text-gray-500">Student</p>
+                                    <p className="font-medium">{selectedPayment.studentId?.name || 'N/A'}</p>
+                                    <p className="text-sm text-gray-600">{selectedPayment.studentId?.email || ''}</p>
+                                </div>
+                                <div>
+                                    <p className="text-sm text-gray-500">Class</p>
+                                    <p className="font-medium">{selectedPayment.studentId?.class || 'N/A'}</p>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <p className="text-sm text-gray-500">Fee</p>
+                                    <p className="font-medium">{selectedPayment.studentFeeId?.feeName || 'N/A'}</p>
+                                </div>
+                                <div>
+                                    <p className="text-sm text-gray-500">Amount</p>
+                                    <p className="text-xl font-bold text-blue-600">{formatCurrency(selectedPayment.amount)}</p>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <p className="text-sm text-gray-500">Bank</p>
+                                    <p className="font-medium">{selectedPayment.bankName}</p>
+                                </div>
+                                <div>
+                                    <p className="text-sm text-gray-500">Reference Number</p>
+                                    <p className="font-mono font-medium">{selectedPayment.referenceNumber}</p>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <p className="text-sm text-gray-500">Payment Date</p>
+                                    <p className="font-medium">{new Date(selectedPayment.paymentDate || selectedPayment.createdAt).toLocaleDateString()}</p>
+                                </div>
+                                <div>
+                                    <p className="text-sm text-gray-500">Status</p>
+                                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadge(selectedPayment.status)}`}>
+                                        {selectedPayment.status.charAt(0).toUpperCase() + selectedPayment.status.slice(1)}
+                                    </span>
+                                </div>
+                            </div>
+
+                            {selectedPayment.confirmedAt && (
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <p className="text-sm text-gray-500">Confirmed At</p>
+                                        <p className="font-medium">{new Date(selectedPayment.confirmedAt).toLocaleDateString()}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm text-gray-500">Confirmed By</p>
+                                        <p className="font-medium">{selectedPayment.confirmedBy?.name || 'N/A'}</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {selectedPayment.receiptNumber && (
+                                <div>
+                                    <p className="text-sm text-gray-500">Receipt Number</p>
+                                    <p className="font-mono font-medium text-blue-600">{selectedPayment.receiptNumber}</p>
+                                </div>
+                            )}
+
+                            {selectedPayment.rejectionReason && (
+                                <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                                    <p className="text-sm text-gray-500">Rejection Reason</p>
+                                    <p className="text-red-600 font-medium">{selectedPayment.rejectionReason}</p>
+                                </div>
+                            )}
+
+                            {/* ✅ Payment Screenshot */}
+                            <div className="border-t pt-4">
+                                <p className="text-sm font-medium text-gray-700 mb-2">Payment Screenshot</p>
+                                {selectedPayment.screenshotUrl ? (
+                                    <div className="border rounded-lg overflow-hidden">
+                                        <img
+                                            src={`http://localhost:7000${selectedPayment.screenshotUrl}`}
+                                            alt="Payment Screenshot"
+                                            className="w-full max-h-96 object-contain"
+                                            onError={(e) => {
+                                                (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x300?text=Screenshot+Not+Available';
+                                            }}
+                                        />
+                                        <div className="bg-gray-50 p-2 text-center">
+                                            <a
+                                                href={`http://localhost:7000${selectedPayment.screenshotUrl}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-blue-600 hover:text-blue-800 text-sm flex items-center justify-center gap-1"
+                                            >
+                                                <Eye size={14} />
+                                                View Full Size
+                                            </a>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center text-gray-500">
+                                        <p>No screenshot uploaded</p>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Actions */}
+                            <div className="flex justify-end gap-3 pt-4 border-t">
+                                {selectedPayment.status === 'pending' && (
+                                    <>
+                                        <button
+                                            onClick={() => {
+                                                handleApprove(selectedPayment._id);
+                                                setShowViewModal(false);
+                                            }}
+                                            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center gap-2"
+                                        >
+                                            <Check size={18} />
+                                            Approve
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                handleReject(selectedPayment._id);
+                                                setShowViewModal(false);
+                                            }}
+                                            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition flex items-center gap-2"
+                                        >
+                                            <X size={18} />
+                                            Reject
+                                        </button>
+                                    </>
+                                )}
+                                {selectedPayment.receiptUrl && (
+                                    <button
+                                        onClick={() => window.open(selectedPayment.receiptUrl, '_blank')}
+                                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
+                                    >
+                                        <Download size={18} />
+                                        Download Receipt
+                                    </button>
+                                )}
+                                <button
+                                    onClick={() => setShowViewModal(false)}
+                                    className="px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-50 transition"
+                                >
+                                    Close
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </DashboardLayout>
     );
 };
 
-export default Payments;
+export default FinancePayments;

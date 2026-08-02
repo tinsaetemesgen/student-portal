@@ -1,3 +1,5 @@
+// src/pages/student/MyFees.tsx - FIXED API ENDPOINT
+
 import { useState, useEffect } from "react";
 import DashboardLayout from "../../layout/DashboardLayout";
 import axios from "axios";
@@ -30,14 +32,60 @@ const MyFees = () => {
     const fetchFeeStatus = async () => {
         try {
             const token = localStorage.getItem('token');
+            const userStr = localStorage.getItem('user');
+            const user = userStr ? JSON.parse(userStr) : null;
+            const studentId = user?._id;
+
+            if (!studentId) {
+                setError("Student ID not found");
+                setLoading(false);
+                return;
+            }
+
+            // ✅ Use the correct finance route for student fees
             const response = await axios.get(
-                'http://localhost:7000/api/fees/my-fees/status',
+                `http://localhost:7000/api/finance/parent/student-fees?studentId=${studentId}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
             if (response.data.success) {
-                setSummary(response.data.data.summary);
-                setFees(response.data.data.fees);
+                const feesData = response.data.data || [];
+                
+                // ✅ Transform data to match the UI
+                const transformedFees = feesData.map((fee: any) => {
+                    let statusText = 'Pending';
+                    let statusColor = 'yellow';
+                    
+                    if (fee.status === 'paid') {
+                        statusText = 'Paid';
+                        statusColor = 'green';
+                    } else if (fee.isOverdue || fee.status === 'overdue') {
+                        statusText = 'Overdue';
+                        statusColor = 'red';
+                    }
+                    
+                    return {
+                        feeName: fee.feeName || 'Unknown Fee',
+                        status: fee.status,
+                        statusText: statusText,
+                        statusColor: statusColor,
+                        dueDate: fee.dueDate || fee.endDate || new Date().toISOString(),
+                    };
+                });
+
+                // ✅ Calculate summary
+                const totalFees = transformedFees.length;
+                const paid = transformedFees.filter(f => f.status === 'paid').length;
+                const pending = transformedFees.filter(f => f.status === 'pending').length;
+                const overdue = transformedFees.filter(f => f.status === 'overdue' || f.statusColor === 'red').length;
+
+                setSummary({
+                    totalFees,
+                    paid,
+                    pending,
+                    overdue,
+                });
+                setFees(transformedFees);
             }
             setLoading(false);
         } catch (error: any) {
@@ -148,7 +196,7 @@ const MyFees = () => {
                                                 {getStatusBadge(fee.status, fee.statusColor)}
                                             </td>
                                             <td className="px-6 py-4 text-gray-600">
-                                                {new Date(fee.dueDate).toLocaleDateString()}
+                                                {fee.dueDate ? new Date(fee.dueDate).toLocaleDateString() : 'N/A'}
                                             </td>
                                         </tr>
                                     ))
@@ -156,12 +204,6 @@ const MyFees = () => {
                             </tbody>
                         </table>
                     </div>
-                </div>
-
-                {/* Info Note */}
-                <div className="bg-blue-50 rounded-xl p-4 border border-blue-200 text-sm text-blue-700">
-                    💡 Note: Fee amounts are not displayed to students to help you focus on your studies. 
-                    Please contact the finance office for any payment-related questions.
                 </div>
             </div>
         </DashboardLayout>

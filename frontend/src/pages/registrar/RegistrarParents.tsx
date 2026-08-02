@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
-import { Users, UserPlus, Search, Link2, Eye, X } from "lucide-react";
-import DashboardLayout from "../../layout/DashboardLayout";
+import { UserPlus, Search, Link2, X } from "lucide-react"; import DashboardLayout from "../../layout/DashboardLayout";
 import axios from "axios";
 
 interface Parent {
@@ -19,6 +18,7 @@ interface Student {
     email: string;
     class: string;
     age: number;
+    parentId?: string;
 }
 
 const RegistrarParents = () => {
@@ -256,14 +256,14 @@ const RegistrarParents = () => {
                                     required
                                 />
                                 {/* Add this after the email field */}
-<input
-    type="password"
-    placeholder="Password (default: parent123)"
-    value={formData.password}
-    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-    className="w-full border rounded-lg px-4 py-2"
-    required
-/>
+                                <input
+                                    type="password"
+                                    placeholder="Password (default: parent123)"
+                                    value={formData.password}
+                                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                    className="w-full border rounded-lg px-4 py-2"
+                                    required
+                                />
                                 <input
                                     type="text"
                                     placeholder="Phone Number"

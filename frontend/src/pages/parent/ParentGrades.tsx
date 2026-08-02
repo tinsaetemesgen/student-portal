@@ -78,13 +78,14 @@ const ParentGrades = () => {
                 `http://localhost:7000/api/parents/${userId}/children`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-            
+
             const childrenData: Child[] = (childrenRes.data?.data || []) as Child[];
             setChildren(childrenData);
 
             if (childrenData.length > 0) {
-                setSelectedChild(childrenData[0]._id);
-                await fetchChildGrades(childrenData[0]._id, token);
+                const firstChildId = childrenData[0]._id;
+                setSelectedChild(firstChildId);
+                await fetchChildGrades(firstChildId, token ?? undefined);
             } else {
                 setLoading(false);
             }
@@ -98,7 +99,7 @@ const ParentGrades = () => {
     const fetchChildGrades = async (childId: string, token?: string) => {
         try {
             const authToken = token || localStorage.getItem('token');
-            
+
             const gradesRes = await axios.get(
                 `http://localhost:7000/api/grades/child/${childId}/grades`,
                 { headers: { Authorization: `Bearer ${authToken}` } }
@@ -196,7 +197,7 @@ const ParentGrades = () => {
 
         const assessments = grade.assessments;
         const keys = ['quiz', 'homework', 'classTest', 'finalTest', 'groupWork'];
-        
+
         return (
             <div className="mt-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
                 <h4 className="text-sm font-semibold text-gray-700 mb-3">📊 Assessment Breakdown</h4>
@@ -283,11 +284,10 @@ const ParentGrades = () => {
                             <button
                                 key={child._id}
                                 onClick={() => handleChildChange(child._id)}
-                                className={`px-4 py-2 rounded-lg font-medium transition ${
-                                    selectedChild === child._id
+                                className={`px-4 py-2 rounded-lg font-medium transition ${selectedChild === child._id
                                         ? 'bg-blue-600 text-white'
                                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                }`}
+                                    }`}
                             >
                                 {child.name} ({child.class || 'No Class'})
                             </button>
