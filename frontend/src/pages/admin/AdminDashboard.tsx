@@ -7,7 +7,7 @@ import axios from "axios";
 const AdminDashboard = () => {
     const [modalOpen, setModalOpen] = useState(false);
     const [modalRole, setModalRole] = useState<"student" | "teacher">("student");
-    
+
     const [stats, setStats] = useState([
         { title: "Total Students", value: "0" },
         { title: "Total Teachers", value: "0" },
@@ -24,7 +24,7 @@ const AdminDashboard = () => {
     const fetchDashboardData = async () => {
         try {
             const token = localStorage.getItem('token');
-            
+
             const statsRes = await axios.get('http://localhost:7000/api/users/stats/roles', {
                 headers: { Authorization: `Bearer ${token}` }
             });
@@ -59,7 +59,7 @@ const AdminDashboard = () => {
     const handleSave = async (data: UserData) => {
         try {
             const token = localStorage.getItem('token');
-            
+
             // ✅ Map frontend fields to backend schema
             const userData: any = {
                 name: `${data.firstName} ${data.lastName}`.trim(),
@@ -102,12 +102,12 @@ const AdminDashboard = () => {
             setModalOpen(false);
             await fetchDashboardData();
             alert(`${modalRole.charAt(0).toUpperCase() + modalRole.slice(1)} added successfully!`);
-            
+
         } catch (error: any) {
             console.error("❌ Error saving user:", error);
-            const errorMsg = error.response?.data?.error || 
-                             error.response?.data?.errors?.join(', ') || 
-                             "Failed to add user";
+            const errorMsg = error.response?.data?.error ||
+                error.response?.data?.errors?.join(', ') ||
+                "Failed to add user";
             alert(errorMsg);
         }
     };
@@ -116,7 +116,7 @@ const AdminDashboard = () => {
         return (
             <DashboardLayout role="admin">
                 <div className="flex items-center justify-center min-h-[60vh]">
-                    <div className="text-xl text-gray-500">Loading dashboard...</div>
+                    <div className="text-xl text-gray-500 dark:text-gray-400">Loading dashboard...</div>
                 </div>
             </DashboardLayout>
         );
@@ -128,9 +128,9 @@ const AdminDashboard = () => {
                 {/* Stats */}
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
                     {stats.map((stat) => (
-                        <div key={stat.title} className="bg-white p-6 rounded-xl shadow-sm">
-                            <p className="text-gray-500 text-sm">{stat.title}</p>
-                            <h3 className="text-3xl font-bold mt-2 text-gray-800">
+                        <div key={stat.title} className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm">
+                            <p className="text-gray-500 dark:text-gray-400 text-sm">{stat.title}</p>
+                            <h3 className="text-3xl font-bold mt-2 text-gray-800 dark:text-gray-100">
                                 {stat.value}
                             </h3>
                         </div>
@@ -138,9 +138,9 @@ const AdminDashboard = () => {
                 </div>
 
                 {/* Recent Activities */}
-                <div className="bg-white rounded-xl shadow-sm p-6">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
-                        <h3 className="text-lg font-semibold">Recent Activities</h3>
+                        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Recent Activities</h3>
 
                         <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                             <button
@@ -175,17 +175,17 @@ const AdminDashboard = () => {
                     <div className="overflow-x-auto">
                         <table className="w-full text-left">
                             <thead>
-                                <tr className="border-b text-gray-500 text-sm">
+                                <tr className="border-b border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 text-sm">
                                     <th className="pb-3">Activity</th>
                                     <th className="pb-3">User</th>
                                     <th className="pb-3">Time</th>
                                 </tr>
                             </thead>
 
-                            <tbody className="text-gray-700">
+                            <tbody className="text-gray-700 dark:text-gray-200">
                                 {recentActivities.length > 0 ? (
                                     recentActivities.map((activity, index) => (
-                                        <tr key={index} className="border-b last:border-b-0">
+                                        <tr key={index} className="border-b border-gray-200 dark:border-gray-700 last:border-b-0">
                                             <td className="py-4">{activity.activity}</td>
                                             <td className="py-4">{activity.user}</td>
                                             <td className="py-4">{activity.time}</td>
@@ -193,7 +193,7 @@ const AdminDashboard = () => {
                                     ))
                                 ) : (
                                     <tr>
-                                        <td className="py-4 text-gray-500" colSpan={3}>
+                                        <td className="py-4 text-gray-500 dark:text-gray-400" colSpan={3}>
                                             No recent activities
                                         </td>
                                     </tr>

@@ -265,7 +265,7 @@ const handleSubmit = async (e: React.FormEvent) => {
         return (
             <DashboardLayout role="finance_officer">
                 <div className="flex items-center justify-center min-h-[60vh]">
-                    <div className="text-xl text-gray-500">Loading fee structures...</div>
+                    <div className="text-xl text-gray-500 dark:text-gray-400">Loading fee structures...</div>
                 </div>
             </DashboardLayout>
         );
@@ -276,12 +276,12 @@ const handleSubmit = async (e: React.FormEvent) => {
             <div className="space-y-6">
                 {/* Success Message */}
                 {success && (
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-green-700 flex items-center gap-3 animate-fadeIn">
+                    <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 text-green-700 dark:text-green-400 flex items-center gap-3 animate-fadeIn">
                         <Check size={24} className="flex-shrink-0" />
                         <div>
                             <p className="font-medium">{successMessage}</p>
                             {assignedCount > 0 && (
-                                <p className="text-sm text-green-600">
+                                <p className="text-sm text-green-600 dark:text-green-400">
                                     ✅ {assignedCount} students have been assigned this fee automatically.
                                 </p>
                             )}
@@ -291,8 +291,8 @@ const handleSubmit = async (e: React.FormEvent) => {
 
                 <div className="flex justify-between items-center">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-800">Fee Structures</h1>
-                        <p className="text-gray-500">Manage school fee structures with automatic assignment</p>
+                        <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Fee Structures</h1>
+                        <p className="text-gray-500 dark:text-gray-400">Manage school fee structures with automatic assignment</p>
                     </div>
                     <button
                         onClick={() => setShowModal(true)}
@@ -304,26 +304,26 @@ const handleSubmit = async (e: React.FormEvent) => {
                 </div>
 
                 {/* Fee Table */}
-                <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full border-collapse">
-                            <thead className="bg-gray-50">
+                            <thead className="bg-gray-50 dark:bg-gray-700">
                                 <tr>
-                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600">Name</th>
-                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600">Amount</th>
-                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600">Type</th>
-                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600">Level</th>
-                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600">Start Date</th>
-                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600">End Date</th>
-                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600">Total</th>
-                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600">Status</th>
-                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600">Actions</th>
+                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Name</th>
+                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Amount</th>
+                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Type</th>
+                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Level</th>
+                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Start Date</th>
+                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">End Date</th>
+                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Total</th>
+                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Status</th>
+                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-100">
+                            <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                                 {fees.length === 0 ? (
                                     <tr>
-                                        <td colSpan={9} className="px-4 py-8 text-center text-gray-500">
+                                        <td colSpan={9} className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
                                             No fee structures created yet.
                                         </td>
                                     </tr>
@@ -333,9 +333,9 @@ const handleSubmit = async (e: React.FormEvent) => {
                                         const totalAmount = getTotalAmount(fee);
                                         
                                         return (
-                                            <tr key={fee._id} className="hover:bg-gray-50 transition-colors">
-                                                <td className="px-4 py-3 font-medium">{fee.name}</td>
-                                                <td className="px-4 py-3">{formatCurrency(fee.amount)}</td>
+                                            <tr key={fee._id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                                                <td className="px-4 py-3 font-medium text-gray-800 dark:text-gray-200">{fee.name}</td>
+                                                <td className="px-4 py-3 text-gray-800 dark:text-gray-200">{formatCurrency(fee.amount)}</td>
                                                 <td className="px-4 py-3">
                                                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${getFeeTypeBadge(fee.feeType)}`}>
                                                         {fee.feeType.charAt(0).toUpperCase() + fee.feeType.slice(1)}
@@ -346,12 +346,12 @@ const handleSubmit = async (e: React.FormEvent) => {
                                                         {fee.classLevel.charAt(0).toUpperCase() + fee.classLevel.slice(1)}
                                                     </span>
                                                 </td>
-                                                <td className="px-4 py-3 text-sm">{new Date(fee.startDate).toLocaleDateString()}</td>
-                                                <td className="px-4 py-3 text-sm">
+                                                <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">{new Date(fee.startDate).toLocaleDateString()}</td>
+                                                <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
                                                     <div className="flex items-center gap-2">
                                                         {new Date(fee.endDate).toLocaleDateString()}
                                                         {overdue && (
-                                                            <span className="text-red-500 text-xs bg-red-50 px-2 py-1 rounded-full flex items-center gap-1">
+                                                            <span className="text-red-500 text-xs bg-red-50 dark:bg-red-900/30 px-2 py-1 rounded-full flex items-center gap-1">
                                                                 <AlertCircle size={12} />
                                                                 Overdue
                                                             </span>
@@ -360,7 +360,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                                                 </td>
                                                 <td className="px-4 py-3">
                                                     <div>
-                                                        <span className="font-semibold">{formatCurrency(totalAmount)}</span>
+                                                        <span className="font-semibold text-gray-800 dark:text-gray-200">{formatCurrency(totalAmount)}</span>
                                                         {totalAmount > fee.amount && (
                                                             <span className="text-xs text-red-500 block">
                                                                 +{formatCurrency(fee.lateFeeAmount)} late fee
@@ -371,12 +371,12 @@ const handleSubmit = async (e: React.FormEvent) => {
                                                 <td className="px-4 py-3">
                                                     <div className="flex flex-col gap-1">
                                                         <span className={`px-2 py-1 rounded-full text-xs text-center ${
-                                                            fee.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
+                                                            fee.isActive ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
                                                         }`}>
                                                             {fee.isActive ? 'Active' : 'Inactive'}
                                                         </span>
                                                         {fee.gracePeriodDays > 0 && (
-                                                            <span className="text-xs text-gray-500 text-center flex items-center justify-center gap-1">
+                                                            <span className="text-xs text-gray-500 dark:text-gray-400 text-center flex items-center justify-center gap-1">
                                                                 <Clock size={10} />
                                                                 Grace: {fee.gracePeriodDays}d
                                                             </span>
@@ -389,15 +389,15 @@ const handleSubmit = async (e: React.FormEvent) => {
                                                             onClick={() => handleToggleActive(fee._id, fee.isActive)}
                                                             className={`px-2 py-1 rounded text-xs transition-colors ${
                                                                 fee.isActive 
-                                                                    ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200' 
-                                                                    : 'bg-green-100 text-green-700 hover:bg-green-200'
+                                                                ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 hover:bg-yellow-200 dark:hover:bg-yellow-900/50'
+                                                                : 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-900/50'
                                                             }`}
                                                         >
                                                             {fee.isActive ? 'Deactivate' : 'Activate'}
                                                         </button>
                                                         <button
                                                             onClick={() => handleDelete(fee._id)}
-                                                            className="px-2 py-1 bg-red-100 text-red-700 rounded text-xs hover:bg-red-200 transition-colors"
+                                                            className="px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded text-xs hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors"
                                                         >
                                                             Delete
                                                         </button>
@@ -415,15 +415,15 @@ const handleSubmit = async (e: React.FormEvent) => {
                 {/* Create Fee Modal */}
                 {showModal && (
                     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                        <div className="bg-white rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+                        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
                             <div className="flex justify-between items-center mb-4">
-                                <h2 className="text-xl font-bold flex items-center gap-2">
+                                <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
                                     <DollarSign size={24} className="text-blue-600" />
                                     Create Fee Structure
                                 </h2>
                                 <button
                                     onClick={() => setShowModal(false)}
-                                    className="p-1 rounded-lg hover:bg-gray-100 transition"
+                                    className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
                                 >
                                     <X size={20} className="text-gray-500" />
                                 </button>
@@ -431,28 +431,28 @@ const handleSubmit = async (e: React.FormEvent) => {
                             
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 {/* Basic Information */}
-                                <div className="bg-gray-50 rounded-lg p-4">
-                                    <h3 className="text-sm font-semibold text-gray-700 mb-3">Basic Information</h3>
+                                <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
+                                    <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Basic Information</h3>
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Fee Name *</label>
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Fee Name *</label>
                                             <input
                                                 type="text"
                                                 placeholder="e.g., Semester 1 Tuition"
                                                 value={formData.name}
                                                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                                className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 bg-white dark:bg-gray-700 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                                 required
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Amount (ETB) *</label>
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Amount (ETB) *</label>
                                             <input
                                                 type="number"
                                                 placeholder="e.g., 5000"
                                                 value={formData.amount}
                                                 onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                                                className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 bg-white dark:bg-gray-700 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                                 required
                                                 min="0"
                                                 step="0.01"
@@ -462,11 +462,11 @@ const handleSubmit = async (e: React.FormEvent) => {
 
                                     <div className="grid grid-cols-2 gap-4 mt-3">
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Fee Type *</label>
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Fee Type *</label>
                                             <select
                                                 value={formData.feeType}
                                                 onChange={(e) => setFormData({ ...formData, feeType: e.target.value })}
-                                                className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 bg-white dark:bg-gray-700 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                             >
                                                 <option value="tuition">Tuition</option>
                                                 <option value="registration">Registration</option>
@@ -478,11 +478,11 @@ const handleSubmit = async (e: React.FormEvent) => {
                                             </select>
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Class Level *</label>
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Class Level *</label>
                                             <select
                                                 value={formData.classLevel}
                                                 onChange={(e) => setFormData({ ...formData, classLevel: e.target.value })}
-                                                className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 bg-white dark:bg-gray-700 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                             >
                                                 <option value="primary">Primary (1-4)</option>
                                                 <option value="middle">Middle (5-8)</option>
@@ -493,11 +493,11 @@ const handleSubmit = async (e: React.FormEvent) => {
 
                                     <div className="grid grid-cols-2 gap-4 mt-3">
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Semester</label>
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Semester</label>
                                             <select
                                                 value={formData.semester}
                                                 onChange={(e) => setFormData({ ...formData, semester: e.target.value })}
-                                                className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 bg-white dark:bg-gray-700 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                             >
                                                 <option value="Semester 1">Semester 1</option>
                                                 <option value="Semester 2">Semester 2</option>
@@ -505,42 +505,42 @@ const handleSubmit = async (e: React.FormEvent) => {
                                             </select>
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Academic Year</label>
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Academic Year</label>
                                             <input
                                                 type="text"
                                                 placeholder="e.g., 2024/25"
                                                 value={formData.academicYear}
                                                 onChange={(e) => setFormData({ ...formData, academicYear: e.target.value })}
-                                                className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 bg-white dark:bg-gray-700 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                             />
                                         </div>
                                     </div>
                                 </div>
 
                                 {/* Date Range Section */}
-                                <div className="border border-gray-200 rounded-lg p-4">
-                                    <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                                <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                                    <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
                                         <Calendar size={16} />
                                         Date Range
                                     </h3>
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Start Date *</label>
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Start Date *</label>
                                             <input
                                                 type="date"
                                                 value={formData.startDate}
                                                 onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                                                className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 bg-white dark:bg-gray-700 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                                 required
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">End Date (Deadline) *</label>
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">End Date (Deadline) *</label>
                                             <input
                                                 type="date"
                                                 value={formData.endDate}
                                                 onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                                                className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 bg-white dark:bg-gray-700 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                                 required
                                             />
                                         </div>
@@ -548,43 +548,43 @@ const handleSubmit = async (e: React.FormEvent) => {
                                 </div>
 
                                 {/* Penalty System Section */}
-                                <div className="border border-gray-200 rounded-lg p-4">
-                                    <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                                <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                                    <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
                                         <AlertCircle size={16} />
                                         Late Payment Penalty
                                     </h3>
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Late Fee Amount (ETB)</label>
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Late Fee Amount (ETB)</label>
                                             <input
                                                 type="number"
                                                 placeholder="e.g., 100"
                                                 value={formData.lateFeeAmount}
                                                 onChange={(e) => setFormData({ ...formData, lateFeeAmount: e.target.value })}
-                                                className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 bg-white dark:bg-gray-700 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                                 min="0"
                                                 step="0.01"
                                             />
-                                            <p className="text-xs text-gray-500 mt-1">Extra charge if payment is late</p>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Extra charge if payment is late</p>
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Grace Period (Days)</label>
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Grace Period (Days)</label>
                                             <input
                                                 type="number"
                                                 placeholder="e.g., 5"
                                                 value={formData.gracePeriodDays}
                                                 onChange={(e) => setFormData({ ...formData, gracePeriodDays: e.target.value })}
-                                                className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 bg-white dark:bg-gray-700 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                                 min="0"
                                             />
-                                            <p className="text-xs text-gray-500 mt-1">Days after deadline before penalty applies</p>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Days after deadline before penalty applies</p>
                                         </div>
                                     </div>
                                 </div>
 
                                 {/* Auto-Assign Section */}
-                                <div className="border border-blue-200 rounded-lg p-4 bg-blue-50">
-                                    <h3 className="text-sm font-semibold text-blue-800 mb-3 flex items-center gap-2">
+                                <div className="border border-blue-200 dark:border-blue-800 rounded-lg p-4 bg-blue-50 dark:bg-blue-900/20">
+                                    <h3 className="text-sm font-semibold text-blue-800 dark:text-blue-400 mb-3 flex items-center gap-2">
                                         <Users size={16} />
                                         Assignment Options
                                     </h3>
@@ -597,16 +597,16 @@ const handleSubmit = async (e: React.FormEvent) => {
                                             className="w-4 h-4 text-blue-600 rounded mt-1 focus:ring-2 focus:ring-blue-500"
                                         />
                                         <div>
-                                            <label htmlFor="autoAssign" className="text-sm font-medium text-gray-700 cursor-pointer">
-                                                Automatically assign to all students in <span className="text-blue-600 font-semibold capitalize">{formData.classLevel}</span> level
+                                            <label htmlFor="autoAssign" className="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer">
+                                                Automatically assign to all students in <span className="text-blue-600 dark:text-blue-400 font-semibold capitalize">{formData.classLevel}</span> level
                                             </label>
-                                            <p className="text-xs text-gray-500 mt-1">
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                                                 {formData.autoAssign 
                                                     ? '✅ All students in this class level will receive this fee automatically' 
                                                     : '❌ You will need to manually assign this fee to students later'}
                                             </p>
                                             {formData.autoAssign && (
-                                                <div className="mt-2 text-xs text-green-700 bg-green-100 px-2 py-1 rounded-lg inline-block">
+                                                <div className="mt-2 text-xs text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-900/30 px-2 py-1 rounded-lg inline-block">
                                                     💡 This will save you time! No need to assign individually.
                                                 </div>
                                             )}
@@ -615,11 +615,11 @@ const handleSubmit = async (e: React.FormEvent) => {
                                 </div>
 
                                 {/* Form Actions */}
-                                <div className="flex justify-end gap-3 pt-4 border-t">
+                                <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
                                     <button 
                                         type="button" 
                                         onClick={() => setShowModal(false)} 
-                                        className="px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                                        className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                                     >
                                         Cancel
                                     </button>

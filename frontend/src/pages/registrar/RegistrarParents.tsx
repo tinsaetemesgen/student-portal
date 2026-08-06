@@ -121,7 +121,7 @@ const RegistrarParents = () => {
         return (
             <DashboardLayout role="registrar">
                 <div className="flex items-center justify-center min-h-[60vh]">
-                    <div className="text-xl text-gray-500">Loading parents...</div>
+                    <div className="text-xl text-gray-500 dark:text-gray-400">Loading parents...</div>
                 </div>
             </DashboardLayout>
         );
@@ -132,8 +132,8 @@ const RegistrarParents = () => {
             <div className="space-y-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-800">Parent Management</h1>
-                        <p className="text-gray-500">Manage parents and link them to their children</p>
+                        <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Parent Management</h1>
+                        <p className="text-gray-500 dark:text-gray-400">Manage parents and link them to their children</p>
                     </div>
                     <button
                         onClick={() => setShowModal(true)}
@@ -146,18 +146,18 @@ const RegistrarParents = () => {
 
                 {/* Stats */}
                 <div className="grid grid-cols-3 gap-4">
-                    <div className="bg-white rounded-xl shadow-sm p-4">
-                        <p className="text-gray-500 text-sm">Total Parents</p>
-                        <h2 className="text-2xl font-bold">{parents.length}</h2>
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
+                        <p className="text-gray-500 dark:text-gray-400 text-sm">Total Parents</p>
+                        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">{parents.length}</h2>
                     </div>
-                    <div className="bg-white rounded-xl shadow-sm p-4">
-                        <p className="text-gray-500 text-sm">Total Children</p>
-                        <h2 className="text-2xl font-bold">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
+                        <p className="text-gray-500 dark:text-gray-400 text-sm">Total Children</p>
+                        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
                             {parents.reduce((sum, p) => sum + (p.children?.length || 0), 0)}
                         </h2>
                     </div>
-                    <div className="bg-white rounded-xl shadow-sm p-4">
-                        <p className="text-gray-500 text-sm">Unlinked Students</p>
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
+                        <p className="text-gray-500 dark:text-gray-400 text-sm">Unlinked Students</p>
                         <h2 className="text-2xl font-bold text-yellow-600">
                             {students.filter(s => !s.parentId).length}
                         </h2>
@@ -165,7 +165,7 @@ const RegistrarParents = () => {
                 </div>
 
                 {/* Search */}
-                <div className="bg-white rounded-xl shadow-sm p-4">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
                     <div className="relative">
                         <Search size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                         <input
@@ -173,54 +173,54 @@ const RegistrarParents = () => {
                             placeholder="Search parents by name or email..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full border rounded-lg pl-10 pr-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full border border-gray-300 dark:border-gray-600 rounded-lg pl-10 pr-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:text-gray-100"
                         />
                     </div>
                 </div>
 
                 {/* Parents Table */}
-                <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full border-collapse">
-                            <thead className="bg-gray-50">
+                            <thead className="bg-gray-50 dark:bg-gray-700">
                                 <tr>
-                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600">Name</th>
-                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600">Email</th>
-                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600">Phone</th>
-                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600">Children</th>
-                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600">Actions</th>
+                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Name</th>
+                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Email</th>
+                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Phone</th>
+                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Children</th>
+                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-100">
+                            <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                                 {filteredParents.length === 0 ? (
                                     <tr>
-                                        <td colSpan={5} className="px-4 py-8 text-center text-gray-500">
+                                        <td colSpan={5} className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
                                             {parents.length === 0 ? "No parents registered yet." : "No parents match your search."}
                                         </td>
                                     </tr>
                                 ) : (
                                     filteredParents.map((parent) => (
-                                        <tr key={parent._id} className="hover:bg-gray-50">
-                                            <td className="px-4 py-3 font-medium">{parent.name}</td>
-                                            <td className="px-4 py-3 text-gray-600">{parent.email}</td>
-                                            <td className="px-4 py-3">{parent.phone || 'N/A'}</td>
+                                        <tr key={parent._id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                                            <td className="px-4 py-3 font-medium text-gray-800 dark:text-gray-200">{parent.name}</td>
+                                            <td className="px-4 py-3 text-gray-600 dark:text-gray-400">{parent.email}</td>
+                                            <td className="px-4 py-3 text-gray-800 dark:text-gray-200">{parent.phone || 'N/A'}</td>
                                             <td className="px-4 py-3">
                                                 <div className="flex flex-wrap gap-1">
                                                     {parent.children && parent.children.length > 0 ? (
                                                         parent.children.map(child => (
-                                                            <span key={child._id} className="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs">
+                                                            <span key={child._id} className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-2 py-1 rounded text-xs">
                                                                 {child.name}
                                                             </span>
                                                         ))
                                                     ) : (
-                                                        <span className="text-gray-400 text-sm">No children</span>
+                                                            <span className="text-gray-400 dark:text-gray-500 text-sm">No children</span>
                                                     )}
                                                 </div>
                                             </td>
                                             <td className="px-4 py-3">
                                                 <button
                                                     onClick={() => openLinkModal(parent)}
-                                                    className="px-3 py-1 bg-green-100 text-green-700 rounded-lg text-xs hover:bg-green-200 flex items-center gap-1"
+                                                    className="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-lg text-xs hover:bg-green-200 dark:hover:bg-green-900/50 flex items-center gap-1"
                                                 >
                                                     <Link2 size={14} /> Link Student
                                                 </button>
@@ -236,15 +236,15 @@ const RegistrarParents = () => {
                 {/* Add Parent Modal */}
                 {showModal && (
                     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                        <div className="bg-white rounded-xl p-6 w-full max-w-lg">
-                            <h2 className="text-xl font-bold mb-4">Add New Parent</h2>
+                        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-lg">
+                            <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">Add New Parent</h2>
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <input
                                     type="text"
                                     placeholder="Full Name"
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    className="w-full border rounded-lg px-4 py-2"
+                                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 bg-white dark:bg-gray-700 dark:text-gray-100"
                                     required
                                 />
                                 <input
@@ -252,7 +252,7 @@ const RegistrarParents = () => {
                                     placeholder="Email"
                                     value={formData.email}
                                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                    className="w-full border rounded-lg px-4 py-2"
+                                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 bg-white dark:bg-gray-700 dark:text-gray-100"
                                     required
                                 />
                                 {/* Add this after the email field */}
@@ -261,7 +261,7 @@ const RegistrarParents = () => {
                                     placeholder="Password (default: parent123)"
                                     value={formData.password}
                                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                    className="w-full border rounded-lg px-4 py-2"
+                                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 bg-white dark:bg-gray-700 dark:text-gray-100"
                                     required
                                 />
                                 <input
@@ -269,17 +269,17 @@ const RegistrarParents = () => {
                                     placeholder="Phone Number"
                                     value={formData.phone}
                                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                    className="w-full border rounded-lg px-4 py-2"
+                                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 bg-white dark:bg-gray-700 dark:text-gray-100"
                                 />
                                 <input
                                     type="text"
                                     placeholder="Address (optional)"
                                     value={formData.address}
                                     onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                                    className="w-full border rounded-lg px-4 py-2"
+                                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 bg-white dark:bg-gray-700 dark:text-gray-100"
                                 />
                                 <div className="flex justify-end gap-3">
-                                    <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 border rounded-lg">Cancel</button>
+                                    <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700">Cancel</button>
                                     <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-lg">Add Parent</button>
                                 </div>
                             </form>
@@ -290,18 +290,18 @@ const RegistrarParents = () => {
                 {/* Link Student Modal */}
                 {showLinkModal && selectedParent && (
                     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                        <div className="bg-white rounded-xl p-6 w-full max-w-lg">
+                        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-lg">
                             <div className="flex justify-between items-center mb-4">
-                                <h2 className="text-xl font-bold">Link Student to {selectedParent.name}</h2>
-                                <button onClick={() => setShowLinkModal(false)} className="p-1 hover:bg-gray-100 rounded">
-                                    <X size={20} />
+                                <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">Link Student to {selectedParent.name}</h2>
+                                <button onClick={() => setShowLinkModal(false)} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">
+                                    <X size={20} className="text-gray-500 dark:text-gray-400" />
                                 </button>
                             </div>
-                            <p className="text-sm text-gray-500 mb-4">Select a student to link to this parent</p>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Select a student to link to this parent</p>
                             <select
                                 value={selectedStudentId}
                                 onChange={(e) => setSelectedStudentId(e.target.value)}
-                                className="w-full border rounded-lg px-4 py-2 mb-4"
+                                className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 mb-4 bg-white dark:bg-gray-700 dark:text-gray-100"
                             >
                                 <option value="">Select a student...</option>
                                 {students
@@ -313,7 +313,7 @@ const RegistrarParents = () => {
                                     ))}
                             </select>
                             <div className="flex justify-end gap-3">
-                                <button onClick={() => setShowLinkModal(false)} className="px-4 py-2 border rounded-lg">Cancel</button>
+                                <button onClick={() => setShowLinkModal(false)} className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700">Cancel</button>
                                 <button onClick={handleLinkStudent} className="px-4 py-2 bg-green-600 text-white rounded-lg">Link Student</button>
                             </div>
                         </div>

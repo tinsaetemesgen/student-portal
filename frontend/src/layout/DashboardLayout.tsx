@@ -14,7 +14,7 @@ const DashboardLayout = ({ children, role }: DashboardLayoutProps) => {
     const toggleSidebar = () => setSidebarOpen((prev) => !prev);
 
     return (
-        <div className="flex bg-gray-100 min-h-screen">
+        <div className="flex bg-gray-100 dark:bg-gray-900 min-h-screen">
             {/* Mobile Overlay */}
             {sidebarOpen && (
                 <div
@@ -23,7 +23,7 @@ const DashboardLayout = ({ children, role }: DashboardLayoutProps) => {
                 />
             )}
 
-            <Sidebar role={role} isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+            <Sidebar role={role} isOpen={sidebarOpen} toggleSidebar={toggleSidebar} onClose={() => setSidebarOpen(false)} />
 
             <div className="flex-1 min-w-0">
                 <Navbar role={role} toggleSidebar={toggleSidebar} />

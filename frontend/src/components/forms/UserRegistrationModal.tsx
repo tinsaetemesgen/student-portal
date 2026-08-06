@@ -82,15 +82,15 @@ const UserRegistrationModal = ({
 
     return (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl w-full max-w-3xl shadow-2xl max-h-[90vh] overflow-y-auto">
-                <div className="flex items-center justify-between p-4 sm:p-6 border-b">
-                    <h2 className="text-2xl font-bold">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-3xl shadow-2xl max-h-[90vh] overflow-y-auto">
+                <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
+                    <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
                         Add New {role === "student" ? "Student" : "Teacher"}
                     </h2>
 
                     <button
                         onClick={onClose}
-                        className="text-gray-500 hover:text-gray-700 text-2xl"
+                        className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-2xl"
                     >
                         ×
                     </button>
@@ -104,7 +104,7 @@ const UserRegistrationModal = ({
                             placeholder="First Name"
                             value={formData.firstName}
                             onChange={handleChange}
-                            className="border p-3 rounded-lg"
+                            className="border border-gray-200 dark:border-gray-600 p-3 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100"
                             required
                         />
 
@@ -113,7 +113,7 @@ const UserRegistrationModal = ({
                             placeholder="Last Name"
                             value={formData.lastName}
                             onChange={handleChange}
-                            className="border p-3 rounded-lg"
+                            className="border border-gray-200 dark:border-gray-600 p-3 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100"
                             required
                         />
 
@@ -123,7 +123,7 @@ const UserRegistrationModal = ({
                             placeholder="Email"
                             value={formData.email}
                             onChange={handleChange}
-                            className="border p-3 rounded-lg"
+                            className="border border-gray-200 dark:border-gray-600 p-3 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100"
                             required
                         />
 
@@ -132,7 +132,7 @@ const UserRegistrationModal = ({
                             placeholder="Phone Number"
                             value={formData.phone}
                             onChange={handleChange}
-                            className="border p-3 rounded-lg"
+                            className="border border-gray-200 dark:border-gray-600 p-3 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100"
                         />
 
                         <input
@@ -141,7 +141,7 @@ const UserRegistrationModal = ({
                             placeholder="Password"
                             value={formData.password}
                             onChange={handleChange}
-                            className="border p-3 rounded-lg"
+                            className="border border-gray-200 dark:border-gray-600 p-3 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100"
                             required
                         />
 
@@ -149,7 +149,7 @@ const UserRegistrationModal = ({
                             name="gender"
                             value={formData.gender}
                             onChange={handleChange}
-                            className="border p-3 rounded-lg"
+                            className="border border-gray-200 dark:border-gray-600 p-3 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100"
                             required
                         >
                             <option value="">Select Gender</option>
@@ -168,7 +168,7 @@ const UserRegistrationModal = ({
                                 onChange={handleChange}
                                 min="1"
                                 max="120"
-                                className="border p-3 rounded-lg w-full"
+                                className="border border-gray-200 dark:border-gray-600 p-3 rounded-lg w-full bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100"
                                 required
                             />
                         </div>
@@ -178,7 +178,7 @@ const UserRegistrationModal = ({
                                 name="grade"
                                 value={formData.grade}
                                 onChange={handleChange}
-                                className="border p-3 rounded-lg"
+                                className="border border-gray-200 dark:border-gray-600 p-3 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100"
                                 required
                             >
                                 <option value="">Select Grade</option>
@@ -193,18 +193,18 @@ const UserRegistrationModal = ({
                                 placeholder="Department / Subject"
                                 value={formData.department}
                                 onChange={handleChange}
-                                className="border p-3 rounded-lg"
+                                className="border border-gray-200 dark:border-gray-600 p-3 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100"
                                 required
                             />
                         )}
                     </div>
 
                     {/* ✅ Buttons - Full width row */}
-                    <div className="flex justify-end gap-3 pt-6 border-t mt-6">
+                    <div className="flex justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-700 mt-6">
                         <button
                             type="button"
                             onClick={onClose}
-                            className="px-5 py-3 rounded-lg border border-gray-300 font-semibold hover:bg-gray-50"
+                            className="px-5 py-3 rounded-lg border border-gray-300 dark:border-gray-600 font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
                         >
                             Cancel
                         </button>

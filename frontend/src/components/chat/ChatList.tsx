@@ -72,7 +72,7 @@ const ChatList: React.FC = () => {
 
     if (loading) {
         return (
-            <div className="border-r border-gray-200 h-full bg-gray-50 p-4">
+            <div className="border-r border-gray-200 dark:border-gray-700 h-full bg-gray-50 dark:bg-gray-900 p-4">
                 <div className="flex items-center justify-center h-full">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                 </div>
@@ -81,11 +81,11 @@ const ChatList: React.FC = () => {
     }
 
     return (
-        <div className="border-r border-gray-200 h-full flex flex-col bg-white">
+        <div className="border-r border-gray-200 dark:border-gray-700 h-full flex flex-col bg-white dark:bg-gray-800">
             {/* Header */}
-            <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+            <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-800">
                 <div className="flex items-center justify-between mb-3">
-                    <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                    <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2">
                         <MessageCircle size={20} className="text-blue-600" />
                         Messages
                     </h2>
@@ -104,7 +104,7 @@ const ChatList: React.FC = () => {
                         placeholder="Search users..."
                         value={searchTerm}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
-                        className="w-full border rounded-xl pl-10 pr-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                        className="w-full border border-gray-200 dark:border-gray-600 rounded-xl pl-10 pr-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:text-gray-100"
                     />
                 </div>
             </div>
@@ -112,7 +112,7 @@ const ChatList: React.FC = () => {
             {/* User List */}
             <div className="flex-1 overflow-y-auto">
                 {filteredUsers.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center h-64 text-gray-400">
+                    <div className="flex flex-col items-center justify-center h-64 text-gray-400 dark:text-gray-500">
                         <Users size={40} className="mb-3" />
                         <p className="text-sm">No users available to chat</p>
                     </div>
@@ -126,9 +126,8 @@ const ChatList: React.FC = () => {
                             <button
                                 key={user._id}
                                 onClick={() => setSelectedUser(user)}
-                                className={`w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 transition-all border-b border-gray-100 ${
-                                    isSelected ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''
-                                }`}
+                                className={`w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all border-b border-gray-100 dark:border-gray-700 ${isSelected ? 'bg-blue-50 dark:bg-gray-700 border-l-4 border-l-blue-500' : ''
+                                    }`}
                             >
                                 {/* Avatar */}
                                 <div className="relative flex-shrink-0">
@@ -143,7 +142,7 @@ const ChatList: React.FC = () => {
                                 {/* User Info */}
                                 <div className="flex-1 min-w-0 text-left">
                                     <div className="flex items-center gap-2">
-                                        <span className="font-medium text-gray-800 truncate">
+                                        <span className="font-medium text-gray-800 dark:text-gray-100 truncate">
                                             {user.name}
                                         </span>
                                     </div>
@@ -173,8 +172,8 @@ const ChatList: React.FC = () => {
             </div>
 
             {/* Footer */}
-            <div className="p-3 border-t border-gray-200 bg-gray-50">
-                <div className="flex items-center justify-between text-xs text-gray-500">
+            <div className="p-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+                <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
                     <span className="flex items-center gap-1.5">
                         <Users size={14} />
                         {users.length} users

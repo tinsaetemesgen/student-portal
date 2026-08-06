@@ -71,10 +71,10 @@ const FinancePayments = () => {
     const fetchPayments = async () => {
         try {
             const token = localStorage.getItem('token');
-            const url = filter === 'all' 
+            const url = filter === 'all'
                 ? 'http://localhost:7000/api/finance/payments'
                 : `http://localhost:7000/api/finance/payments?status=${filter}`;
-            
+
             const response = await axios.get(url, {
                 headers: { Authorization: `Bearer ${token}` }
             });
@@ -149,7 +149,7 @@ const FinancePayments = () => {
         if (!window.confirm("Are you sure you want to reject this payment?")) return;
         try {
             const token = localStorage.getItem('token');
-            await axios.put(`http://localhost:7000/api/finance/payments/${id}/reject`, 
+            await axios.put(`http://localhost:7000/api/finance/payments/${id}/reject`,
                 { reason: reason || "Payment rejected" },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -193,7 +193,7 @@ const FinancePayments = () => {
         return (
             <DashboardLayout role="finance_officer">
                 <div className="flex items-center justify-center min-h-[60vh]">
-                    <div className="text-xl text-gray-500">Loading payments...</div>
+                    <div className="text-xl text-gray-500 dark:text-gray-400">Loading payments...</div>
                 </div>
             </DashboardLayout>
         );
@@ -204,7 +204,7 @@ const FinancePayments = () => {
             <div className="space-y-6">
                 {/* Success Message */}
                 {success && (
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-green-700 flex items-center gap-3 animate-fadeIn">
+                    <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 text-green-700 dark:text-green-400 flex items-center gap-3 animate-fadeIn">
                         <Check size={24} />
                         <p className="font-medium">{successMessage}</p>
                     </div>
@@ -212,8 +212,8 @@ const FinancePayments = () => {
 
                 {/* Header */}
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-800">Payment Management</h1>
-                    <p className="text-gray-500">Review and confirm student payments</p>
+                    <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Payment Management</h1>
+                    <p className="text-gray-500 dark:text-gray-400">Review and confirm student payments</p>
                 </div>
 
                 {/* Stats Cards */}
@@ -237,45 +237,41 @@ const FinancePayments = () => {
                 </div>
 
                 {/* Filter */}
-                <div className="bg-white rounded-xl shadow-sm p-4">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
                     <div className="flex flex-wrap gap-2">
                         <button
                             onClick={() => setFilter('all')}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-                                filter === 'all' 
-                                    ? 'bg-blue-600 text-white' 
-                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                            }`}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${filter === 'all'
+                                    ? 'bg-blue-600 text-white'
+                                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
+                                }`}
                         >
                             All
                         </button>
                         <button
                             onClick={() => setFilter('pending')}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-                                filter === 'pending' 
-                                    ? 'bg-yellow-600 text-white' 
-                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                            }`}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${filter === 'pending'
+                                    ? 'bg-yellow-600 text-white'
+                                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
+                                }`}
                         >
                             Pending
                         </button>
                         <button
                             onClick={() => setFilter('confirmed')}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-                                filter === 'confirmed' 
-                                    ? 'bg-green-600 text-white' 
-                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                            }`}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${filter === 'confirmed'
+                                    ? 'bg-green-600 text-white'
+                                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
+                                }`}
                         >
                             Confirmed
                         </button>
                         <button
                             onClick={() => setFilter('rejected')}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-                                filter === 'rejected' 
-                                    ? 'bg-red-600 text-white' 
-                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                            }`}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${filter === 'rejected'
+                                    ? 'bg-red-600 text-white'
+                                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
+                                }`}
                         >
                             Rejected
                         </button>
@@ -283,40 +279,40 @@ const FinancePayments = () => {
                 </div>
 
                 {/* Payments Table */}
-                <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full border-collapse">
-                            <thead className="bg-gray-50">
+                            <thead className="bg-gray-50 dark:bg-gray-700">
                                 <tr>
-                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600">Student</th>
-                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600">Fee</th>
-                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600">Amount</th>
-                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600">Bank</th>
-                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600">Reference</th>
-                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600">Status</th>
-                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600">Actions</th>
+                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Student</th>
+                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Fee</th>
+                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Amount</th>
+                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Bank</th>
+                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Reference</th>
+                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Status</th>
+                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-100">
+                            <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                                 {payments.length === 0 ? (
                                     <tr>
-                                        <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
+                                        <td colSpan={7} className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
                                             No payments found.
                                         </td>
                                     </tr>
                                 ) : (
                                     payments.map((payment) => (
-                                        <tr key={payment._id} className="hover:bg-gray-50">
+                                        <tr key={payment._id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
                                             <td className="px-4 py-3">
                                                 <div>
-                                                    <p className="font-medium text-gray-800">{payment.studentId?.name || 'N/A'}</p>
-                                                    <p className="text-xs text-gray-500">{payment.studentId?.email || ''}</p>
+                                                    <p className="font-medium text-gray-800 dark:text-gray-200">{payment.studentId?.name || 'N/A'}</p>
+                                                    <p className="text-xs text-gray-500 dark:text-gray-400">{payment.studentId?.email || ''}</p>
                                                 </div>
                                             </td>
-                                            <td className="px-4 py-3">{payment.studentFeeId?.feeName || 'N/A'}</td>
-                                            <td className="px-4 py-3 font-semibold">{formatCurrency(payment.amount)}</td>
-                                            <td className="px-4 py-3">{payment.bankName}</td>
-                                            <td className="px-4 py-3 font-mono text-sm">{payment.referenceNumber}</td>
+                                            <td className="px-4 py-3 text-gray-800 dark:text-gray-200">{payment.studentFeeId?.feeName || 'N/A'}</td>
+                                            <td className="px-4 py-3 font-semibold text-gray-800 dark:text-gray-200">{formatCurrency(payment.amount)}</td>
+                                            <td className="px-4 py-3 text-gray-800 dark:text-gray-200">{payment.bankName}</td>
+                                            <td className="px-4 py-3 font-mono text-sm text-gray-800 dark:text-gray-200">{payment.referenceNumber}</td>
                                             <td className="px-4 py-3">
                                                 <span className={`px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1 w-fit ${getStatusBadge(payment.status)}`}>
                                                     {getStatusIcon(payment.status)}
@@ -378,11 +374,11 @@ const FinancePayments = () => {
                     onClick={() => setShowViewModal(false)}
                 >
                     <div
-                        className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+                        className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <div className="flex items-center justify-between p-5 border-b sticky top-0 bg-white z-10">
-                            <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                        <div className="flex items-center justify-between p-5 border-b border-gray-200 dark:border-gray-700 sticky top-0 bg-white dark:bg-gray-800 z-10">
+                            <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2">
                                 <FileText size={20} />
                                 Payment Details
                             </h2>
@@ -398,20 +394,20 @@ const FinancePayments = () => {
                             {/* Payment Info */}
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <p className="text-sm text-gray-500">Student</p>
-                                    <p className="font-medium">{selectedPayment.studentId?.name || 'N/A'}</p>
-                                    <p className="text-sm text-gray-600">{selectedPayment.studentId?.email || ''}</p>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">Student</p>
+                                    <p className="font-medium text-gray-800 dark:text-gray-200">{selectedPayment.studentId?.name || 'N/A'}</p>
+                                    <p className="text-sm text-gray-600 dark:text-gray-400">{selectedPayment.studentId?.email || ''}</p>
                                 </div>
                                 <div>
-                                    <p className="text-sm text-gray-500">Class</p>
-                                    <p className="font-medium">{selectedPayment.studentId?.class || 'N/A'}</p>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">Class</p>
+                                    <p className="font-medium text-gray-800 dark:text-gray-200">{selectedPayment.studentId?.class || 'N/A'}</p>
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <p className="text-sm text-gray-500">Fee</p>
-                                    <p className="font-medium">{selectedPayment.studentFeeId?.feeName || 'N/A'}</p>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">Fee</p>
+                                    <p className="font-medium text-gray-800 dark:text-gray-200">{selectedPayment.studentFeeId?.feeName || 'N/A'}</p>
                                 </div>
                                 <div>
                                     <p className="text-sm text-gray-500">Amount</p>
@@ -421,19 +417,19 @@ const FinancePayments = () => {
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <p className="text-sm text-gray-500">Bank</p>
-                                    <p className="font-medium">{selectedPayment.bankName}</p>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">Bank</p>
+                                    <p className="font-medium text-gray-800 dark:text-gray-200">{selectedPayment.bankName}</p>
                                 </div>
                                 <div>
-                                    <p className="text-sm text-gray-500">Reference Number</p>
-                                    <p className="font-mono font-medium">{selectedPayment.referenceNumber}</p>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">Reference Number</p>
+                                    <p className="font-mono font-medium text-gray-800 dark:text-gray-200">{selectedPayment.referenceNumber}</p>
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <p className="text-sm text-gray-500">Payment Date</p>
-                                    <p className="font-medium">{new Date(selectedPayment.paymentDate || selectedPayment.createdAt).toLocaleDateString()}</p>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">Payment Date</p>
+                                    <p className="font-medium text-gray-800 dark:text-gray-200">{new Date(selectedPayment.paymentDate || selectedPayment.createdAt).toLocaleDateString()}</p>
                                 </div>
                                 <div>
                                     <p className="text-sm text-gray-500">Status</p>
@@ -446,33 +442,33 @@ const FinancePayments = () => {
                             {selectedPayment.confirmedAt && (
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <p className="text-sm text-gray-500">Confirmed At</p>
-                                        <p className="font-medium">{new Date(selectedPayment.confirmedAt).toLocaleDateString()}</p>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400">Confirmed At</p>
+                                        <p className="font-medium text-gray-800 dark:text-gray-200">{new Date(selectedPayment.confirmedAt).toLocaleDateString()}</p>
                                     </div>
                                     <div>
-                                        <p className="text-sm text-gray-500">Confirmed By</p>
-                                        <p className="font-medium">{selectedPayment.confirmedBy?.name || 'N/A'}</p>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400">Confirmed By</p>
+                                        <p className="font-medium text-gray-800 dark:text-gray-200">{selectedPayment.confirmedBy?.name || 'N/A'}</p>
                                     </div>
                                 </div>
                             )}
 
                             {selectedPayment.receiptNumber && (
                                 <div>
-                                    <p className="text-sm text-gray-500">Receipt Number</p>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">Receipt Number</p>
                                     <p className="font-mono font-medium text-blue-600">{selectedPayment.receiptNumber}</p>
                                 </div>
                             )}
 
                             {selectedPayment.rejectionReason && (
-                                <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-                                    <p className="text-sm text-gray-500">Rejection Reason</p>
-                                    <p className="text-red-600 font-medium">{selectedPayment.rejectionReason}</p>
+                                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">Rejection Reason</p>
+                                    <p className="text-red-600 dark:text-red-400 font-medium">{selectedPayment.rejectionReason}</p>
                                 </div>
                             )}
 
                             {/* ✅ Payment Screenshot */}
                             <div className="border-t pt-4">
-                                <p className="text-sm font-medium text-gray-700 mb-2">Payment Screenshot</p>
+                                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Payment Screenshot</p>
                                 {selectedPayment.screenshotUrl ? (
                                     <div className="border rounded-lg overflow-hidden">
                                         <img
@@ -483,7 +479,7 @@ const FinancePayments = () => {
                                                 (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x300?text=Screenshot+Not+Available';
                                             }}
                                         />
-                                        <div className="bg-gray-50 p-2 text-center">
+                                        <div className="bg-gray-50 dark:bg-gray-700 p-2 text-center">
                                             <a
                                                 href={`http://localhost:7000${selectedPayment.screenshotUrl}`}
                                                 target="_blank"
@@ -496,14 +492,14 @@ const FinancePayments = () => {
                                         </div>
                                     </div>
                                 ) : (
-                                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center text-gray-500">
+                                    <div className="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-8 text-center text-gray-500 dark:text-gray-400">
                                         <p>No screenshot uploaded</p>
                                     </div>
                                 )}
                             </div>
 
                             {/* Actions */}
-                            <div className="flex justify-end gap-3 pt-4 border-t">
+                            <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
                                 {selectedPayment.status === 'pending' && (
                                     <>
                                         <button
@@ -539,7 +535,7 @@ const FinancePayments = () => {
                                 )}
                                 <button
                                     onClick={() => setShowViewModal(false)}
-                                    className="px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-50 transition"
+                                    className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
                                 >
                                     Close
                                 </button>

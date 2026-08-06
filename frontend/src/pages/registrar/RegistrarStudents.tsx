@@ -104,11 +104,11 @@ const RegistrarStudents = () => {
     // ✅ Handle grade or section change
     const handleGradeOrSectionChange = (field: string, value: string) => {
         const newFormData = { ...formData, [field]: value };
-        
+
         // If both grade and section are selected, check if class exists
         const grade = field === 'grade' ? value : formData.grade;
         const section = field === 'section' ? value : formData.section;
-        
+
         if (grade && section) {
             const existingClass = findExistingClass(grade, section);
             if (existingClass) {
@@ -117,13 +117,13 @@ const RegistrarStudents = () => {
                 newFormData.classId = "";
             }
         }
-        
+
         setFormData(newFormData);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         // ✅ Validate grade and section
         if (!formData.grade || !formData.section) {
             alert('Please select both grade and section');
@@ -132,12 +132,12 @@ const RegistrarStudents = () => {
 
         try {
             const token = localStorage.getItem('token');
-            
+
             // ✅ Use existing class name or generate one
-            const className = formData.classId 
+            const className = formData.classId
                 ? classes.find(c => c._id === formData.classId)?.name || generateClassName(formData.grade, formData.section)
                 : generateClassName(formData.grade, formData.section);
-            
+
             const response = await axios.post('http://localhost:7000/api/registrar/students', {
                 name: formData.name,
                 email: formData.email,
@@ -150,12 +150,12 @@ const RegistrarStudents = () => {
             }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            
+
             setShowModal(false);
             setSuccess(true);
             setSuccessMessage(response.data.message || '✅ Student registered successfully!');
             fetchStudents();
-            
+
             // Reset form
             setFormData({
                 name: "",
@@ -169,7 +169,7 @@ const RegistrarStudents = () => {
                 parentPhone: "",
                 parentEmail: "",
             });
-            
+
             setTimeout(() => {
                 setSuccess(false);
                 setSuccessMessage("");
@@ -212,7 +212,7 @@ const RegistrarStudents = () => {
         return (
             <DashboardLayout role="registrar">
                 <div className="flex items-center justify-center min-h-[60vh]">
-                    <div className="text-xl text-gray-500">Loading students...</div>
+                    <div className="text-xl text-gray-500 dark:text-gray-400">Loading students...</div>
                 </div>
             </DashboardLayout>
         );
@@ -223,7 +223,7 @@ const RegistrarStudents = () => {
             <div className="space-y-6">
                 {/* Success Message */}
                 {success && (
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-green-700 flex items-center gap-3">
+                    <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 text-green-700 dark:text-green-400 flex items-center gap-3">
                         <Check size={24} />
                         <div>
                             <p className="font-medium">{successMessage}</p>
@@ -234,8 +234,8 @@ const RegistrarStudents = () => {
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-800">Student Management</h1>
-                        <p className="text-gray-500">Register and manage student records</p>
+                        <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Student Management</h1>
+                        <p className="text-gray-500 dark:text-gray-400">Register and manage student records</p>
                     </div>
                     <button
                         onClick={() => setShowModal(true)}
@@ -247,46 +247,46 @@ const RegistrarStudents = () => {
                 </div>
 
                 {/* Search Bar */}
-                <div className="bg-white rounded-xl shadow-sm p-4">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
                     <div className="relative">
-                        <Search size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                        <Search size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" />
                         <input
                             type="text"
                             placeholder="Search students by name, email, or class..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full border rounded-lg pl-10 pr-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full border border-gray-200 dark:border-gray-600 rounded-lg pl-10 pr-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:text-gray-100"
                         />
                     </div>
                 </div>
 
                 {/* Students Table */}
-                <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full border-collapse">
-                            <thead className="bg-gray-50">
+                            <thead className="bg-gray-50 dark:bg-gray-700">
                                 <tr>
-                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600">Name</th>
-                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600">Email</th>
-                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600">Class</th>
-                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600">Level</th>
-                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600">Parent</th>
-                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600">Actions</th>
+                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Name</th>
+                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Email</th>
+                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Class</th>
+                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Level</th>
+                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Parent</th>
+                                    <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-100">
+                            <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                                 {filteredStudents.length === 0 ? (
                                     <tr>
-                                        <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
+                                        <td colSpan={6} className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
                                             {students.length === 0 ? "No students registered yet." : "No students match your search."}
                                         </td>
                                     </tr>
                                 ) : (
                                     filteredStudents.map((student) => (
-                                        <tr key={student._id} className="hover:bg-gray-50">
-                                            <td className="px-4 py-3 font-medium">{student.name}</td>
-                                            <td className="px-4 py-3 text-gray-600">{student.email}</td>
-                                            <td className="px-4 py-3">{student.class || 'N/A'}</td>
+                                        <tr key={student._id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                                            <td className="px-4 py-3 font-medium text-gray-800 dark:text-gray-200">{student.name}</td>
+                                            <td className="px-4 py-3 text-gray-600 dark:text-gray-400">{student.email}</td>
+                                            <td className="px-4 py-3 text-gray-800 dark:text-gray-200">{student.class || 'N/A'}</td>
                                             <td className="px-4 py-3">
                                                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${getClassLevelBadge(student.classLevel)}`}>
                                                     {student.classLevel || 'N/A'}
@@ -295,11 +295,11 @@ const RegistrarStudents = () => {
                                             <td className="px-4 py-3">
                                                 {student.parentId ? (
                                                     <div>
-                                                        <p className="text-sm font-medium">{student.parentId.name}</p>
-                                                        <p className="text-xs text-gray-500">{student.parentId.email}</p>
+                                                        <p className="text-sm font-medium text-gray-800 dark:text-gray-200">{student.parentId.name}</p>
+                                                        <p className="text-xs text-gray-500 dark:text-gray-400">{student.parentId.email}</p>
                                                     </div>
                                                 ) : (
-                                                    <span className="text-gray-400 text-sm">Not linked</span>
+                                                    <span className="text-gray-400 dark:text-gray-500 text-sm">Not linked</span>
                                                 )}
                                             </td>
                                             <td className="px-4 py-3">
@@ -323,54 +323,54 @@ const RegistrarStudents = () => {
                 {/* ✅ Enhanced Modal with Grade & Section Dropdowns */}
                 {showModal && (
                     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                        <div className="bg-white rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+                        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
                             <div className="flex justify-between items-center mb-4">
-                                <h2 className="text-xl font-bold text-gray-800">Register New Student</h2>
+                                <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">Register New Student</h2>
                                 <button
                                     onClick={() => setShowModal(false)}
-                                    className="p-1 rounded-lg hover:bg-gray-100 transition"
+                                    className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
                                 >
-                                    <X size={20} className="text-gray-500" />
+                                    <X size={20} className="text-gray-500 dark:text-gray-400" />
                                 </button>
                             </div>
 
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 {/* Personal Information Section */}
-                                <div className="bg-gray-50 rounded-lg p-4">
-                                    <h3 className="text-sm font-semibold text-gray-700 mb-3">Personal Information</h3>
+                                <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
+                                    <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Personal Information</h3>
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Full Name *</label>
                                             <input
                                                 type="text"
                                                 placeholder="e.g., John Doe"
                                                 value={formData.name}
                                                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                                className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                                                className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:text-gray-100"
                                                 required
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email *</label>
                                             <input
                                                 type="email"
                                                 placeholder="student@example.com"
                                                 value={formData.email}
                                                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                                className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                                                className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:text-gray-100"
                                                 required
                                             />
                                         </div>
                                     </div>
-                                    
+
                                     {/* ✅ Grade & Section Dropdowns */}
                                     <div className="grid grid-cols-2 gap-4 mt-3">
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Grade *</label>
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Grade *</label>
                                             <select
                                                 value={formData.grade}
                                                 onChange={(e) => handleGradeOrSectionChange('grade', e.target.value)}
-                                                className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                                                className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:text-gray-100"
                                                 required
                                             >
                                                 <option value="">Select Grade</option>
@@ -380,11 +380,11 @@ const RegistrarStudents = () => {
                                             </select>
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Section *</label>
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Section *</label>
                                             <select
                                                 value={formData.section}
                                                 onChange={(e) => handleGradeOrSectionChange('section', e.target.value)}
-                                                className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                                                className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:text-gray-100"
                                                 required
                                             >
                                                 <option value="">Select Section</option>
@@ -397,11 +397,10 @@ const RegistrarStudents = () => {
 
                                     {/* ✅ Show class assignment status */}
                                     {formData.grade && formData.section && (
-                                        <div className={`mt-2 p-2 rounded-lg text-sm ${
-                                            formData.classId 
-                                                ? 'bg-green-50 border border-green-200 text-green-700' 
-                                                : 'bg-yellow-50 border border-yellow-200 text-yellow-700'
-                                        }`}>
+                                        <div className={`mt-2 p-2 rounded-lg text-sm ${formData.classId
+                                            ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-400'
+                                            : 'bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 text-yellow-700 dark:text-yellow-400'
+                                            }`}>
                                             {formData.classId ? (
                                                 <div className="flex items-center gap-2">
                                                     <Users size={16} />
@@ -413,7 +412,7 @@ const RegistrarStudents = () => {
                                                 </div>
                                             ) : (
                                                 <span>
-                                                    ⚠️ No existing class found for Grade {formData.grade} Section {formData.section}. 
+                                                    ⚠️ No existing class found for Grade {formData.grade} Section {formData.section}.
                                                     A new class will be created automatically.
                                                 </span>
                                             )}
@@ -422,25 +421,25 @@ const RegistrarStudents = () => {
 
                                     <div className="grid grid-cols-2 gap-4 mt-3">
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Age</label>
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Age</label>
                                             <input
                                                 type="number"
                                                 placeholder="e.g., 15"
                                                 value={formData.age}
                                                 onChange={(e) => setFormData({ ...formData, age: e.target.value })}
-                                                className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                                                className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:text-gray-100"
                                                 min="0"
                                                 max="120"
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Password *</label>
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password *</label>
                                             <input
                                                 type="password"
                                                 placeholder="Default: password123"
                                                 value={formData.password}
                                                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                                className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                                                className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:text-gray-100"
                                                 required
                                             />
                                         </div>
@@ -448,48 +447,48 @@ const RegistrarStudents = () => {
                                 </div>
 
                                 {/* Parent Information Section */}
-                                <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-                                    <h3 className="text-sm font-semibold text-blue-800 mb-3">Parent Information</h3>
+                                <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
+                                    <h3 className="text-sm font-semibold text-blue-800 dark:text-blue-400 mb-3">Parent Information</h3>
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Parent Name</label>
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Parent Name</label>
                                             <input
                                                 type="text"
                                                 placeholder="e.g., Jane Doe"
                                                 value={formData.parentName}
                                                 onChange={(e) => setFormData({ ...formData, parentName: e.target.value })}
-                                                className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                                                className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:text-gray-100"
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Parent Email</label>
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Parent Email</label>
                                             <input
                                                 type="email"
                                                 placeholder="parent@example.com"
                                                 value={formData.parentEmail}
                                                 onChange={(e) => setFormData({ ...formData, parentEmail: e.target.value })}
-                                                className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                                                className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:text-gray-100"
                                             />
-                                            <p className="text-xs text-blue-600 mt-1">💡 Creates parent account if not exists</p>
+                                            <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">💡 Creates parent account if not exists</p>
                                         </div>
                                     </div>
                                     <div className="mt-3">
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Parent Phone</label>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Parent Phone</label>
                                         <input
                                             type="text"
                                             placeholder="e.g., 0912345678"
                                             value={formData.parentPhone}
                                             onChange={(e) => setFormData({ ...formData, parentPhone: e.target.value })}
-                                            className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                                            className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:text-gray-100"
                                         />
                                     </div>
                                 </div>
 
-                                <div className="flex justify-end gap-3 pt-2 border-t">
+                                <div className="flex justify-end gap-3 pt-2 border-t border-gray-200 dark:border-gray-700">
                                     <button
                                         type="button"
                                         onClick={() => setShowModal(false)}
-                                        className="px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-50 transition"
+                                        className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
                                     >
                                         Cancel
                                     </button>

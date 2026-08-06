@@ -1,8 +1,8 @@
 // src/pages/admin/AdminAnnouncements.tsx - ENHANCED UI
 
 import { useState, useEffect } from "react";
-import { 
-    Plus, Megaphone, CheckCircle, Clock, X, Calendar, Users, 
+import {
+    Plus, Megaphone, CheckCircle, Clock, X, Calendar, Users,
     Edit2, Trash2, Eye, EyeOff, Send, Bell, Sparkles,
     Filter, Search, ChevronDown, ChevronUp, Award
 } from "lucide-react";
@@ -92,7 +92,7 @@ const AdminAnnouncements = () => {
             //     headers: { Authorization: `Bearer ${token}` }
             // });
             // setAnnouncements(response.data.data || []);
-            
+
             // Mock data
             setAnnouncements([
                 {
@@ -150,7 +150,7 @@ const AdminAnnouncements = () => {
             // await axios.post('http://localhost:7000/api/announcements', formData, {
             //     headers: { Authorization: `Bearer ${token}` }
             // });
-            
+
             const newAnnouncement: Announcement = {
                 _id: Date.now().toString(),
                 ...formData,
@@ -158,9 +158,9 @@ const AdminAnnouncements = () => {
                 createdAt: new Date().toISOString(),
                 views: 0,
             };
-            
+
             if (editingId) {
-                setAnnouncements(announcements.map(a => 
+                setAnnouncements(announcements.map(a =>
                     a._id === editingId ? { ...a, ...formData } : a
                 ));
             } else {
@@ -198,7 +198,7 @@ const AdminAnnouncements = () => {
 
     const getFilteredAnnouncements = () => {
         let filtered = announcements;
-        
+
         if (filterAudience !== "All") {
             filtered = filtered.filter(a => a.audience === filterAudience);
         }
@@ -206,7 +206,7 @@ const AdminAnnouncements = () => {
             filtered = filtered.filter(a => a.status === filterStatus);
         }
         if (searchTerm) {
-            filtered = filtered.filter(a => 
+            filtered = filtered.filter(a =>
                 a.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 a.content.toLowerCase().includes(searchTerm.toLowerCase())
             );
@@ -222,7 +222,7 @@ const AdminAnnouncements = () => {
                 <div className="flex items-center justify-center min-h-[60vh]">
                     <div className="text-center">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                        <p className="text-gray-500">Loading announcements...</p>
+                        <p className="text-gray-500 dark:text-gray-400">Loading announcements...</p>
                     </div>
                 </div>
             </DashboardLayout>
@@ -235,14 +235,14 @@ const AdminAnnouncements = () => {
                 {/* Header with Stats */}
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                        <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
                             <Megaphone size={28} className="text-blue-600" />
                             Announcements
-                            <span className="text-sm font-normal text-gray-500 bg-gray-100 px-3 py-1 rounded-full ml-2">
+                            <span className="text-sm font-normal text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded-full ml-2">
                                 {announcements.length} total
                             </span>
                         </h1>
-                        <p className="text-gray-500">Create and manage school announcements</p>
+                        <p className="text-gray-500 dark:text-gray-400">Create and manage school announcements</p>
                     </div>
                     <button
                         onClick={() => { resetForm(); setShowModal(true); }}
@@ -255,52 +255,52 @@ const AdminAnnouncements = () => {
 
                 {/* Stats Cards */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 border border-gray-100 dark:border-gray-700">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-gray-500 text-sm">Total</p>
-                                <h2 className="text-2xl font-bold text-gray-800">{announcements.length}</h2>
+                                <p className="text-gray-500 dark:text-gray-400 text-sm">Total</p>
+                                <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">{announcements.length}</h2>
                             </div>
-                            <div className="bg-blue-100 p-3 rounded-xl">
+                            <div className="bg-blue-100 dark:bg-blue-900/40 p-3 rounded-xl">
                                 <Megaphone size={20} className="text-blue-600" />
                             </div>
                         </div>
                     </div>
-                    <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 border border-gray-100 dark:border-gray-700">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-gray-500 text-sm">Published</p>
+                                <p className="text-gray-500 dark:text-gray-400 text-sm">Published</p>
                                 <h2 className="text-2xl font-bold text-green-600">
                                     {announcements.filter(a => a.status === "Published").length}
                                 </h2>
                             </div>
-                            <div className="bg-green-100 p-3 rounded-xl">
+                            <div className="bg-green-100 dark:bg-green-900/40 p-3 rounded-xl">
                                 <CheckCircle size={20} className="text-green-600" />
                             </div>
                         </div>
                     </div>
-                    <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 border border-gray-100 dark:border-gray-700">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-gray-500 text-sm">Drafts</p>
+                                <p className="text-gray-500 dark:text-gray-400 text-sm">Drafts</p>
                                 <h2 className="text-2xl font-bold text-orange-600">
                                     {announcements.filter(a => a.status === "Draft").length}
                                 </h2>
                             </div>
-                            <div className="bg-orange-100 p-3 rounded-xl">
+                            <div className="bg-orange-100 dark:bg-orange-900/40 p-3 rounded-xl">
                                 <Clock size={20} className="text-orange-600" />
                             </div>
                         </div>
                     </div>
-                    <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 border border-gray-100 dark:border-gray-700">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-gray-500 text-sm">Urgent</p>
+                                <p className="text-gray-500 dark:text-gray-400 text-sm">Urgent</p>
                                 <h2 className="text-2xl font-bold text-red-600">
                                     {announcements.filter(a => a.priority === "Urgent").length}
                                 </h2>
                             </div>
-                            <div className="bg-red-100 p-3 rounded-xl">
+                            <div className="bg-red-100 dark:bg-red-900/40 p-3 rounded-xl">
                                 <Bell size={20} className="text-red-600" />
                             </div>
                         </div>
@@ -308,7 +308,7 @@ const AdminAnnouncements = () => {
                 </div>
 
                 {/* Filters & Search */}
-                <div className="bg-white rounded-xl shadow-sm p-4">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
                     <div className="flex flex-col md:flex-row gap-4">
                         <div className="flex-1 relative">
                             <Search size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -317,14 +317,14 @@ const AdminAnnouncements = () => {
                                 placeholder="Search announcements..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full border rounded-xl pl-10 pr-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full border border-gray-200 dark:border-gray-600 rounded-xl pl-10 pr-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:text-gray-100"
                             />
                         </div>
                         <div className="flex gap-2 flex-wrap">
                             <select
                                 value={filterAudience}
                                 onChange={(e) => setFilterAudience(e.target.value)}
-                                className="border rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                                className="border border-gray-200 dark:border-gray-600 rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:text-gray-100"
                             >
                                 <option value="All">All Audiences</option>
                                 <option value="All">🌐 All</option>
@@ -336,7 +336,7 @@ const AdminAnnouncements = () => {
                             <select
                                 value={filterStatus}
                                 onChange={(e) => setFilterStatus(e.target.value)}
-                                className="border rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                                className="border border-gray-200 dark:border-gray-600 rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:text-gray-100"
                             >
                                 <option value="All">All Status</option>
                                 <option value="Published">✅ Published</option>
@@ -350,10 +350,10 @@ const AdminAnnouncements = () => {
                 {/* Announcements Cards */}
                 <div className="space-y-4">
                     {filteredAnnouncements.length === 0 ? (
-                        <div className="bg-white rounded-xl shadow-sm p-12 text-center">
-                            <Megaphone size={56} className="mx-auto text-gray-300" />
-                            <h3 className="mt-4 text-lg font-medium text-gray-700">No announcements found</h3>
-                            <p className="text-gray-500">Create your first announcement to get started</p>
+                        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-12 text-center">
+                            <Megaphone size={56} className="mx-auto text-gray-300 dark:text-gray-600" />
+                            <h3 className="mt-4 text-lg font-medium text-gray-700 dark:text-gray-200">No announcements found</h3>
+                            <p className="text-gray-500 dark:text-gray-400">Create your first announcement to get started</p>
                             <button
                                 onClick={() => { resetForm(); setShowModal(true); }}
                                 className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition"
@@ -372,14 +372,14 @@ const AdminAnnouncements = () => {
                             return (
                                 <div
                                     key={announcement._id}
-                                    className={`bg-white rounded-xl shadow-sm border-l-4 ${priorityStyle.border} border-gray-200 hover:shadow-md transition-all overflow-hidden`}
+                                    className={`bg-white dark:bg-gray-800 rounded-xl shadow-sm border-l-4 ${priorityStyle.border} border-gray-200 dark:border-gray-700 hover:shadow-md transition-all overflow-hidden`}
                                 >
                                     <div className="p-5">
                                         <div className="flex items-start justify-between">
                                             <div className="flex-1">
                                                 {/* Title Row */}
                                                 <div className="flex items-center flex-wrap gap-2">
-                                                    <h3 className="text-lg font-semibold text-gray-800">
+                                                    <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
                                                         {announcement.title}
                                                     </h3>
                                                     <span className={`px-3 py-0.5 rounded-full text-xs font-medium flex items-center gap-1 ${priorityStyle.bg} ${priorityStyle.text}`}>
@@ -391,12 +391,12 @@ const AdminAnnouncements = () => {
                                                 </div>
 
                                                 {/* Content */}
-                                                <p className={`text-gray-600 mt-2 ${isExpanded ? '' : 'line-clamp-2'}`}>
+                                                <p className={`text-gray-600 dark:text-gray-300 mt-2 ${isExpanded ? '' : 'line-clamp-2'}`}>
                                                     {announcement.content}
                                                 </p>
 
                                                 {/* Meta Info */}
-                                                <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-gray-500">
+                                                <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-gray-500 dark:text-gray-400">
                                                     <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium flex items-center gap-1 ${audienceBadge.bg} ${audienceBadge.text}`}>
                                                         {audienceBadge.icon} {announcement.audience}
                                                     </span>
@@ -468,9 +468,9 @@ const AdminAnnouncements = () => {
             {/* Modal */}
             {showModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => setShowModal(false)}>
-                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-                        <div className="flex items-center justify-between p-6 border-b sticky top-0 bg-white z-10">
-                            <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700 sticky top-0 bg-white dark:bg-gray-800 z-10">
+                            <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
                                 <Sparkles size={20} className="text-blue-600" />
                                 {editingId ? "Edit Announcement" : "Create Announcement"}
                             </h2>
@@ -481,36 +481,36 @@ const AdminAnnouncements = () => {
 
                         <form onSubmit={handleSubmit} className="p-6 space-y-5">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1.5">Title *</label>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Title *</label>
                                 <input
                                     type="text"
                                     required
                                     value={formData.title}
                                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                                    className="w-full border rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full border border-gray-200 dark:border-gray-600 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:text-gray-100"
                                     placeholder="Enter announcement title"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1.5">Content *</label>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Content *</label>
                                 <textarea
                                     required
                                     rows={4}
                                     value={formData.content}
                                     onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                                    className="w-full border rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                                    className="w-full border border-gray-200 dark:border-gray-600 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 resize-none bg-white dark:bg-gray-700 dark:text-gray-100"
                                     placeholder="Write your announcement content here..."
                                 />
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Audience</label>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Audience</label>
                                     <select
                                         value={formData.audience}
                                         onChange={(e) => setFormData({ ...formData, audience: e.target.value as any })}
-                                        className="w-full border rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full border border-gray-200 dark:border-gray-600 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:text-gray-100"
                                     >
                                         <option value="All">🌐 All</option>
                                         <option value="Students">🎓 Students</option>
@@ -520,11 +520,11 @@ const AdminAnnouncements = () => {
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Priority</label>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Priority</label>
                                     <select
                                         value={formData.priority}
                                         onChange={(e) => setFormData({ ...formData, priority: e.target.value as any })}
-                                        className="w-full border rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full border border-gray-200 dark:border-gray-600 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:text-gray-100"
                                     >
                                         <option value="Low">📌 Low</option>
                                         <option value="Medium">🔵 Medium</option>
@@ -536,20 +536,20 @@ const AdminAnnouncements = () => {
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Date</label>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Date</label>
                                     <input
                                         type="date"
                                         value={formData.date}
                                         onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                                        className="w-full border rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full border border-gray-200 dark:border-gray-600 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:text-gray-100"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Status</label>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Status</label>
                                     <select
                                         value={formData.status}
                                         onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-                                        className="w-full border rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full border border-gray-200 dark:border-gray-600 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:text-gray-100"
                                     >
                                         <option value="Published">✅ Published</option>
                                         <option value="Draft">📝 Draft</option>
@@ -559,20 +559,20 @@ const AdminAnnouncements = () => {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1.5">Expires At (Optional)</label>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Expires At (Optional)</label>
                                 <input
                                     type="datetime-local"
                                     value={formData.expiresAt}
                                     onChange={(e) => setFormData({ ...formData, expiresAt: e.target.value })}
-                                    className="w-full border rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full border border-gray-200 dark:border-gray-600 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:text-gray-100"
                                 />
                             </div>
 
-                            <div className="flex justify-end gap-3 pt-4 border-t">
+                            <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
                                 <button
                                     type="button"
                                     onClick={() => setShowModal(false)}
-                                    className="px-6 py-2.5 border rounded-xl text-gray-700 hover:bg-gray-50 transition font-medium"
+                                    className="px-6 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition font-medium"
                                 >
                                     Cancel
                                 </button>

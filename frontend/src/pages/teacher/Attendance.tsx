@@ -153,19 +153,19 @@ const Attendance = () => {
 
     const statusBadge = (status: string) => {
         const styles: Record<string, string> = {
-            present: "bg-green-100 text-green-700",
-            absent: "bg-red-100 text-red-700",
-            late: "bg-yellow-100 text-yellow-700",
-            excused: "bg-blue-100 text-blue-700",
+            present: "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400",
+            absent: "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400",
+            late: "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400",
+            excused: "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400",
         };
-        return styles[status] || "bg-gray-100 text-gray-700";
+        return styles[status] || "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300";
     };
 
     if (loading) {
         return (
             <DashboardLayout role="teacher">
                 <div className="flex items-center justify-center min-h-[60vh]">
-                    <div className="text-xl text-gray-500">Loading attendance...</div>
+                    <div className="text-xl text-gray-500 dark:text-gray-400">Loading attendance...</div>
                 </div>
             </DashboardLayout>
         );
@@ -173,22 +173,22 @@ const Attendance = () => {
 
     const modalContent = (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => setShowModal(false)}>
-            <div className="bg-white rounded-xl shadow-xl w-full max-w-lg" onClick={(e) => e.stopPropagation()}>
-                <div className="flex items-center justify-between p-5 border-b">
-                    <h2 className="text-lg font-semibold">Mark Attendance</h2>
-                    <button onClick={() => setShowModal(false)} className="p-1 rounded-lg hover:bg-gray-100">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-lg" onClick={(e) => e.stopPropagation()}>
+                <div className="flex items-center justify-between p-5 border-b border-gray-200 dark:border-gray-700">
+                    <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Mark Attendance</h2>
+                    <button onClick={() => setShowModal(false)} className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
                         <X size={20} className="text-gray-500" />
                     </button>
                 </div>
                 <form onSubmit={handleSubmit} className="p-5 space-y-4">
                     {/* Class Selection */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Class</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Class</label>
                         <select
                             required
                             value={formData.classId}
                             onChange={(e) => setFormData({ ...formData, classId: e.target.value })}
-                            className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
                         >
                             <option value="">Select Class</option>
                             {classes.map((cls) => (
@@ -199,12 +199,12 @@ const Attendance = () => {
 
                     {/* Student Selection */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Student</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Student</label>
                         <select
                             required
                             value={formData.studentId}
                             onChange={(e) => setFormData({ ...formData, studentId: e.target.value })}
-                            className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
                         >
                             <option value="">Select Student</option>
                             {students.map((student) => (
@@ -215,21 +215,21 @@ const Attendance = () => {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date</label>
                             <input
                                 type="date"
                                 required
                                 value={formData.date}
                                 onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                                className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
                             <select
                                 value={formData.status}
                                 onChange={(e) => setFormData({ ...formData, status: e.target.value as "present" | "absent" | "late" | "excused" })}
-                                className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
                             >
                                 <option value="present">Present</option>
                                 <option value="absent">Absent</option>
@@ -240,12 +240,12 @@ const Attendance = () => {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Remarks (optional)</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Remarks (optional)</label>
                         <input
                             type="text"
                             value={formData.remarks}
                             onChange={(e) => setFormData({ ...formData, remarks: e.target.value })}
-                            className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
                             placeholder="e.g., Sick leave"
                         />
                     </div>
@@ -254,7 +254,7 @@ const Attendance = () => {
                         <button
                             type="button"
                             onClick={() => setShowModal(false)}
-                            className="px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-50"
+                            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
                         >
                             Cancel
                         </button>
@@ -275,8 +275,8 @@ const Attendance = () => {
             <div className="space-y-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-800">Attendance</h1>
-                        <p className="text-gray-500">Track student attendance</p>
+                        <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Attendance</h1>
+                        <p className="text-gray-500 dark:text-gray-400">Track student attendance</p>
                     </div>
                     <button
                         onClick={() => setShowModal(true)}
@@ -288,52 +288,52 @@ const Attendance = () => {
 
                 {/* Stats Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div className="bg-white rounded-xl shadow-sm p-5 flex items-center gap-4">
-                        <div className="bg-green-100 p-3 rounded-lg text-green-600"><ClipboardCheck size={25} /></div>
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5 flex items-center gap-4">
+                        <div className="bg-green-100 dark:bg-green-900/30 p-3 rounded-lg text-green-600 dark:text-green-400"><ClipboardCheck size={25} /></div>
                         <div>
-                            <p className="text-gray-500 text-sm">Present</p>
-                            <h2 className="text-2xl font-bold">{presentCount}</h2>
+                            <p className="text-gray-500 dark:text-gray-400 text-sm">Present</p>
+                            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">{presentCount}</h2>
                         </div>
                     </div>
-                    <div className="bg-white rounded-xl shadow-sm p-5 flex items-center gap-4">
-                        <div className="bg-red-100 p-3 rounded-lg text-red-600"><ClipboardCheck size={25} /></div>
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5 flex items-center gap-4">
+                        <div className="bg-red-100 dark:bg-red-900/30 p-3 rounded-lg text-red-600 dark:text-red-400"><ClipboardCheck size={25} /></div>
                         <div>
-                            <p className="text-gray-500 text-sm">Absent</p>
-                            <h2 className="text-2xl font-bold">{absentCount}</h2>
+                            <p className="text-gray-500 dark:text-gray-400 text-sm">Absent</p>
+                            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">{absentCount}</h2>
                         </div>
                     </div>
-                    <div className="bg-white rounded-xl shadow-sm p-5 flex items-center gap-4">
-                        <div className="bg-yellow-100 p-3 rounded-lg text-yellow-600"><ClipboardCheck size={25} /></div>
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5 flex items-center gap-4">
+                        <div className="bg-yellow-100 dark:bg-yellow-900/30 p-3 rounded-lg text-yellow-600 dark:text-yellow-400"><ClipboardCheck size={25} /></div>
                         <div>
-                            <p className="text-gray-500 text-sm">Late</p>
-                            <h2 className="text-2xl font-bold">{lateCount}</h2>
+                            <p className="text-gray-500 dark:text-gray-400 text-sm">Late</p>
+                            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">{lateCount}</h2>
                         </div>
                     </div>
                 </div>
 
                 {/* Attendance Table - NO GRADE COLUMN */}
-                <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full border-collapse">
-                            <thead className="bg-gray-50">
+                            <thead className="bg-gray-50 dark:bg-gray-700">
                                 <tr>
-                                    <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600">Student</th>
-                                    <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600">Date</th>
-                                    <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600">Status</th>
+                                    <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Student</th>
+                                    <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Date</th>
+                                    <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Status</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-100">
+                            <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                                 {attendanceRecords.length === 0 ? (
                                     <tr>
-                                        <td colSpan={3} className="px-6 py-8 text-center text-gray-500">
+                                        <td colSpan={3} className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
                                             No attendance records yet.
                                         </td>
                                     </tr>
                                 ) : (
                                     attendanceRecords.slice(0, 10).map((record) => (
-                                        <tr key={record._id} className="hover:bg-gray-50">
-                                            <td className="px-6 py-4 font-medium">{record.studentId?.name || 'Unknown'}</td>
-                                            <td className="px-6 py-4 text-gray-600">{new Date(record.date).toLocaleDateString()}</td>
+                                        <tr key={record._id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                                            <td className="px-6 py-4 font-medium text-gray-800 dark:text-gray-200">{record.studentId?.name || 'Unknown'}</td>
+                                            <td className="px-6 py-4 text-gray-600 dark:text-gray-400">{new Date(record.date).toLocaleDateString()}</td>
                                             <td className="px-6 py-4">
                                                 <span className={`px-3 py-1 rounded-full text-xs font-medium capitalize ${statusBadge(record.status)}`}>
                                                     {record.status}

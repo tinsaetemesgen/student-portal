@@ -104,25 +104,25 @@ const Settings = () => {
         <DashboardLayout role="admin">
             <div className="space-y-6">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-800">Settings</h1>
-                    <p className="text-gray-500">Manage school and system preferences</p>
+                    <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Settings</h1>
+                    <p className="text-gray-500 dark:text-gray-400">Manage school and system preferences</p>
                 </div>
 
                 {/* Logo Upload Section */}
-                <section className="bg-white rounded-xl shadow-sm p-6">
+                <section className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
                     <div className="flex items-center gap-3 mb-6">
-                        <div className="bg-gray-100 p-3 rounded-lg text-gray-600">
+                        <div className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg text-gray-600 dark:text-gray-300">
                             <ImageIcon size={24} />
                         </div>
-                        <h2 className="font-semibold text-lg">School Logo</h2>
+                        <h2 className="font-semibold text-lg text-gray-800 dark:text-gray-100">School Logo</h2>
                     </div>
 
                     <div className="flex flex-col sm:flex-row items-center gap-6">
-                        <div className="w-28 h-28 rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden bg-gray-50">
+                        <div className="w-28 h-28 rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center overflow-hidden bg-gray-50 dark:bg-gray-700">
                             {logoPreview ? (
                                 <img src={logoPreview} alt="School Logo" className="w-full h-full object-contain" />
                             ) : (
-                                <div className="text-center text-gray-400">
+                                <div className="text-center text-gray-400 dark:text-gray-500">
                                     <ImageIcon size={32} className="mx-auto mb-1" />
                                     <p className="text-xs">No logo</p>
                                 </div>
@@ -138,44 +138,44 @@ const Settings = () => {
                             />
                             <button
                                 onClick={() => fileInputRef.current?.click()}
-                                className="flex items-center gap-2 bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition"
+                                className="flex items-center gap-2 bg-gray-600 dark:bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-700 dark:hover:bg-gray-600 transition"
                             >
                                 <Upload size={18} />
                                 Upload Logo
                             </button>
-                            <p className="text-xs text-gray-500 mt-2">Recommended: 200x200px PNG or JPG</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Recommended: 200x200px PNG or JPG</p>
                         </div>
                     </div>
                 </section>
 
                 {/* School Information */}
-                <section className="bg-white rounded-xl shadow-sm p-6">
+                <section className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
                     <div className="flex items-center gap-3 mb-6">
-                        <div className="bg-gray-100 p-3 rounded-lg text-gray-600">
+                        <div className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg text-gray-600 dark:text-gray-300">
                             <School size={24} />
                         </div>
-                        <h2 className="font-semibold text-lg">School Information</h2>
+                        <h2 className="font-semibold text-lg text-gray-800 dark:text-gray-100">School Information</h2>
                     </div>
 
                     <div className="grid md:grid-cols-2 gap-5">
                         {fieldList.map((field) => (
                             <div key={field.key}>
-                                <label className="text-sm text-gray-600">{field.label}</label>
+                                <label className="text-sm text-gray-600 dark:text-gray-400">{field.label}</label>
                                 <input
                                     type="text"
                                     value={schoolFields[field.key]}
                                     onChange={(e) => updateSchoolField(field.key, e.target.value)}
-                                    className="mt-1 w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="mt-1 w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:text-gray-100"
                                 />
                             </div>
                         ))}
 
                         <div className="md:col-span-2">
-                            <label className="text-sm text-gray-600">Address</label>
+                            <label className="text-sm text-gray-600 dark:text-gray-400">Address</label>
                             <textarea
                                 value={schoolFields.address}
                                 onChange={(e) => updateSchoolField("address", e.target.value)}
-                                className="mt-1 w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                                className="mt-1 w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:text-gray-100"
                                 rows={3}
                             />
                         </div>
@@ -191,26 +191,26 @@ const Settings = () => {
                 </section>
 
                 {/* System Settings */}
-                <section className="bg-white rounded-xl shadow-sm p-6">
+                <section className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
                     <div className="flex items-center gap-3 mb-6">
-                        <div className="bg-gray-100 p-3 rounded-lg text-gray-600">
+                        <div className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg text-gray-600 dark:text-gray-300">
                             <ShieldCheck size={24} />
                         </div>
-                        <h2 className="font-semibold text-lg">System Settings</h2>
+                        <h2 className="font-semibold text-lg text-gray-800 dark:text-gray-100">System Settings</h2>
                     </div>
 
                     <div className="space-y-4">
                         {systemOptionList.map((option) => {
                             const Icon = option.icon;
                             return (
-                                <div key={option.key} className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0">
+                                <div key={option.key} className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 pb-4 last:border-0 last:pb-0">
                                     <div className="flex items-center gap-3">
-                                        <Icon size={20} className="text-gray-500" />
-                                        <span className="text-gray-700">{option.label}</span>
+                                        <Icon size={20} className="text-gray-500 dark:text-gray-400" />
+                                        <span className="text-gray-700 dark:text-gray-200">{option.label}</span>
                                     </div>
                                     <button
                                         onClick={() => toggleSetting(option.key)}
-                                        className={`w-12 h-6 rounded-full transition relative p-1 ${systemSettings[option.key] ? "bg-blue-600" : "bg-gray-300"
+                                        className={`w-12 h-6 rounded-full transition relative p-1 ${systemSettings[option.key] ? "bg-blue-600" : "bg-gray-300 dark:bg-gray-600"
                                             }`}
                                     >
                                         <div
@@ -225,12 +225,12 @@ const Settings = () => {
                 </section>
 
                 {/* Password Section */}
-                <section className="bg-white rounded-xl shadow-sm p-6">
+                <section className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
                     <div className="flex items-center gap-3 mb-6">
-                        <div className="bg-gray-100 p-3 rounded-lg text-gray-600">
+                        <div className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg text-gray-600 dark:text-gray-300">
                             <Lock size={24} />
                         </div>
-                        <h2 className="font-semibold text-lg">Change Password</h2>
+                        <h2 className="font-semibold text-lg text-gray-800 dark:text-gray-100">Change Password</h2>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -239,21 +239,21 @@ const Settings = () => {
                             placeholder="Current Password"
                             value={password.current}
                             onChange={(e) => setPassword({ ...password, current: e.target.value })}
-                            className="border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                            className="border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:text-gray-100"
                         />
                         <input
                             type="password"
                             placeholder="New Password"
                             value={password.newPassword}
                             onChange={(e) => setPassword({ ...password, newPassword: e.target.value })}
-                            className="border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                            className="border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:text-gray-100"
                         />
                         <input
                             type="password"
                             placeholder="Confirm Password"
                             value={password.confirm}
                             onChange={(e) => setPassword({ ...password, confirm: e.target.value })}
-                            className="border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                            className="border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:text-gray-100"
                         />
                     </div>
 
@@ -266,9 +266,9 @@ const Settings = () => {
                 </section>
 
                 {/* System Info */}
-                <section className="bg-gray-100 rounded-xl p-6">
-                    <h2 className="font-semibold text-lg mb-3 text-gray-800">School Portal</h2>
-                    <div className="text-sm text-gray-700 space-y-1">
+                <section className="bg-gray-100 dark:bg-gray-800 rounded-xl p-6">
+                    <h2 className="font-semibold text-lg mb-3 text-gray-800 dark:text-gray-100">School Portal</h2>
+                    <div className="text-sm text-gray-700 dark:text-gray-300 space-y-1">
                         <p>Version: 1.0.0</p>
                         <p>Frontend: React + Tailwind</p>
                         <p>Backend: Express + MongoDB</p>

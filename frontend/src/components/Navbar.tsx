@@ -2,22 +2,22 @@
 
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { 
-    Bell, 
-    Menu, 
-    LogOut, 
-    MessageCircle, 
+import {
+    Bell,
+    Menu,
+    LogOut,
+    MessageCircle,
     User as UserIcon,
     Settings,
-    HelpCircle,
     ChevronDown,
     Check,
     X,
-    Users,
-    Sparkles
+    Sun,
+    Moon
 } from "lucide-react";
 import axios from "axios";
 import { getSocket } from "../services/socket";
+import { useTheme } from "../hooks/useTheme";
 
 type Role = "admin" | "registrar" | "finance_officer" | "teacher" | "student" | "parent";
 
@@ -87,6 +87,7 @@ const roleInfo = {
 const Navbar = ({ role, toggleSidebar }: NavbarProps) => {
     const navigate = useNavigate();
     const info = roleInfo[role];
+    const { theme, toggleTheme } = useTheme();
 
     // User info from localStorage
     const userStr = localStorage.getItem('user');
@@ -152,7 +153,7 @@ const Navbar = ({ role, toggleSidebar }: NavbarProps) => {
             );
             setUnreadCount(0);
             setNotifications([]);
-            
+
             const socket = getSocket();
             if (socket) {
                 socket.emit('message:read-all');
@@ -190,7 +191,7 @@ const Navbar = ({ role, toggleSidebar }: NavbarProps) => {
         const minutes = Math.floor(diff / 60000);
         const hours = Math.floor(diff / 3600000);
         const days = Math.floor(diff / 86400000);
-        
+
         if (minutes < 1) return 'Just now';
         if (minutes < 60) return `${minutes}m ago`;
         if (hours < 24) return `${hours}h ago`;
@@ -267,24 +268,24 @@ const Navbar = ({ role, toggleSidebar }: NavbarProps) => {
     // ============================================
 
     return (
-        <header className="bg-white border-b px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between sticky top-0 z-40 shadow-sm">
+        <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between sticky top-0 z-40 shadow-sm">
             {/* ============================================
                 LEFT SECTION - Title & Hamburger
                 ============================================ */}
             <div className="flex items-center gap-3 min-w-0">
                 <button
                     onClick={toggleSidebar}
-                    className="p-2 rounded-lg hover:bg-gray-100 transition md:hidden flex-shrink-0"
+                    className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition md:hidden flex-shrink-0"
                     aria-label="Toggle sidebar"
                 >
-                    <Menu size={22} className="text-gray-600" />
+                    <Menu size={22} className="text-gray-600 dark:text-gray-300" />
                 </button>
 
                 <div className="min-w-0">
-                    <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 truncate">
+                    <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-100 truncate">
                         {info.title}
                     </h1>
-                    <p className="text-xs sm:text-sm text-gray-500 hidden sm:block truncate">
+                    <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 hidden sm:block truncate">
                         {info.subtitle}
                     </p>
                 </div>
@@ -295,13 +296,27 @@ const Navbar = ({ role, toggleSidebar }: NavbarProps) => {
                 ============================================ */}
             <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0">
 
+                {/* 🌙 Dark Mode Toggle */}
+                <button
+                    onClick={toggleTheme}
+                    className="relative p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+                    aria-label="Toggle dark mode"
+                    title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+                >
+                    {theme === 'dark' ? (
+                        <Sun size={20} className="text-yellow-400" />
+                    ) : (
+                        <Moon size={20} className="text-gray-600" />
+                    )}
+                </button>
+
                 {/* 🔔 Chat Button */}
                 <Link
                     to={info.chatPath}
-                    className="relative p-2 rounded-full hover:bg-gray-100 transition"
+                    className="relative p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition"
                     aria-label="Messages"
                 >
-                    <MessageCircle size={20} className="text-gray-600" />
+                    <MessageCircle size={20} className="text-gray-600 dark:text-gray-300" />
                     {unreadCount > 0 && (
                         <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[10px] font-bold min-w-[18px] h-[18px] rounded-full flex items-center justify-center px-1 animate-pulse">
                             {unreadCount > 9 ? '9+' : unreadCount}
@@ -319,10 +334,10 @@ const Navbar = ({ role, toggleSidebar }: NavbarProps) => {
                             }
                             setShowUserDropdown(false);
                         }}
-                        className="relative p-2 rounded-full hover:bg-gray-100 transition"
+                        className="relative p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition"
                         aria-label="Notifications"
                     >
-                        <Bell size={20} className="text-gray-600" />
+                        <Bell size={20} className="text-gray-600 dark:text-gray-300" />
                         {unreadCount > 0 && (
                             <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[10px] font-bold min-w-[18px] h-[18px] rounded-full flex items-center justify-center px-1 animate-pulse">
                                 {unreadCount > 9 ? '9+' : unreadCount}
@@ -333,16 +348,16 @@ const Navbar = ({ role, toggleSidebar }: NavbarProps) => {
                     {/* Notification Dropdown */}
                     {showNotificationDropdown && (
                         <>
-                            <div 
-                                className="fixed inset-0 z-40" 
+                            <div
+                                className="fixed inset-0 z-40"
                                 onClick={() => setShowNotificationDropdown(false)}
                             ></div>
-                            <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 overflow-hidden">
+                            <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 z-50 overflow-hidden">
                                 {/* Header */}
-                                <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-gradient-to-r from-blue-50 to-indigo-50">
+                                <div className="p-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-800">
                                     <div className="flex items-center gap-2">
-                                        <Bell size={18} className="text-blue-600" />
-                                        <h3 className="font-semibold text-gray-800">Notifications</h3>
+                                        <Bell size={18} className="text-blue-600 dark:text-blue-400" />
+                                        <h3 className="font-semibold text-gray-800 dark:text-gray-100">Notifications</h3>
                                         {unreadCount > 0 && (
                                             <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
                                                 {unreadCount} new
@@ -353,7 +368,7 @@ const Navbar = ({ role, toggleSidebar }: NavbarProps) => {
                                         {unreadCount > 0 && (
                                             <button
                                                 onClick={markAllAsRead}
-                                                className="text-xs text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1"
+                                                className="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium flex items-center gap-1"
                                             >
                                                 <Check size={14} />
                                                 Mark all read
@@ -361,9 +376,9 @@ const Navbar = ({ role, toggleSidebar }: NavbarProps) => {
                                         )}
                                         <button
                                             onClick={() => setShowNotificationDropdown(false)}
-                                            className="p-1 rounded hover:bg-gray-200 transition"
+                                            className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition"
                                         >
-                                            <X size={14} className="text-gray-400" />
+                                            <X size={14} className="text-gray-400 dark:text-gray-500" />
                                         </button>
                                     </div>
                                 </div>
@@ -371,36 +386,35 @@ const Navbar = ({ role, toggleSidebar }: NavbarProps) => {
                                 {/* Notification List */}
                                 <div className="max-h-80 overflow-y-auto">
                                     {loading ? (
-                                        <div className="p-8 text-center text-gray-400">
+                                        <div className="p-8 text-center text-gray-400 dark:text-gray-500">
                                             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-3"></div>
                                             <p className="text-sm">Loading...</p>
                                         </div>
                                     ) : notifications.length === 0 ? (
-                                        <div className="p-8 text-center text-gray-400">
-                                            <Bell size={32} className="mx-auto mb-3 text-gray-300" />
+                                        <div className="p-8 text-center text-gray-400 dark:text-gray-500">
+                                            <Bell size={32} className="mx-auto mb-3 text-gray-300 dark:text-gray-600" />
                                             <p className="text-sm">No new notifications</p>
                                         </div>
                                     ) : (
                                         notifications.map((notif) => (
-                                            <div 
+                                            <div
                                                 key={notif._id}
-                                                className={`px-4 py-3 hover:bg-gray-50 border-b border-gray-50 transition cursor-pointer flex items-start gap-3 ${
-                                                    !notif.isRead ? 'bg-blue-50' : ''
-                                                }`}
+                                                className={`px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-50 dark:border-gray-700 transition cursor-pointer flex items-start gap-3 ${!notif.isRead ? 'bg-blue-50 dark:bg-gray-700' : ''
+                                                    }`}
                                                 onClick={goToChat}
                                             >
                                                 <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${getRoleColor(notif.senderId?.role || '')}`}>
                                                     {notif.senderId?.name?.charAt(0) || 'U'}
                                                 </div>
                                                 <div className="flex-1 min-w-0">
-                                                    <p className="text-sm text-gray-800">
+                                                    <p className="text-sm text-gray-800 dark:text-gray-100">
                                                         <span className="font-medium">{notif.senderId?.name || 'Unknown'}</span>
-                                                        <span className="text-gray-600"> sent you a message</span>
+                                                        <span className="text-gray-600 dark:text-gray-300"> sent you a message</span>
                                                     </p>
-                                                    <p className="text-xs text-gray-500 truncate">
+                                                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
                                                         {notif.content}
                                                     </p>
-                                                    <p className="text-[10px] text-gray-400 mt-1">
+                                                    <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1">
                                                         {formatTime(notif.createdAt)}
                                                     </p>
                                                 </div>
@@ -413,10 +427,10 @@ const Navbar = ({ role, toggleSidebar }: NavbarProps) => {
                                 </div>
 
                                 {/* Footer */}
-                                <div className="p-3 border-t border-gray-100 bg-gray-50">
+                                <div className="p-3 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
                                     <button
                                         onClick={goToChat}
-                                        className="w-full text-center text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center justify-center gap-2"
+                                        className="w-full text-center text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium flex items-center justify-center gap-2"
                                     >
                                         <MessageCircle size={16} />
                                         View All Messages
@@ -434,33 +448,33 @@ const Navbar = ({ role, toggleSidebar }: NavbarProps) => {
                             setShowUserDropdown(!showUserDropdown);
                             setShowNotificationDropdown(false);
                         }}
-                        className="flex items-center gap-2 hover:bg-gray-100 rounded-lg px-2 py-1.5 transition"
+                        className="flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg px-2 py-1.5 transition"
                         aria-label="User menu"
                     >
                         <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center font-bold text-sm text-white shadow-md bg-gradient-to-br from-blue-600 to-indigo-600`}>
                             {displayName.charAt(0).toUpperCase()}
                         </div>
-                        <ChevronDown size={16} className="text-gray-400 hidden sm:block" />
+                        <ChevronDown size={16} className="text-gray-400 dark:text-gray-500 hidden sm:block" />
                     </button>
 
                     {/* User Dropdown */}
                     {showUserDropdown && (
                         <>
-                            <div 
-                                className="fixed inset-0 z-40" 
+                            <div
+                                className="fixed inset-0 z-40"
                                 onClick={() => setShowUserDropdown(false)}
                             ></div>
-                            <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 overflow-hidden">
+                            <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 z-50 overflow-hidden">
                                 {/* User Info */}
-                                <div className="p-4 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-indigo-50">
+                                <div className="p-4 border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-800">
                                     <div className="flex items-center gap-3">
                                         <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 text-white flex items-center justify-center text-xl font-bold shadow-md">
                                             {displayName.charAt(0).toUpperCase()}
                                         </div>
                                         <div className="min-w-0">
-                                            <p className="font-semibold text-gray-800 truncate">{displayName}</p>
+                                            <p className="font-semibold text-gray-800 dark:text-gray-100 truncate">{displayName}</p>
                                             <div className="flex items-center gap-1">
-                                                <span className="text-xs text-gray-500 capitalize truncate">
+                                                <span className="text-xs text-gray-500 dark:text-gray-400 capitalize truncate">
                                                     {displayRole.replace('_', ' ')}
                                                 </span>
                                                 <span className="text-sm">{getRoleEmoji(role)}</span>
@@ -473,26 +487,26 @@ const Navbar = ({ role, toggleSidebar }: NavbarProps) => {
                                 <div className="py-2">
                                     <Link
                                         to={`/${role}/profile`}
-                                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition text-sm text-gray-700"
+                                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700 transition text-sm text-gray-700 dark:text-gray-200"
                                         onClick={() => setShowUserDropdown(false)}
                                     >
-                                        <UserIcon size={16} className="text-gray-400" />
+                                        <UserIcon size={16} className="text-gray-400 dark:text-gray-500" />
                                         Profile
                                     </Link>
                                     <Link
                                         to={`/${role}/settings`}
-                                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition text-sm text-gray-700"
+                                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700 transition text-sm text-gray-700 dark:text-gray-200"
                                         onClick={() => setShowUserDropdown(false)}
                                     >
-                                        <Settings size={16} className="text-gray-400" />
+                                        <Settings size={16} className="text-gray-400 dark:text-gray-500" />
                                         Settings
                                     </Link>
                                     <Link
                                         to={`/${role}/chat`}
-                                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition text-sm text-gray-700"
+                                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700 transition text-sm text-gray-700 dark:text-gray-200"
                                         onClick={() => setShowUserDropdown(false)}
                                     >
-                                        <MessageCircle size={16} className="text-gray-400" />
+                                        <MessageCircle size={16} className="text-gray-400 dark:text-gray-500" />
                                         Messages
                                         {unreadCount > 0 && (
                                             <span className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
@@ -500,13 +514,13 @@ const Navbar = ({ role, toggleSidebar }: NavbarProps) => {
                                             </span>
                                         )}
                                     </Link>
-                                    <div className="border-t border-gray-100 my-1"></div>
+                                    <div className="border-t border-gray-100 dark:border-gray-700 my-1"></div>
                                     <button
                                         onClick={() => {
                                             setShowUserDropdown(false);
                                             handleLogout();
                                         }}
-                                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-red-50 transition text-sm text-red-600 w-full"
+                                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-red-50 dark:hover:bg-red-900/20 transition text-sm text-red-600 dark:text-red-400 w-full"
                                     >
                                         <LogOut size={16} />
                                         Logout

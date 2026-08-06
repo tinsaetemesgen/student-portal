@@ -1,15 +1,13 @@
-// src/components/Sidebar.tsx - COMPLETE WITH ALL NAVIGATION
+// src/components/Sidebar.tsx
 
-import React from 'react';
-import { 
-    LayoutDashboard, 
-    Users, 
-    BookOpen, 
-    Calendar, 
-    Award, 
-    FileText, 
-    Bell, 
-    Settings, 
+import React from "react";
+import {
+    Users,
+    BookOpen,
+    Calendar,
+    Award,
+    FileText,
+    Settings,
     MessageCircle,
     DollarSign,
     ClipboardList,
@@ -24,29 +22,30 @@ import {
     Megaphone,
     Clock,
     UserCog,
-    Upload,
-    Download,
-    FileSpreadsheet,
-    GraduationCap,
     BookMarked,
     FolderOpen,
     FileCheck,
     PieChart,
     UserCheck,
-    HelpCircle
-} from 'lucide-react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+} from "lucide-react";
 
-// ✅ Import School Logo
-import schoolLogo from '../assets/logo.png';
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import schoolLogo from "../assets/logo.png";
 
-const SCHOOL_NAME = 'Kamara School';
-const SCHOOL_SHORT_NAME = 'KS';
+const SCHOOL_NAME = "Kamara School";
+const SCHOOL_SHORT_NAME = "KS";
 
 interface SidebarProps {
-    role: 'admin' | 'registrar' | 'finance_officer' | 'teacher' | 'student' | 'parent';
+    role:
+    | "admin"
+    | "registrar"
+    | "finance_officer"
+    | "teacher"
+    | "student"
+    | "parent";
     isOpen: boolean;
     toggleSidebar: () => void;
+    onClose?: () => void;
 }
 
 interface NavItem {
@@ -56,85 +55,104 @@ interface NavItem {
     badge?: number;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ role, isOpen, toggleSidebar }) => {
+const Sidebar: React.FC<SidebarProps> = ({
+    role,
+    isOpen,
+    toggleSidebar,
+    onClose,
+}) => {
     const location = useLocation();
     const navigate = useNavigate();
 
-    // ✅ Get user info
-    const userStr = localStorage.getItem('user');
+    const userStr = localStorage.getItem("user");
     const user = userStr ? JSON.parse(userStr) : null;
-    const displayName = user?.name || 'User';
+
+    const displayName = user?.name || "User";
     const displayRole = user?.role || role;
 
-    // ✅ Navigation items based on role
     const getNavItems = (): NavItem[] => {
         const commonItems: NavItem[] = [
-            { path: `/${role}`, label: 'Dashboard', icon: <Home size={20} /> },
-            { path: `/${role}/announcements`, label: 'Announcements', icon: <Megaphone size={20} /> },
-            { path: `/${role}/chat`, label: 'Chat', icon: <MessageCircle size={20} /> },
+            {
+                path: `/${role}`,
+                label: "Dashboard",
+                icon: <Home size={20} />,
+            },
+            {
+                path: `/${role}/announcements`,
+                label: "Announcements",
+                icon: <Megaphone size={20} />,
+            },
+            {
+                path: `/${role}/chat`,
+                label: "Chat",
+                icon: <MessageCircle size={20} />,
+            },
         ];
 
         switch (role) {
-            case 'admin':
+            case "admin":
                 return [
                     ...commonItems,
-                    { path: '/admin/students', label: 'Students', icon: <Users size={20} /> },
-                    { path: '/admin/teachers', label: 'Teachers', icon: <UserPlus size={20} /> },
-                    { path: '/admin/classes', label: 'Classes', icon: <School size={20} /> },
-                    { path: '/admin/attendance', label: 'Attendance', icon: <Clock size={20} /> },
-                    { path: '/admin/grades', label: 'Grades', icon: <Award size={20} /> },
-                    { path: '/admin/payments', label: 'Payments', icon: <CreditCard size={20} /> },
-                    { path: '/admin/reports', label: 'Reports', icon: <PieChart size={20} /> },
-                    { path: '/admin/settings', label: 'Settings', icon: <Settings size={20} /> },
+                    { path: "/admin/students", label: "Students", icon: <Users size={20} /> },
+                    { path: "/admin/teachers", label: "Teachers", icon: <UserPlus size={20} /> },
+                    { path: "/admin/classes", label: "Classes", icon: <School size={20} /> },
+                    { path: "/admin/attendance", label: "Attendance", icon: <Clock size={20} /> },
+                    { path: "/admin/grades", label: "Grades", icon: <Award size={20} /> },
+                    { path: "/admin/payments", label: "Payments", icon: <CreditCard size={20} /> },
+                    { path: "/admin/reports", label: "Reports", icon: <PieChart size={20} /> },
+                    { path: "/admin/settings", label: "Settings", icon: <Settings size={20} /> },
                 ];
-            case 'registrar':
+
+            case "registrar":
                 return [
                     ...commonItems,
-                    { path: '/registrar/students', label: 'Students', icon: <Users size={20} /> },
-                    { path: '/registrar/teachers', label: 'Teachers', icon: <UserPlus size={20} /> },
-                    { path: '/registrar/classes', label: 'Classes', icon: <School size={20} /> },
-                    { path: '/registrar/parents', label: 'Parents', icon: <UserCog size={20} /> },
-                    { path: '/registrar/password-reset', label: 'Password Reset', icon: <UserCheck size={20} /> },
+                    { path: "/registrar/students", label: "Students", icon: <Users size={20} /> },
+                    { path: "/registrar/teachers", label: "Teachers", icon: <UserPlus size={20} /> },
+                    { path: "/registrar/classes", label: "Classes", icon: <School size={20} /> },
+                    { path: "/registrar/parents", label: "Parents", icon: <UserCog size={20} /> },
+                    { path: "/registrar/password-reset", label: "Password Reset", icon: <UserCheck size={20} /> },
                 ];
-            case 'finance_officer':
+
+            case "finance_officer":
                 return [
                     ...commonItems,
-                    { path: '/finance/fees', label: 'Fee Structures', icon: <DollarSign size={20} /> },
-                    { path: '/finance/payments', label: 'Payments', icon: <CreditCard size={20} /> },
-                    { path: '/finance/reports', label: 'Reports', icon: <BarChart size={20} /> },
+                    { path: "/finance/fees", label: "Fee Structures", icon: <DollarSign size={20} /> },
+                    { path: "/finance/payments", label: "Payments", icon: <CreditCard size={20} /> },
+                    { path: "/finance/reports", label: "Reports", icon: <BarChart size={20} /> },
                 ];
-            case 'teacher':
+
+            case "teacher":
                 return [
                     ...commonItems,
-                    { path: '/teacher/attendance', label: 'Attendance', icon: <ClipboardList size={20} /> },
-                    { path: '/teacher/grades', label: 'Grades', icon: <Award size={20} /> },
-                    // ✅ NEW: Resources & Report Cards
-                    { path: '/teacher/resources', label: 'Resources', icon: <FolderOpen size={20} /> },
-                    { path: '/teacher/report-cards', label: 'Report Cards', icon: <FileCheck size={20} /> },
-                    { path: '/teacher/worksheets', label: 'Worksheets', icon: <BookMarked size={20} /> },
+                    { path: "/teacher/attendance", label: "Attendance", icon: <ClipboardList size={20} /> },
+                    { path: "/teacher/grades", label: "Grades", icon: <Award size={20} /> },
+                    { path: "/teacher/resources", label: "Resources", icon: <FolderOpen size={20} /> },
+                    { path: "/teacher/report-cards", label: "Report Cards", icon: <FileCheck size={20} /> },
+                    { path: "/teacher/worksheets", label: "Worksheets", icon: <BookMarked size={20} /> },
                 ];
-            case 'student':
+
+            case "student":
                 return [
                     ...commonItems,
-                    { path: '/student/attendance', label: 'Attendance', icon: <Calendar size={20} /> },
-                    { path: '/student/grades', label: 'Grades', icon: <Award size={20} /> },
-                    { path: '/student/fees', label: 'Fees', icon: <DollarSign size={20} /> },
-                    // ✅ NEW: Resources & Report Cards
-                    { path: '/student/resources', label: 'Resources', icon: <BookOpen size={20} /> },
-                    { path: '/student/report-cards', label: 'Report Cards', icon: <FileText size={20} /> },
-                    { path: '/student/worksheets', label: 'Worksheets', icon: <BookMarked size={20} /> },
+                    { path: "/student/attendance", label: "Attendance", icon: <Calendar size={20} /> },
+                    { path: "/student/grades", label: "Grades", icon: <Award size={20} /> },
+                    { path: "/student/fees", label: "Fees", icon: <DollarSign size={20} /> },
+                    { path: "/student/resources", label: "Resources", icon: <BookOpen size={20} /> },
+                    { path: "/student/report-cards", label: "Report Cards", icon: <FileText size={20} /> },
+                    { path: "/student/worksheets", label: "Worksheets", icon: <BookMarked size={20} /> },
                 ];
-            case 'parent':
+
+            case "parent":
                 return [
                     ...commonItems,
-                    { path: '/parent/children', label: 'Children', icon: <Users size={20} /> },
-                    { path: '/parent/attendance', label: 'Attendance', icon: <Calendar size={20} /> },
-                    { path: '/parent/grades', label: 'Grades', icon: <Award size={20} /> },
-                    { path: '/parent/payments', label: 'Payments', icon: <DollarSign size={20} /> },
-                    // ✅ NEW: Resources & Report Cards
-                    { path: '/parent/resources', label: 'Resources', icon: <BookOpen size={20} /> },
-                    { path: '/parent/report-cards', label: 'Report Cards', icon: <FileText size={20} /> },
+                    { path: "/parent/children", label: "Children", icon: <Users size={20} /> },
+                    { path: "/parent/attendance", label: "Attendance", icon: <Calendar size={20} /> },
+                    { path: "/parent/grades", label: "Grades", icon: <Award size={20} /> },
+                    { path: "/parent/payments", label: "Payments", icon: <DollarSign size={20} /> },
+                    { path: "/parent/resources", label: "Resources", icon: <BookOpen size={20} /> },
+                    { path: "/parent/report-cards", label: "Report Cards", icon: <FileText size={20} /> },
                 ];
+
             default:
                 return commonItems;
         }
@@ -143,23 +161,22 @@ const Sidebar: React.FC<SidebarProps> = ({ role, isOpen, toggleSidebar }) => {
     const navItems = getNavItems();
 
     const handleLogout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        navigate('/');
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        navigate("/");
     };
 
     return (
-        <aside 
-            className={`bg-gradient-to-b from-blue-900 to-indigo-900 text-white flex flex-col h-screen transition-all duration-300 shadow-2xl ${
-                isOpen ? 'w-64' : 'w-20'
-            }`}
+        <aside
+            className={`bg-linear-to-b from-blue-900 to-indigo-900 text-white flex flex-col h-screen transition-all duration-300 shadow-2xl ${isOpen ? 'w-64' : 'w-20'
+                }`}
         >
             {/* School Logo & Branding */}
             <div className={`flex items-center gap-3 p-4 border-b border-blue-800/30 ${isOpen ? 'justify-start' : 'justify-center'}`}>
-                <div className="flex-shrink-0">
-                    <img 
-                        src={schoolLogo} 
-                        alt={SCHOOL_NAME} 
+                <div className="shrink-0">
+                    <img
+                        src={schoolLogo}
+                        alt={SCHOOL_NAME}
                         className={`${isOpen ? 'w-14 h-14' : 'w-12 h-12'} rounded-xl object-cover bg-white/10 p-1 border border-blue-400/30 shadow-lg`}
                         onError={(e) => {
                             (e.target as HTMLImageElement).style.display = 'none';
@@ -187,7 +204,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role, isOpen, toggleSidebar }) => {
 
             {/* User Profile */}
             <div className={`flex items-center gap-3 p-4 border-b border-blue-800/30 ${isOpen ? 'justify-start' : 'justify-center'}`}>
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-white font-bold text-sm shadow-lg flex-shrink-0">
+                <div className="w-10 h-10 rounded-full bg-linear-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-white font-bold text-sm shadow-lg shrink-0">
                     {displayName.charAt(0).toUpperCase()}
                 </div>
                 {isOpen && (
@@ -202,32 +219,92 @@ const Sidebar: React.FC<SidebarProps> = ({ role, isOpen, toggleSidebar }) => {
             <nav className="flex-1 overflow-y-auto py-4 scrollbar-thin scrollbar-thumb-blue-600/30">
                 <ul className="space-y-1 px-2">
                     {navItems.map((item) => {
-                        const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + '/');
+                        const isActive =
+                            location.pathname === item.path ||
+                            location.pathname.startsWith(item.path + "/");
+
                         return (
-                            <li key={item.path}>
+                            <li key={item.path} className="relative">
                                 <Link
                                     to={item.path}
-                                    className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group relative ${
-                                        isActive
-                                            ? 'bg-white/20 text-white shadow-lg shadow-blue-900/20'
-                                            : 'text-blue-200 hover:bg-white/10 hover:text-white'
-                                    }`}
+                                    onClick={onClose}
+                                    className={`relative flex items-center ${isOpen ? "justify-start" : "justify-center"
+                                        } gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group ${isActive
+                                            ? "bg-white/20 text-white shadow-lg shadow-blue-900/20"
+                                            : "text-blue-200 hover:bg-white/10 hover:text-white"
+                                        }`}
                                 >
-                                    <span className={`flex-shrink-0 ${isActive ? 'text-yellow-400' : 'text-blue-300 group-hover:text-white'}`}>
+                                    {/* Icon */}
+                                    <span
+                                        className={`shrink-0 ${isActive
+                                            ? "text-yellow-400"
+                                            : "text-blue-300 group-hover:text-white"
+                                            }`}
+                                    >
                                         {item.icon}
                                     </span>
+
+                                    {/* Expanded label */}
                                     {isOpen && (
-                                        <span className="text-sm font-medium">{item.label}</span>
+                                        <span className="text-sm font-medium">
+                                            {item.label}
+                                        </span>
                                     )}
-                                    {item.badge && (
-                                        <span className={`ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full ${!isOpen && 'hidden'}`}>
+
+                                    {/* Badge */}
+                                    {item.badge && isOpen && (
+                                        <span className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
                                             {item.badge}
                                         </span>
                                     )}
+
+                                    {/* Tooltip */}
                                     {!isOpen && (
-                                        <span className="absolute left-16 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
-                                            {item.label}
-                                        </span>
+                                        <div
+                                            className="
+                                    fixed
+                                    left-20
+                                    opacity-0 invisible
+                                    group-hover:opacity-100
+                                    group-hover:visible
+                                    transition-all duration-150
+                                    scale-95
+                                    group-hover:scale-100
+                                    pointer-events-none
+                                    z-9999
+                                "
+                                            style={{
+                                                transform: "translateY(-50%)",
+                                            }}
+                                        >
+                                            <div className="relative">
+                                                <div
+                                                    className="
+                                            absolute left-0 top-1/2
+                                            -translate-x-1/2 -translate-y-1/2
+                                            w-2 h-2
+                                            bg-[#252526]
+                                            rotate-45
+                                            border-l border-t border-[#3c3c3c]
+                                        "
+                                                />
+
+                                                <div
+                                                    className="
+                                            bg-[#252526]
+                                            border border-[#3c3c3c]
+                                            text-[#cccccc]
+                                            text-[13px]
+                                            px-3 py-1.5
+                                            rounded
+                                            shadow-[0_4px_14px_rgba(0,0,0,0.45)]
+                                            whitespace-nowrap
+                                        "
+                                                >
+                                                    {item.label}
+                                                </div>
+                                            </div>
+                                        </div>
                                     )}
                                 </Link>
                             </li>
@@ -235,15 +312,13 @@ const Sidebar: React.FC<SidebarProps> = ({ role, isOpen, toggleSidebar }) => {
                     })}
                 </ul>
             </nav>
-
             {/* Footer */}
             <div className="p-4 border-t border-blue-800/30">
                 {/* Toggle Button */}
                 <button
                     onClick={toggleSidebar}
-                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-blue-300 hover:bg-white/10 hover:text-white transition-all duration-200 ${
-                        isOpen ? 'justify-start' : 'justify-center'
-                    }`}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-blue-300 hover:bg-white/10 hover:text-white transition-all duration-200 ${isOpen ? 'justify-start' : 'justify-center'
+                        }`}
                 >
                     {isOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
                     {isOpen && <span className="text-sm">Collapse</span>}
@@ -252,9 +327,8 @@ const Sidebar: React.FC<SidebarProps> = ({ role, isOpen, toggleSidebar }) => {
                 {/* Logout */}
                 <button
                     onClick={handleLogout}
-                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-red-300 hover:bg-red-500/20 hover:text-red-200 transition-all duration-200 mt-2 ${
-                        isOpen ? 'justify-start' : 'justify-center'
-                    }`}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-red-300 hover:bg-red-500/20 hover:text-red-200 transition-all duration-200 mt-2 ${isOpen ? 'justify-start' : 'justify-center'
+                        }`}
                 >
                     <LogOut size={20} />
                     {isOpen && <span className="text-sm">Logout</span>}

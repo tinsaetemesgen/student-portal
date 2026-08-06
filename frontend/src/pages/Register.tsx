@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { 
-    Mail, Lock, AlertCircle, GraduationCap, User, 
-    BookOpen, Sparkles, UserPlus, School 
+import {
+    Mail, Lock, AlertCircle, GraduationCap, User,
+    Sparkles, UserPlus, School
 } from "lucide-react";
 import axios from "axios";
 
@@ -59,15 +59,15 @@ const Register = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-4">
-            <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl max-w-md w-full p-8 border border-white/20">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900 p-4">
+            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-3xl shadow-2xl max-w-md w-full p-8 border border-white/20 dark:border-gray-700">
                 {/* ✅ School Logo & Branding */}
                 <div className="text-center mb-6">
                     <div className="flex items-center justify-center gap-3 mb-3">
                         {SCHOOL_LOGO ? (
-                            <img 
-                                src={SCHOOL_LOGO} 
-                                alt={SCHOOL_NAME} 
+                            <img
+                                src={SCHOOL_LOGO}
+                                alt={SCHOOL_NAME}
                                 className="w-14 h-14 rounded-2xl object-cover shadow-lg"
                             />
                         ) : (
@@ -76,7 +76,7 @@ const Register = () => {
                             </div>
                         )}
                         <div className="text-left">
-                            <h1 className="text-xl font-bold text-gray-800 leading-tight">
+                            <h1 className="text-xl font-bold text-gray-800 dark:text-gray-100 leading-tight">
                                 {SCHOOL_NAME}
                             </h1>
                             <p className="text-xs text-blue-600 font-medium flex items-center gap-1">
@@ -86,11 +86,11 @@ const Register = () => {
                         </div>
                     </div>
                     <div className="h-px w-16 bg-gradient-to-r from-transparent via-blue-300 to-transparent mx-auto my-2"></div>
-                    <p className="text-gray-500 text-sm">Create your account</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-sm">Create your account</p>
                 </div>
 
                 {error && (
-                    <div className="bg-red-50 border border-red-200 rounded-xl p-3 flex items-start gap-2 mb-4">
+                    <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-3 flex items-start gap-2 mb-4">
                         <AlertCircle size={18} className="text-red-500 flex-shrink-0 mt-0.5" />
                         <p className="text-sm text-red-600">{error}</p>
                     </div>
@@ -98,7 +98,7 @@ const Register = () => {
 
                 <form onSubmit={handleSubmit} className="space-y-3">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Full Name</label>
                         <div className="relative">
                             <User size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                             <input
@@ -113,7 +113,7 @@ const Register = () => {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
                         <div className="relative">
                             <Mail size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                             <input
@@ -128,7 +128,7 @@ const Register = () => {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label>
                         <div className="relative">
                             <Lock size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                             <input
@@ -144,7 +144,7 @@ const Register = () => {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Confirm Password</label>
                         <div className="relative">
                             <Lock size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                             <input
@@ -159,7 +159,7 @@ const Register = () => {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Role</label>
                         <select
                             value={formData.role}
                             onChange={(e) => setFormData({ ...formData, role: e.target.value })}
@@ -173,7 +173,7 @@ const Register = () => {
 
                     {formData.role === 'student' && (
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Class</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Class</label>
                             <div className="relative">
                                 <School size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                                 <input
@@ -206,7 +206,7 @@ const Register = () => {
                     </button>
                 </form>
 
-                <p className="text-center text-sm text-gray-500 mt-4">
+                <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-4">
                     Already have an account?{' '}
                     <Link to="/login" className="text-blue-600 hover:underline font-medium">
                         Sign in
@@ -215,7 +215,7 @@ const Register = () => {
 
                 {/* ✅ Footer Branding */}
                 <div className="mt-4 text-center">
-                    <p className="text-xs text-gray-400">
+                    <p className="text-xs text-gray-400 dark:text-gray-500">
                         © {new Date().getFullYear()} {SCHOOL_NAME}. All rights reserved.
                     </p>
                 </div>

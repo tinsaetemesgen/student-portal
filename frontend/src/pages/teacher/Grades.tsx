@@ -337,22 +337,22 @@ const Grades = () => {
     };
 
     const gradeColors: Record<string, string> = {
-        'A+': 'bg-green-100 text-green-700',
-        'A': 'bg-green-100 text-green-700',
-        'A-': 'bg-green-100 text-green-700',
-        'B+': 'bg-blue-100 text-blue-700',
-        'B': 'bg-blue-100 text-blue-700',
-        'B-': 'bg-blue-100 text-blue-700',
-        'C+': 'bg-yellow-100 text-yellow-700',
-        'C': 'bg-yellow-100 text-yellow-700',
-        'C-': 'bg-yellow-100 text-yellow-700',
-        'D': 'bg-orange-100 text-orange-700',
-        'F': 'bg-red-100 text-red-700',
-        'I': 'bg-gray-100 text-gray-500',
+        'A+': 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400',
+        'A': 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400',
+        'A-': 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400',
+        'B+': 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
+        'B': 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
+        'B-': 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
+        'C+': 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400',
+        'C': 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400',
+        'C-': 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400',
+        'D': 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400',
+        'F': 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400',
+        'I': 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400',
     };
 
     const getGradeColor = (grade: string) => {
-        return gradeColors[grade] || 'bg-gray-100 text-gray-700';
+        return gradeColors[grade] || 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300';
     };
 
     const getAssessmentIcon = (key: string) => {
@@ -388,13 +388,13 @@ const Grades = () => {
             .map(key => getAssessmentLabel(key));
 
         return (
-            <div className="mt-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                <h4 className="text-sm font-semibold text-gray-700 mb-3">📊 Assessment Breakdown</h4>
+            <div className="mt-3 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600">
+                <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3">📊 Assessment Breakdown</h4>
                 
                 {!allComplete && (
-                    <div className="mb-3 p-2 bg-yellow-50 border border-yellow-200 rounded-lg text-sm text-yellow-700">
+                    <div className="mb-3 p-2 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg text-sm text-yellow-700 dark:text-yellow-400">
                         ⚠️ <span className="font-medium">Incomplete Grade</span> — Missing: {pendingAssessments.join(', ')}
-                        <span className="block text-xs text-yellow-600 mt-1">This grade will be calculated once all assessments are entered.</span>
+                        <span className="block text-xs text-yellow-600 dark:text-yellow-500 mt-1">This grade will be calculated once all assessments are entered.</span>
                     </div>
                 )}
                 
@@ -405,13 +405,13 @@ const Grades = () => {
                         const percentage = data.maxScore > 0 ? Math.round((data.score / data.maxScore) * 100) : 0;
                         const isPending = data.score === 0;
                         return (
-                            <div key={key} className={`bg-white p-2 rounded border border-gray-100 text-center ${isPending ? 'opacity-50' : ''}`}>
-                                <div className="text-xs text-gray-500">{getAssessmentIcon(key)} {getAssessmentLabel(key)}</div>
-                                <div className="font-bold text-sm">
+                            <div key={key} className={`bg-white dark:bg-gray-800 p-2 rounded border border-gray-100 dark:border-gray-600 text-center ${isPending ? 'opacity-50' : ''}`}>
+                                <div className="text-xs text-gray-500 dark:text-gray-400">{getAssessmentIcon(key)} {getAssessmentLabel(key)}</div>
+                                <div className="font-bold text-sm text-gray-800 dark:text-gray-100">
                                     {isPending ? '—' : `${data.score}/${data.maxScore}`}
                                 </div>
-                                <div className="text-xs text-gray-400">{data.weight}% weight</div>
-                                <div className={`text-xs font-medium ${isPending ? 'text-gray-400' : 'text-blue-600'}`}>
+                                <div className="text-xs text-gray-400 dark:text-gray-500">{data.weight}% weight</div>
+                                <div className={`text-xs font-medium ${isPending ? 'text-gray-400 dark:text-gray-500' : 'text-blue-600 dark:text-blue-400'}`}>
                                     {isPending ? '⏳ Pending' : `${percentage}%`}
                                 </div>
                             </div>
@@ -421,18 +421,18 @@ const Grades = () => {
                 
                 {allComplete ? (
                     <div className="mt-2 flex justify-between text-sm">
-                        <span className="text-gray-600">Total Score: <strong className="text-gray-800">{grade.totalScore || grade.score}%</strong></span>
-                        <span className="text-gray-600">Grade: <strong className={getGradeColor(grade.letterGrade || grade.grade || '')}>{grade.letterGrade || grade.grade}</strong></span>
-                        <span className="text-gray-600">GPA: <strong className="text-gray-800">{grade.gradePoints?.toFixed(1) || 'N/A'}</strong></span>
+                        <span className="text-gray-600 dark:text-gray-300">Total Score: <strong className="text-gray-800 dark:text-gray-100">{grade.totalScore || grade.score}%</strong></span>
+                        <span className="text-gray-600 dark:text-gray-300">Grade: <strong className={getGradeColor(grade.letterGrade || grade.grade || '')}>{grade.letterGrade || grade.grade}</strong></span>
+                        <span className="text-gray-600 dark:text-gray-300">GPA: <strong className="text-gray-800 dark:text-gray-100">{grade.gradePoints?.toFixed(1) || 'N/A'}</strong></span>
                     </div>
                 ) : (
-                    <div className="mt-2 text-sm text-gray-500 italic">
+                        <div className="mt-2 text-sm text-gray-500 dark:text-gray-400 italic">
                         ⏳ Waiting for {pendingAssessments.join(', ')} to calculate final grade.
                     </div>
                 )}
                 
                 {grade.feedback && (
-                    <div className="mt-2 text-sm text-gray-600 border-t pt-2">
+                    <div className="mt-2 text-sm text-gray-600 dark:text-gray-300 border-t border-gray-200 dark:border-gray-600 pt-2">
                         💬 <span className="italic">{grade.feedback}</span>
                     </div>
                 )}
@@ -444,7 +444,7 @@ const Grades = () => {
         return (
             <DashboardLayout role="teacher">
                 <div className="flex items-center justify-center min-h-[60vh]">
-                    <div className="text-xl text-gray-500">Loading grades...</div>
+                    <div className="text-xl text-gray-500 dark:text-gray-400">Loading grades...</div>
                 </div>
             </DashboardLayout>
         );
@@ -453,21 +453,21 @@ const Grades = () => {
     // Add Grade Modal
     const modalContent = (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => setShowModal(false)}>
-            <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-                <div className="flex items-center justify-between p-5 border-b">
-                    <h2 className="text-lg font-semibold">Add Grade</h2>
-                    <button onClick={() => setShowModal(false)} className="p-1 rounded-lg hover:bg-gray-100">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+                <div className="flex items-center justify-between p-5 border-b border-gray-200 dark:border-gray-700">
+                    <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Add Grade</h2>
+                    <button onClick={() => setShowModal(false)} className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
                         <X size={20} className="text-gray-500" />
                     </button>
                 </div>
                 <form onSubmit={handleSubmit} className="p-5 space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Class</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Class</label>
                         <select
                             required
                             value={formData.classId}
                             onChange={(e) => setFormData({ ...formData, classId: e.target.value })}
-                            className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
                         >
                             <option value="">Select Class</option>
                             {classes.map((cls) => (
@@ -477,12 +477,12 @@ const Grades = () => {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Student</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Student</label>
                         <select
                             required
                             value={formData.studentId}
                             onChange={(e) => setFormData({ ...formData, studentId: e.target.value })}
-                            className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
                         >
                             <option value="">Select Student</option>
                             {students.map((student) => (
@@ -493,22 +493,22 @@ const Grades = () => {
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Subject</label>
                             <input
                                 type="text"
                                 required
                                 value={formData.subject}
                                 onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                                className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
                                 placeholder="e.g., Mathematics"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Grade Type</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Grade Type</label>
                             <select
                                 value={formData.type}
                                 onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                                className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
                             >
                                 <option value="Exam">Exam</option>
                                 <option value="Quiz">Quiz</option>
@@ -522,40 +522,40 @@ const Grades = () => {
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Semester</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Semester</label>
                             <select
                                 value={formData.semester}
                                 onChange={(e) => setFormData({ ...formData, semester: e.target.value })}
-                                className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
                             >
                                 <option value="Semester 1">Semester 1</option>
                                 <option value="Semester 2">Semester 2</option>
                             </select>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Academic Year</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Academic Year</label>
                             <input
                                 type="text"
                                 required
                                 value={formData.academicYear}
                                 onChange={(e) => setFormData({ ...formData, academicYear: e.target.value })}
-                                className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
                                 placeholder="e.g., 2024/25"
                             />
                         </div>
                     </div>
 
-                    <div className="border-t pt-4">
+                    <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
                         <div className="flex items-center justify-between mb-3">
-                            <h4 className="text-sm font-semibold text-gray-700">📊 Assessment Scores</h4>
+                            <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-200">📊 Assessment Scores</h4>
                             <span className={`text-xs px-2 py-1 rounded-full ${
                                 formData.assessments.quiz.score > 0 &&
                                 formData.assessments.homework.score > 0 &&
                                 formData.assessments.classTest.score > 0 &&
                                 formData.assessments.finalTest.score > 0 &&
                                 formData.assessments.groupWork.score > 0
-                                    ? 'bg-green-100 text-green-700'
-                                    : 'bg-yellow-100 text-yellow-700'
+                                ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
+                                : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400'
                             }`}>
                                 {formData.assessments.quiz.score > 0 &&
                                  formData.assessments.homework.score > 0 &&
@@ -568,8 +568,8 @@ const Grades = () => {
                         </div>
                         
                         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-                            <div className={`p-2 rounded-lg border ${formData.assessments.quiz.score > 0 ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-gray-50'}`}>
-                                <label className="block text-xs font-medium text-gray-600 mb-1">Quiz (15%)</label>
+                            <div className={`p-2 rounded-lg border ${formData.assessments.quiz.score > 0 ? 'border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20' : 'border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700'}`}>
+                                <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Quiz (15%)</label>
                                 <input
                                     type="number"
                                     min="0"
@@ -582,14 +582,14 @@ const Grades = () => {
                                             quiz: { ...formData.assessments.quiz, score: parseInt(e.target.value) || 0 }
                                         }
                                     })}
-                                    className={`w-full border rounded-lg px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-blue-500 ${formData.assessments.quiz.score > 0 ? 'border-green-500' : ''}`}
+                                    className={`w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-blue-500 ${formData.assessments.quiz.score > 0 ? 'border-green-500 dark:border-green-600' : ''}`}
                                     placeholder="/20"
                                 />
-                                <span className="text-xs text-gray-400">/20</span>
+                                <span className="text-xs text-gray-400 dark:text-gray-500">/20</span>
                             </div>
                             
-                            <div className={`p-2 rounded-lg border ${formData.assessments.homework.score > 0 ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-gray-50'}`}>
-                                <label className="block text-xs font-medium text-gray-600 mb-1">Homework (10%)</label>
+                            <div className={`p-2 rounded-lg border ${formData.assessments.homework.score > 0 ? 'border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20' : 'border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700'}`}>
+                                <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Homework (10%)</label>
                                 <input
                                     type="number"
                                     min="0"
@@ -602,14 +602,14 @@ const Grades = () => {
                                             homework: { ...formData.assessments.homework, score: parseInt(e.target.value) || 0 }
                                         }
                                     })}
-                                    className={`w-full border rounded-lg px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-blue-500 ${formData.assessments.homework.score > 0 ? 'border-green-500' : ''}`}
+                                    className={`w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-blue-500 ${formData.assessments.homework.score > 0 ? 'border-green-500 dark:border-green-600' : ''}`}
                                     placeholder="/15"
                                 />
-                                <span className="text-xs text-gray-400">/15</span>
+                                <span className="text-xs text-gray-400 dark:text-gray-500">/15</span>
                             </div>
                             
-                            <div className={`p-2 rounded-lg border ${formData.assessments.classTest.score > 0 ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-gray-50'}`}>
-                                <label className="block text-xs font-medium text-gray-600 mb-1">Class Test (20%)</label>
+                            <div className={`p-2 rounded-lg border ${formData.assessments.classTest.score > 0 ? 'border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20' : 'border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700'}`}>
+                                <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Class Test (20%)</label>
                                 <input
                                     type="number"
                                     min="0"
@@ -622,14 +622,14 @@ const Grades = () => {
                                             classTest: { ...formData.assessments.classTest, score: parseInt(e.target.value) || 0 }
                                         }
                                     })}
-                                    className={`w-full border rounded-lg px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-blue-500 ${formData.assessments.classTest.score > 0 ? 'border-green-500' : ''}`}
+                                    className={`w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-blue-500 ${formData.assessments.classTest.score > 0 ? 'border-green-500 dark:border-green-600' : ''}`}
                                     placeholder="/20"
                                 />
-                                <span className="text-xs text-gray-400">/20</span>
+                                <span className="text-xs text-gray-400 dark:text-gray-500">/20</span>
                             </div>
                             
-                            <div className={`p-2 rounded-lg border ${formData.assessments.finalTest.score > 0 ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-gray-50'}`}>
-                                <label className="block text-xs font-medium text-gray-600 mb-1">Final Test (35%)</label>
+                            <div className={`p-2 rounded-lg border ${formData.assessments.finalTest.score > 0 ? 'border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20' : 'border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700'}`}>
+                                <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Final Test (35%)</label>
                                 <input
                                     type="number"
                                     min="0"
@@ -642,14 +642,14 @@ const Grades = () => {
                                             finalTest: { ...formData.assessments.finalTest, score: parseInt(e.target.value) || 0 }
                                         }
                                     })}
-                                    className={`w-full border rounded-lg px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-blue-500 ${formData.assessments.finalTest.score > 0 ? 'border-green-500' : ''}`}
+                                    className={`w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-blue-500 ${formData.assessments.finalTest.score > 0 ? 'border-green-500 dark:border-green-600' : ''}`}
                                     placeholder="/50"
                                 />
-                                <span className="text-xs text-gray-400">/50</span>
+                                <span className="text-xs text-gray-400 dark:text-gray-500">/50</span>
                             </div>
                             
-                            <div className={`p-2 rounded-lg border ${formData.assessments.groupWork.score > 0 ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-gray-50'}`}>
-                                <label className="block text-xs font-medium text-gray-600 mb-1">Group Work (20%)</label>
+                            <div className={`p-2 rounded-lg border ${formData.assessments.groupWork.score > 0 ? 'border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20' : 'border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700'}`}>
+                                <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Group Work (20%)</label>
                                 <input
                                     type="number"
                                     min="0"
@@ -662,24 +662,24 @@ const Grades = () => {
                                             groupWork: { ...formData.assessments.groupWork, score: parseInt(e.target.value) || 0 }
                                         }
                                     })}
-                                    className={`w-full border rounded-lg px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-blue-500 ${formData.assessments.groupWork.score > 0 ? 'border-green-500' : ''}`}
+                                    className={`w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-blue-500 ${formData.assessments.groupWork.score > 0 ? 'border-green-500 dark:border-green-600' : ''}`}
                                     placeholder="/20"
                                 />
-                                <span className="text-xs text-gray-400">/20</span>
+                                <span className="text-xs text-gray-400 dark:text-gray-500">/20</span>
                             </div>
                         </div>
                         
-                        <div className="mt-3 p-2 rounded-lg bg-gray-50 border border-gray-200 text-sm">
+                        <div className="mt-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-sm">
                             {formData.assessments.quiz.score > 0 &&
                              formData.assessments.homework.score > 0 &&
                              formData.assessments.classTest.score > 0 &&
                              formData.assessments.finalTest.score > 0 &&
                              formData.assessments.groupWork.score > 0 ? (
-                                <div className="text-green-700">✅ All assessments complete. Grade will be calculated.</div>
+                                    <div className="text-green-700 dark:text-green-400">✅ All assessments complete. Grade will be calculated.</div>
                             ) : (
-                                <div className="text-yellow-700">
+                                    <div className="text-yellow-700 dark:text-yellow-400">
                                     ⏳ <span className="font-medium">Incomplete Grade</span> — Fill all assessment fields to calculate final grade.
-                                    <span className="block text-xs text-gray-500 mt-1">Missing: {
+                                        <span className="block text-xs text-gray-500 dark:text-gray-400 mt-1">Missing: {
                                         [
                                             !formData.assessments.quiz.score && 'Quiz',
                                             !formData.assessments.homework.score && 'Homework',
@@ -694,12 +694,12 @@ const Grades = () => {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Feedback (optional)</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Feedback (optional)</label>
                         <input
                             type="text"
                             value={formData.feedback}
                             onChange={(e) => setFormData({ ...formData, feedback: e.target.value })}
-                            className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
                             placeholder="e.g., Good work!"
                         />
                     </div>
@@ -708,7 +708,7 @@ const Grades = () => {
                         <button
                             type="button"
                             onClick={() => setShowModal(false)}
-                            className="px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-50"
+                            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
                         >
                             Cancel
                         </button>
@@ -727,42 +727,42 @@ const Grades = () => {
     // Edit Grade Modal
     const editModalContent = showEditModal && editingGrade && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => setShowEditModal(false)}>
-            <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-                <div className="flex items-center justify-between p-5 border-b">
-                    <h2 className="text-lg font-semibold">Edit Grade</h2>
-                    <button onClick={() => setShowEditModal(false)} className="p-1 rounded-lg hover:bg-gray-100">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+                <div className="flex items-center justify-between p-5 border-b border-gray-200 dark:border-gray-700">
+                    <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Edit Grade</h2>
+                    <button onClick={() => setShowEditModal(false)} className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
                         <X size={20} className="text-gray-500" />
                     </button>
                 </div>
                 <form onSubmit={handleEditSubmit} className="p-5 space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Student</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Student</label>
                         <input
                             type="text"
                             disabled
                             value={editingGrade.studentId?.name || 'Unknown'}
-                            className="w-full border rounded-lg px-4 py-2 bg-gray-100 text-gray-700"
+                            className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200"
                         />
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Subject</label>
                             <input
                                 type="text"
                                 required
                                 value={formData.subject}
                                 onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                                className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
                                 placeholder="e.g., Mathematics"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Grade Type</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Grade Type</label>
                             <select
                                 value={formData.type}
                                 onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                                className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
                             >
                                 <option value="Exam">Exam</option>
                                 <option value="Quiz">Quiz</option>
@@ -776,40 +776,40 @@ const Grades = () => {
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Semester</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Semester</label>
                             <select
                                 value={formData.semester}
                                 onChange={(e) => setFormData({ ...formData, semester: e.target.value })}
-                                className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
                             >
                                 <option value="Semester 1">Semester 1</option>
                                 <option value="Semester 2">Semester 2</option>
                             </select>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Academic Year</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Academic Year</label>
                             <input
                                 type="text"
                                 required
                                 value={formData.academicYear}
                                 onChange={(e) => setFormData({ ...formData, academicYear: e.target.value })}
-                                className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
                                 placeholder="e.g., 2024/25"
                             />
                         </div>
                     </div>
 
-                    <div className="border-t pt-4">
+                    <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
                         <div className="flex items-center justify-between mb-3">
-                            <h4 className="text-sm font-semibold text-gray-700">📊 Assessment Scores</h4>
+                            <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-200">📊 Assessment Scores</h4>
                             <span className={`text-xs px-2 py-1 rounded-full ${
                                 formData.assessments.quiz.score > 0 &&
                                 formData.assessments.homework.score > 0 &&
                                 formData.assessments.classTest.score > 0 &&
                                 formData.assessments.finalTest.score > 0 &&
                                 formData.assessments.groupWork.score > 0
-                                    ? 'bg-green-100 text-green-700'
-                                    : 'bg-yellow-100 text-yellow-700'
+                                ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
+                                : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400'
                             }`}>
                                 {formData.assessments.quiz.score > 0 &&
                                  formData.assessments.homework.score > 0 &&
@@ -822,8 +822,8 @@ const Grades = () => {
                         </div>
                         
                         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-                            <div className={`p-2 rounded-lg border ${formData.assessments.quiz.score > 0 ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-gray-50'}`}>
-                                <label className="block text-xs font-medium text-gray-600 mb-1">Quiz (15%)</label>
+                            <div className={`p-2 rounded-lg border ${formData.assessments.quiz.score > 0 ? 'border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20' : 'border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700'}`}>
+                                <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Quiz (15%)</label>
                                 <input
                                     type="number"
                                     min="0"
@@ -836,14 +836,14 @@ const Grades = () => {
                                             quiz: { ...formData.assessments.quiz, score: parseInt(e.target.value) || 0 }
                                         }
                                     })}
-                                    className={`w-full border rounded-lg px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-blue-500 ${formData.assessments.quiz.score > 0 ? 'border-green-500' : ''}`}
+                                    className={`w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-blue-500 ${formData.assessments.quiz.score > 0 ? 'border-green-500 dark:border-green-600' : ''}`}
                                     placeholder="/20"
                                 />
-                                <span className="text-xs text-gray-400">/20</span>
+                                <span className="text-xs text-gray-400 dark:text-gray-500">/20</span>
                             </div>
                             
-                            <div className={`p-2 rounded-lg border ${formData.assessments.homework.score > 0 ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-gray-50'}`}>
-                                <label className="block text-xs font-medium text-gray-600 mb-1">Homework (10%)</label>
+                            <div className={`p-2 rounded-lg border ${formData.assessments.homework.score > 0 ? 'border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20' : 'border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700'}`}>
+                                <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Homework (10%)</label>
                                 <input
                                     type="number"
                                     min="0"
@@ -856,14 +856,14 @@ const Grades = () => {
                                             homework: { ...formData.assessments.homework, score: parseInt(e.target.value) || 0 }
                                         }
                                     })}
-                                    className={`w-full border rounded-lg px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-blue-500 ${formData.assessments.homework.score > 0 ? 'border-green-500' : ''}`}
+                                    className={`w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-blue-500 ${formData.assessments.homework.score > 0 ? 'border-green-500 dark:border-green-600' : ''}`}
                                     placeholder="/15"
                                 />
-                                <span className="text-xs text-gray-400">/15</span>
+                                <span className="text-xs text-gray-400 dark:text-gray-500">/15</span>
                             </div>
                             
-                            <div className={`p-2 rounded-lg border ${formData.assessments.classTest.score > 0 ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-gray-50'}`}>
-                                <label className="block text-xs font-medium text-gray-600 mb-1">Class Test (20%)</label>
+                            <div className={`p-2 rounded-lg border ${formData.assessments.classTest.score > 0 ? 'border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20' : 'border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700'}`}>
+                                <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Class Test (20%)</label>
                                 <input
                                     type="number"
                                     min="0"
@@ -876,14 +876,14 @@ const Grades = () => {
                                             classTest: { ...formData.assessments.classTest, score: parseInt(e.target.value) || 0 }
                                         }
                                     })}
-                                    className={`w-full border rounded-lg px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-blue-500 ${formData.assessments.classTest.score > 0 ? 'border-green-500' : ''}`}
+                                    className={`w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-blue-500 ${formData.assessments.classTest.score > 0 ? 'border-green-500 dark:border-green-600' : ''}`}
                                     placeholder="/20"
                                 />
-                                <span className="text-xs text-gray-400">/20</span>
+                                <span className="text-xs text-gray-400 dark:text-gray-500">/20</span>
                             </div>
                             
-                            <div className={`p-2 rounded-lg border ${formData.assessments.finalTest.score > 0 ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-gray-50'}`}>
-                                <label className="block text-xs font-medium text-gray-600 mb-1">Final Test (35%)</label>
+                            <div className={`p-2 rounded-lg border ${formData.assessments.finalTest.score > 0 ? 'border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20' : 'border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700'}`}>
+                                <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Final Test (35%)</label>
                                 <input
                                     type="number"
                                     min="0"
@@ -896,14 +896,14 @@ const Grades = () => {
                                             finalTest: { ...formData.assessments.finalTest, score: parseInt(e.target.value) || 0 }
                                         }
                                     })}
-                                    className={`w-full border rounded-lg px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-blue-500 ${formData.assessments.finalTest.score > 0 ? 'border-green-500' : ''}`}
+                                    className={`w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-blue-500 ${formData.assessments.finalTest.score > 0 ? 'border-green-500 dark:border-green-600' : ''}`}
                                     placeholder="/50"
                                 />
-                                <span className="text-xs text-gray-400">/50</span>
+                                <span className="text-xs text-gray-400 dark:text-gray-500">/50</span>
                             </div>
                             
-                            <div className={`p-2 rounded-lg border ${formData.assessments.groupWork.score > 0 ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-gray-50'}`}>
-                                <label className="block text-xs font-medium text-gray-600 mb-1">Group Work (20%)</label>
+                            <div className={`p-2 rounded-lg border ${formData.assessments.groupWork.score > 0 ? 'border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20' : 'border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700'}`}>
+                                <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Group Work (20%)</label>
                                 <input
                                     type="number"
                                     min="0"
@@ -916,24 +916,24 @@ const Grades = () => {
                                             groupWork: { ...formData.assessments.groupWork, score: parseInt(e.target.value) || 0 }
                                         }
                                     })}
-                                    className={`w-full border rounded-lg px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-blue-500 ${formData.assessments.groupWork.score > 0 ? 'border-green-500' : ''}`}
+                                    className={`w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-blue-500 ${formData.assessments.groupWork.score > 0 ? 'border-green-500 dark:border-green-600' : ''}`}
                                     placeholder="/20"
                                 />
-                                <span className="text-xs text-gray-400">/20</span>
+                                <span className="text-xs text-gray-400 dark:text-gray-500">/20</span>
                             </div>
                         </div>
                         
-                        <div className="mt-3 p-2 rounded-lg bg-gray-50 border border-gray-200 text-sm">
+                        <div className="mt-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-sm">
                             {formData.assessments.quiz.score > 0 &&
                              formData.assessments.homework.score > 0 &&
                              formData.assessments.classTest.score > 0 &&
                              formData.assessments.finalTest.score > 0 &&
                              formData.assessments.groupWork.score > 0 ? (
-                                <div className="text-green-700">✅ All assessments complete. Grade will be calculated.</div>
+                                    <div className="text-green-700 dark:text-green-400">✅ All assessments complete. Grade will be calculated.</div>
                             ) : (
-                                <div className="text-yellow-700">
+                                    <div className="text-yellow-700 dark:text-yellow-400">
                                     ⏳ <span className="font-medium">Incomplete Grade</span> — Fill all assessment fields to calculate final grade.
-                                    <span className="block text-xs text-gray-500 mt-1">Missing: {
+                                        <span className="block text-xs text-gray-500 dark:text-gray-400 mt-1">Missing: {
                                         [
                                             !formData.assessments.quiz.score && 'Quiz',
                                             !formData.assessments.homework.score && 'Homework',
@@ -948,12 +948,12 @@ const Grades = () => {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Feedback (optional)</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Feedback (optional)</label>
                         <input
                             type="text"
                             value={formData.feedback}
                             onChange={(e) => setFormData({ ...formData, feedback: e.target.value })}
-                            className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
                             placeholder="e.g., Good work!"
                         />
                     </div>
@@ -962,7 +962,7 @@ const Grades = () => {
                         <button
                             type="button"
                             onClick={() => setShowEditModal(false)}
-                            className="px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-50"
+                            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
                         >
                             Cancel
                         </button>
@@ -983,8 +983,8 @@ const Grades = () => {
             <div className="space-y-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-800">Grade Management</h1>
-                        <p className="text-gray-500">Record and manage student grades with weighted assessments</p>
+                        <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Grade Management</h1>
+                        <p className="text-gray-500 dark:text-gray-400">Record and manage student grades with weighted assessments</p>
                     </div>
                     <button
                         onClick={() => setShowModal(true)}
@@ -994,67 +994,67 @@ const Grades = () => {
                     </button>
                 </div>
 
-                <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full border-collapse">
-                            <thead className="bg-gray-50">
+                            <thead className="bg-gray-50 dark:bg-gray-700">
                                 <tr>
-                                    <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600">Student</th>
-                                    <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600">Subject</th>
-                                    <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600">Score</th>
-                                    <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600">Grade</th>
-                                    <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600">Type</th>
-                                    <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600">Status</th>
-                                    <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600">Date</th>
-                                    <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600">Actions</th>
+                                    <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Student</th>
+                                    <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Subject</th>
+                                    <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Score</th>
+                                    <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Grade</th>
+                                    <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Type</th>
+                                    <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Status</th>
+                                    <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Date</th>
+                                    <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-100">
+                            <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                                 {gradeRecords.length === 0 ? (
                                     <tr>
-                                        <td colSpan={8} className="px-6 py-8 text-center text-gray-500">
+                                        <td colSpan={8} className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
                                             No grades recorded yet.
                                         </td>
                                     </tr>
                                 ) : (
                                     gradeRecords.map((record) => (
                                         <>
-                                            <tr key={record._id} className="hover:bg-gray-50">
-                                                <td className="px-6 py-4 font-medium">{record.studentId?.name || 'Unknown'}</td>
-                                                <td className="px-6 py-4">{record.subject}</td>
-                                                <td className="px-6 py-4 font-bold">{record.totalScore || record.score}%</td>
+                                            <tr key={record._id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                                                <td className="px-6 py-4 font-medium text-gray-800 dark:text-gray-200">{record.studentId?.name || 'Unknown'}</td>
+                                                <td className="px-6 py-4 text-gray-700 dark:text-gray-300">{record.subject}</td>
+                                                <td className="px-6 py-4 font-bold text-gray-800 dark:text-gray-100">{record.totalScore || record.score}%</td>
                                                 <td className="px-6 py-4">
                                                     <span className={`px-3 py-1 rounded-full text-xs font-medium ${getGradeColor(record.letterGrade || record.grade || '')}`}>
                                                         {record.letterGrade || record.grade}
                                                     </span>
                                                 </td>
-                                                <td className="px-6 py-4">{record.type}</td>
+                                                <td className="px-6 py-4 text-gray-700 dark:text-gray-300">{record.type}</td>
                                                 <td className="px-6 py-4">
                                                     {record.isComplete ? (
-                                                        <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
+                                                        <span className="px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full text-xs font-medium">
                                                             ✅ Complete
                                                         </span>
                                                     ) : (
-                                                        <span className="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-medium">
+                                                            <span className="px-2 py-1 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 rounded-full text-xs font-medium">
                                                             ⏳ Pending
                                                         </span>
                                                     )}
                                                 </td>
-                                                <td className="px-6 py-4 text-gray-600">
+                                                <td className="px-6 py-4 text-gray-600 dark:text-gray-400">
                                                     {new Date(record.date).toLocaleDateString()}
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     <div className="flex gap-2">
                                                         <button
                                                             onClick={() => openEditModal(record)}
-                                                            className="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg text-xs hover:bg-blue-200 flex items-center gap-1"
+                                                            className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-lg text-xs hover:bg-blue-200 dark:hover:bg-blue-900/50 flex items-center gap-1"
                                                         >
                                                             <Edit2 size={14} /> Edit
                                                         </button>
                                                         {record.assessments && (
                                                             <button
                                                                 onClick={() => toggleExpand(record._id)}
-                                                                className="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center gap-1"
+                                                                className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-medium flex items-center gap-1"
                                                             >
                                                                 <BarChart3 size={16} />
                                                                 {expandedGrade === record._id ? 'Hide' : 'View'}
@@ -1065,7 +1065,7 @@ const Grades = () => {
                                             </tr>
                                             {expandedGrade === record._id && (
                                                 <tr>
-                                                    <td colSpan={8} className="px-6 py-4 bg-gray-50">
+                                                    <td colSpan={8} className="px-6 py-4 bg-gray-50 dark:bg-gray-700/50">
                                                         {renderAssessmentBreakdown(record)}
                                                     </td>
                                                 </tr>
