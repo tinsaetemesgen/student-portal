@@ -1,9 +1,10 @@
 // src/pages/parent/ParentAnnouncements.tsx - ENHANCED UI
 
 import { useState, useEffect } from "react";
-import { Megaphone, Calendar, Clock, AlertCircle, Users, GraduationCap, Bell, Sparkles } from "lucide-react";
+import { Megaphone, Calendar, Clock, AlertCircle, Users, GraduationCap, Bell } from "lucide-react";
 import DashboardLayout from "../../layout/DashboardLayout";
 import axios from "axios";
+import { getApiErrorMessage } from "../../services/error";
 
 interface Announcement {
     _id: string;
@@ -64,37 +65,37 @@ const ParentAnnouncements = () => {
     const [error, setError] = useState("");
 
     useEffect(() => {
+        async function fetchData() {
+            try {
+                const token = localStorage.getItem('token');
+                
+                const annRes = await axios.get('http://localhost:7000/api/announcements', {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                setAnnouncements(annRes.data.data || []);
+
+                const userStr = localStorage.getItem('user');
+                const user = userStr ? JSON.parse(userStr) : null;
+                const userId = user?._id;
+
+                if (userId) {
+                    const childRes = await axios.get(
+                        `http://localhost:7000/api/parents/${userId}/children`,
+                        { headers: { Authorization: `Bearer ${token}` } }
+                    );
+                    setChildren(childRes.data.data || []);
+                }
+
+                setLoading(false);
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                setError(getApiErrorMessage(error, "Failed to load announcements"));
+                setLoading(false);
+            }
+        }
+
         fetchData();
     }, []);
-
-    const fetchData = async () => {
-        try {
-            const token = localStorage.getItem('token');
-            
-            const annRes = await axios.get('http://localhost:7000/api/announcements', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            setAnnouncements(annRes.data.data || []);
-
-            const userStr = localStorage.getItem('user');
-            const user = userStr ? JSON.parse(userStr) : null;
-            const userId = user?._id;
-
-            if (userId) {
-                const childRes = await axios.get(
-                    `http://localhost:7000/api/parents/${userId}/children`,
-                    { headers: { Authorization: `Bearer ${token}` } }
-                );
-                setChildren(childRes.data.data || []);
-            }
-
-            setLoading(false);
-        } catch (error: any) {
-            console.error("Error fetching data:", error);
-            setError(error.response?.data?.error || "Failed to load announcements");
-            setLoading(false);
-        }
-    };
 
     const isRelevantToChildren = (announcement: Announcement) => {
         if (announcement.audience === 'parents' || announcement.audience === 'all') return true;

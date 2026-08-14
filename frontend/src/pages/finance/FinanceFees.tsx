@@ -3,8 +3,6 @@
 import { useState, useEffect } from "react";
 import { 
     Plus, 
-    Edit2, 
-    Trash2, 
     DollarSign, 
     Calendar, 
     AlertCircle, 
@@ -15,6 +13,7 @@ import {
 } from "lucide-react";
 import DashboardLayout from "../../layout/DashboardLayout";
 import axios from "axios";
+import { getApiErrorMessage } from "../../services/error";
 
 interface FeeStructure {
     _id: string;
@@ -36,7 +35,7 @@ interface FeeStructure {
 const FinanceFees = () => {
     const [fees, setFees] = useState<FeeStructure[]>([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
+    const [, setError] = useState("");
     const [showModal, setShowModal] = useState(false);
     const [success, setSuccess] = useState(false);
     const [successMessage, setSuccessMessage] = useState("");
@@ -61,7 +60,7 @@ const FinanceFees = () => {
     }, []);
 
     // ✅ UPDATED: Use /api/finance/fee-structures
-    const fetchFees = async () => {
+    async function fetchFees() {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.get('http://localhost:7000/api/finance/fee-structures', {
@@ -69,12 +68,12 @@ const FinanceFees = () => {
             });
             setFees(response.data.data || []);
             setLoading(false);
-        } catch (error: any) {
+        } catch (error) {
             console.error("Error fetching fees:", error);
-            setError(error.response?.data?.error || "Failed to load fees");
+            setError(getApiErrorMessage(error, "Failed to load fees"));
             setLoading(false);
         }
-    };
+    }
 
  // In FinanceFees.tsx - Update handleSubmit
 
@@ -138,58 +137,23 @@ const handleSubmit = async (e: React.FormEvent) => {
             setAssignedCount(0);
         }, 5000);
         
-    } catch (error: any) {
+    } catch (error) {
         console.error('❌ Error:', error);
-        if (error.response) {
-            const errorMsg = error.response.data?.error || error.response.data?.message || JSON.stringify(error.response.data);
+        const errObj = error as {
+            response?: { data?: { error?: string; message?: string } };
+            request?: unknown;
+            message?: string;
+        };
+        if (errObj.response) {
+            const errorMsg = errObj.response.data?.error || errObj.response.data?.message || JSON.stringify(errObj.response.data);
             alert(`❌ Server Error: ${errorMsg}`);
-        } else if (error.request) {
+        } else if (errObj.request) {
             alert('❌ No response from server. Please check if server is running.');
         } else {
-            alert(`❌ Error: ${error.message}`);
+            alert(`❌ Error: ${errObj.message}`);
         }
     }
 };
-
-    // ✅ NEW: Manual assignment function using existing assign-fees endpoint
-    const assignFeeToStudents = async (feeStructureId: string, classLevel: string) => {
-        try {
-            const token = localStorage.getItem('token');
-            
-            // First, get all students in this class level
-            const studentsRes = await axios.get('http://localhost:7000/api/registrar/students', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            
-            const allStudents = studentsRes.data.data || [];
-            const filteredStudents = allStudents.filter(
-                (student: any) => student.classLevel === classLevel
-            );
-            
-            if (filteredStudents.length === 0) {
-                console.log(`⚠️ No students found in ${classLevel} level`);
-                return 0;
-            }
-            
-            const studentIds = filteredStudents.map((s: any) => s._id);
-            
-            // Assign fee to students
-            const assignRes = await axios.post('http://localhost:7000/api/finance/assign-fees', {
-                feeStructureId,
-                studentIds,
-            }, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            
-            const assigned = assignRes.data.data?.successful?.length || 0;
-            console.log(`✅ Assigned to ${assigned} students in ${classLevel}`);
-            return assigned;
-            
-        } catch (error) {
-            console.error('❌ Error assigning fees:', error);
-            return 0;
-        }
-    };
 
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('en-ET', { style: 'currency', currency: 'ETB' }).format(amount);
@@ -242,8 +206,8 @@ const handleSubmit = async (e: React.FormEvent) => {
             });
             fetchFees();
             alert('✅ Fee structure deleted successfully!');
-        } catch (error: any) {
-            alert(error.response?.data?.error || "Failed to delete fee");
+        } catch (error) {
+            alert(getApiErrorMessage(error, "Failed to delete fee"));
         }
     };
 
@@ -256,8 +220,8 @@ const handleSubmit = async (e: React.FormEvent) => {
             });
             fetchFees();
             alert(`✅ Fee ${currentStatus ? 'deactivated' : 'activated'} successfully!`);
-        } catch (error: any) {
-            alert(error.response?.data?.error || "Failed to toggle fee status");
+        } catch (error) {
+            alert(getApiErrorMessage(error, "Failed to toggle fee status"));
         }
     };
 

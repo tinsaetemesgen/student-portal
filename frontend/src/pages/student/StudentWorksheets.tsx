@@ -9,13 +9,12 @@ import {
     AlertCircle, 
     Search,
     Eye,
-    Calendar,
-    Award,
     ChevronRight,
     BookOpen
 } from "lucide-react";
 import DashboardLayout from "../../layout/DashboardLayout";
 import axios from "axios";
+import { getApiErrorMessage } from "../../services/error";
 
 interface Worksheet {
     _id: string;
@@ -43,10 +42,13 @@ const StudentWorksheets = () => {
     const [searchTerm, setSearchTerm] = useState("");
 
     useEffect(() => {
-        fetchWorksheets();
+        async function load() {
+            await fetchWorksheets();
+        }
+        load();
     }, []);
 
-    const fetchWorksheets = async () => {
+    async function fetchWorksheets() {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.get('http://localhost:7000/api/worksheets/my-worksheets', {
@@ -58,12 +60,12 @@ const StudentWorksheets = () => {
                 console.log('📊 Worksheets:', response.data.data);
             }
             setLoading(false);
-        } catch (error: any) {
+        } catch (error) {
             console.error("Error fetching worksheets:", error);
-            setError(error.response?.data?.error || "Failed to load worksheets");
+            setError(getApiErrorMessage(error, "Failed to load worksheets"));
             setLoading(false);
         }
-    };
+    }
 
     // ✅ SIMPLE: Check if worksheet was submitted
     const isSubmitted = (w: Worksheet) => {
@@ -180,7 +182,7 @@ const StudentWorksheets = () => {
                         {['all', 'pending', 'submitted'].map((f) => (
                             <button
                                 key={f}
-                                onClick={() => setFilter(f as any)}
+                                onClick={() => setFilter(f as 'all' | 'pending' | 'submitted')}
                                 className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
                                     filter === f ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                 }`}

@@ -7,6 +7,7 @@ import {
     Sparkles, UserPlus, School
 } from "lucide-react";
 import axios from "axios";
+import { getApiErrorMessage } from "../services/error";
 
 // ✅ School Logo
 const SCHOOL_LOGO = '/src/assets/logo.png';
@@ -51,8 +52,8 @@ const Register = () => {
             if (response.data.success) {
                 navigate('/login');
             }
-        } catch (err: any) {
-            setError(err.response?.data?.error || "Registration failed");
+        } catch (error) {
+            setError(getApiErrorMessage(error, "Registration failed"));
         } finally {
             setLoading(false);
         }

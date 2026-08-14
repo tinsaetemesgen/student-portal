@@ -3,11 +3,12 @@
 import { useState, useEffect } from "react";
 import { 
     Upload, FileText, Download, Trash2, Search, 
-    X, Check, RefreshCw, School, Users, 
-    Eye, Edit2, Plus, Filter, Loader2
+    X, Check, RefreshCw, 
+    Eye, Plus
 } from "lucide-react";
 import DashboardLayout from "../../layout/DashboardLayout";
 import axios from "axios";
+import { getApiErrorMessage } from "../../services/error";
 
 interface ReportCard {
     _id: string;
@@ -90,10 +91,13 @@ const TeacherReportCards = () => {
     const [uploading, setUploading] = useState(false);
 
     useEffect(() => {
-        fetchAllData();
+        async function load() {
+            await fetchAllData();
+        }
+        load();
     }, []);
 
-    const fetchAllData = async () => {
+    async function fetchAllData() {
         setLoading(true);
         await Promise.all([
             fetchReportCards(),
@@ -101,9 +105,9 @@ const TeacherReportCards = () => {
             fetchClasses()
         ]);
         setLoading(false);
-    };
+    }
 
-    const fetchReportCards = async () => {
+    async function fetchReportCards() {
         try {
             const token = localStorage.getItem('token');
             let url = 'http://localhost:7000/api/report-cards';
@@ -116,12 +120,12 @@ const TeacherReportCards = () => {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setReportCards(response.data.data || []);
-        } catch (error: any) {
+        } catch (error) {
             console.error("Error fetching report cards:", error);
         }
-    };
+    }
 
-    const fetchStudents = async () => {
+    async function fetchStudents() {
         try {
             setLoadingStudents(true);
             const token = localStorage.getItem('token');
@@ -135,7 +139,7 @@ const TeacherReportCards = () => {
             setStudents(studentsData);
             console.log('📚 Students loaded:', studentsData.length);
             setLoadingStudents(false);
-        } catch (error: any) {
+        } catch (error) {
             console.error("Error fetching students:", error);
             setLoadingStudents(false);
             
@@ -151,9 +155,9 @@ const TeacherReportCards = () => {
                 console.error("Fallback error fetching students:", fallbackError);
             }
         }
-    };
+    }
 
-    const fetchClasses = async () => {
+    async function fetchClasses() {
         try {
             setLoadingClasses(true);
             const token = localStorage.getItem('token');
@@ -167,7 +171,7 @@ const TeacherReportCards = () => {
             setClasses(classesData);
             console.log('📚 Classes loaded:', classesData.length);
             setLoadingClasses(false);
-        } catch (error: any) {
+        } catch (error) {
             console.error("Error fetching classes:", error);
             setLoadingClasses(false);
             
@@ -183,7 +187,7 @@ const TeacherReportCards = () => {
                 console.error("Fallback error fetching classes:", fallbackError);
             }
         }
-    };
+    }
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
@@ -272,8 +276,8 @@ const TeacherReportCards = () => {
                 setSuccess(false);
                 setSuccessMessage("");
             }, 5000);
-        } catch (error: any) {
-            alert(error.response?.data?.error || "Failed to upload report card");
+        } catch (error) {
+            alert(getApiErrorMessage(error, "Failed to upload report card"));
         } finally {
             setUploading(false);
         }
@@ -312,8 +316,8 @@ const TeacherReportCards = () => {
             });
             fetchReportCards();
             alert('✅ Report card deleted successfully!');
-        } catch (error: any) {
-            alert(error.response?.data?.error || "Failed to delete report card");
+        } catch (error) {
+            alert(getApiErrorMessage(error, "Failed to delete report card"));
         }
     };
 
@@ -333,8 +337,8 @@ const TeacherReportCards = () => {
             link.click();
             link.remove();
             window.URL.revokeObjectURL(url);
-        } catch (error: any) {
-            alert(error.response?.data?.error || "Failed to download report card");
+        } catch (error) {
+            alert(getApiErrorMessage(error, "Failed to download report card"));
         }
     };
 

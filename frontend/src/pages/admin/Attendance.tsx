@@ -1,6 +1,12 @@
 import { useState, useEffect } from "react";
 import DashboardLayout from "../../layout/DashboardLayout";
 import axios from "axios";
+import { getApiErrorMessage } from "../../services/error";
+
+interface ClassData {
+    _id: string;
+    name: string;
+}
 
 interface AttendanceSummary {
     totalClasses: number;
@@ -33,14 +39,10 @@ const AdminAttendance = () => {
     const [summary, setSummary] = useState<AttendanceSummary | null>(null);
     const [recentRecords, setRecentRecords] = useState<AttendanceRecord[]>([]);
     const [selectedClass, setSelectedClass] = useState<string>("");
-    const [classes, setClasses] = useState<any[]>([]);
+    const [classes, setClasses] = useState<ClassData[]>([]);
     const [error, setError] = useState("");
 
-    useEffect(() => {
-        fetchDashboardData();
-    }, []);
-
-    const fetchDashboardData = async () => {
+    async function fetchDashboardData() {
         try {
             const token = localStorage.getItem('token');
 
@@ -75,12 +77,19 @@ const AdminAttendance = () => {
             }
 
             setLoading(false);
-        } catch (error: any) {
+        } catch (error) {
             console.error("Error fetching attendance data:", error);
-            setError(error.response?.data?.error || "Failed to load attendance data");
+            setError(getApiErrorMessage(error, "Failed to load attendance data"));
             setLoading(false);
         }
-    };
+    }
+
+    useEffect(() => {
+        async function load() {
+            await fetchDashboardData();
+        }
+        load();
+    }, []);
 
     const fetchClassAttendance = async (classId: string) => {
         if (!classId) return;

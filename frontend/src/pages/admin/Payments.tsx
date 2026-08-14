@@ -1,9 +1,10 @@
 // src/pages/finance/FinancePayments.tsx - COMPLETE WITH VIEW MODAL
 
 import { useState, useEffect } from "react";
-import { Check, X, Eye, Download, AlertCircle, Banknote, Users, FileText } from "lucide-react";
+import { Check, X, Eye, Download, AlertCircle, FileText } from "lucide-react";
 import DashboardLayout from "../../layout/DashboardLayout";
 import axios from "axios";
+import { getApiErrorMessage } from "../../services/error";
 
 interface Payment {
     _id: string;
@@ -53,7 +54,7 @@ const FinancePayments = () => {
         totalCollected: 0,
     });
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
+    const [, setError] = useState("");
     const [filter, setFilter] = useState<string>("all");
     const [success, setSuccess] = useState(false);
     const [successMessage, setSuccessMessage] = useState("");
@@ -61,14 +62,9 @@ const FinancePayments = () => {
     // ✅ View Modal State
     const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
     const [showViewModal, setShowViewModal] = useState(false);
-    const [viewLoading, setViewLoading] = useState(false);
+    const [, setViewLoading] = useState(false);
 
-    useEffect(() => {
-        fetchPayments();
-        fetchStats();
-    }, []);
-
-    const fetchPayments = async () => {
+    async function fetchPayments() {
         try {
             const token = localStorage.getItem('token');
             const url = filter === 'all'
@@ -80,14 +76,14 @@ const FinancePayments = () => {
             });
             setPayments(response.data.data || []);
             setLoading(false);
-        } catch (error: any) {
+        } catch (error) {
             console.error("Error fetching payments:", error);
-            setError(error.response?.data?.error || "Failed to load payments");
+            setError(getApiErrorMessage(error, "Failed to load payments"));
             setLoading(false);
         }
-    };
+    }
 
-    const fetchStats = async () => {
+    async function fetchStats() {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.get('http://localhost:7000/api/finance/revenue', {
@@ -102,7 +98,15 @@ const FinancePayments = () => {
         } catch (error) {
             console.error("Error fetching stats:", error);
         }
-    };
+    }
+
+    useEffect(() => {
+        async function load() {
+            await fetchPayments();
+            await fetchStats();
+        }
+        load();
+    }, []);
 
     // ✅ View Payment Details
     const handleViewPayment = async (paymentId: string) => {
@@ -116,9 +120,9 @@ const FinancePayments = () => {
             setSelectedPayment(response.data.data);
             setShowViewModal(true);
             setViewLoading(false);
-        } catch (error: any) {
+        } catch (error) {
             console.error("Error fetching payment details:", error);
-            alert(error.response?.data?.error || "Failed to load payment details");
+            alert(getApiErrorMessage(error, "Failed to load payment details"));
             setViewLoading(false);
         }
     };
@@ -138,8 +142,8 @@ const FinancePayments = () => {
                 setSuccess(false);
                 setSuccessMessage("");
             }, 5000);
-        } catch (error: any) {
-            alert(error.response?.data?.error || "Failed to approve payment");
+        } catch (error) {
+            alert(getApiErrorMessage(error, "Failed to approve payment"));
         }
     };
 
@@ -161,8 +165,8 @@ const FinancePayments = () => {
                 setSuccess(false);
                 setSuccessMessage("");
             }, 5000);
-        } catch (error: any) {
-            alert(error.response?.data?.error || "Failed to reject payment");
+        } catch (error) {
+            alert(getApiErrorMessage(error, "Failed to reject payment"));
         }
     };
 

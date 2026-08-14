@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import type { ReactNode } from 'react';
 import { getSocket } from '../services/socket';
+import { getApiErrorMessage } from '../services/error';
 import axios from 'axios';
 import { Socket } from 'socket.io-client';
 
@@ -95,10 +96,11 @@ export const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
             // Listen for unread count updates
             socket.on('message:unread', (data: { count: number; userId?: string }) => {
-    if (data.userId) {
+    const { userId } = data;
+    if (userId) {
         setUnreadCounts(prev => ({
             ...prev,
-            [data.userId]: data.count
+            [userId]: data.count
         }));
     }
     // Also update total unread count
@@ -170,8 +172,7 @@ export const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     // 📡 API CALLS
     // ============================================
 
-    const fetchUsers = async (): Promise<void> => {
-        try {
+    async function fetchUsers(): Promise<void> {        try {
             const token = localStorage.getItem('token');
             const response = await axios.get<{ success: boolean; data: User[] }>(
                 'http://localhost:7000/api/messages/users/available',
@@ -181,16 +182,16 @@ export const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 setUsers(response.data.data || []);
                 setLoading(false);
             }
-        } catch (error: any) {
+        } catch (error) {
             console.error('Error fetching users:', error);
             if (isMounted.current) {
-                setError(error.response?.data?.error || 'Failed to load users');
+                setError(getApiErrorMessage(error, 'Failed to load users'));
                 setLoading(false);
             }
         }
     };
 
-    const refreshMessages = async (): Promise<void> => {
+    async function refreshMessages(): Promise<void> {
         if (!selectedUser) return;
         
         try {
@@ -204,12 +205,12 @@ export const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 // After fetching, mark as read
                 markAsRead(selectedUser._id);
             }
-        } catch (error: any) {
+        } catch (error) {
             console.error('Error fetching messages:', error);
         }
     };
 
-    const fetchUnreadCount = async (): Promise<void> => {
+    async function fetchUnreadCount(): Promise<void> {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.get<{ success: boolean; data: { unread: number } }>(
@@ -324,6 +325,7 @@ export const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useChat = (): ChatContextType => {
     const context = useContext(ChatContext);
     if (!context) {

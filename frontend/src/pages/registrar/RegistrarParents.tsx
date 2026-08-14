@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { UserPlus, Search, Link2, X } from "lucide-react"; import DashboardLayout from "../../layout/DashboardLayout";
 import axios from "axios";
+import { getApiErrorMessage } from "../../services/error";
 
 interface Parent {
     _id: string;
@@ -25,7 +26,7 @@ const RegistrarParents = () => {
     const [parents, setParents] = useState<Parent[]>([]);
     const [students, setStudents] = useState<Student[]>([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
+    const [, setError] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
     const [showModal, setShowModal] = useState(false);
     const [showLinkModal, setShowLinkModal] = useState(false);
@@ -44,7 +45,7 @@ const RegistrarParents = () => {
         fetchStudents();
     }, []);
 
-    const fetchParents = async () => {
+    async function fetchParents() {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.get('http://localhost:7000/api/registrar/parents', {
@@ -52,14 +53,14 @@ const RegistrarParents = () => {
             });
             setParents(response.data.data || []);
             setLoading(false);
-        } catch (error: any) {
+        } catch (error) {
             console.error("Error fetching parents:", error);
-            setError(error.response?.data?.error || "Failed to load parents");
+            setError(getApiErrorMessage(error, "Failed to load parents"));
             setLoading(false);
         }
-    };
+    }
 
-    const fetchStudents = async () => {
+    async function fetchStudents() {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.get('http://localhost:7000/api/registrar/students', {
@@ -69,7 +70,7 @@ const RegistrarParents = () => {
         } catch (error) {
             console.error("Error fetching students:", error);
         }
-    };
+    }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -81,8 +82,8 @@ const RegistrarParents = () => {
             setShowModal(false);
             fetchParents();
             alert('✅ Parent created successfully!');
-        } catch (error: any) {
-            alert(error.response?.data?.error || "Failed to create parent");
+        } catch (error) {
+            alert(getApiErrorMessage(error, "Failed to create parent"));
         }
     };
 
@@ -102,8 +103,8 @@ const RegistrarParents = () => {
             setSelectedStudentId("");
             fetchParents();
             alert('✅ Student linked to parent successfully!');
-        } catch (error: any) {
-            alert(error.response?.data?.error || "Failed to link student");
+        } catch (error) {
+            alert(getApiErrorMessage(error, "Failed to link student"));
         }
     };
 

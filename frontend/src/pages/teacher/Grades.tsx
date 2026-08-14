@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Plus, X, Edit2, BarChart3 } from "lucide-react";
 import DashboardLayout from "../../layout/DashboardLayout";
 import axios from "axios";
+import { getApiErrorMessage } from "../../services/error";
 
 interface Assessment {
     score: number;
@@ -99,12 +100,7 @@ const Grades = () => {
         },
     });
 
-    useEffect(() => {
-        fetchGradeData();
-        fetchStudentsAndClasses();
-    }, []);
-
-    const fetchGradeData = async () => {
+    async function fetchGradeData() {
         try {
             const token = localStorage.getItem('token');
             
@@ -140,9 +136,9 @@ const Grades = () => {
             console.error("❌ Error fetching grades:", error);
             setLoading(false);
         }
-    };
+    }
 
-    const fetchStudentsAndClasses = async () => {
+    async function fetchStudentsAndClasses() {
         try {
             const token = localStorage.getItem('token');
             
@@ -162,7 +158,15 @@ const Grades = () => {
         } catch (error) {
             console.error("Error fetching students/classes:", error);
         }
-    };
+    }
+
+    useEffect(() => {
+        async function load() {
+            await fetchGradeData();
+            await fetchStudentsAndClasses();
+        }
+        load();
+    }, []);
 
     const forceRefreshGrades = async () => {
         try {
@@ -232,9 +236,9 @@ const Grades = () => {
                 ? '✅ Grade saved successfully! The student can now see their complete grade.' 
                 : '⏳ Grade saved as incomplete. The final grade will be calculated when all assessments are filled.');
             
-        } catch (error: any) {
+        } catch (error) {
             console.error("❌ Error adding grade:", error);
-            alert(error.response?.data?.error || "Failed to add grade");
+            alert(getApiErrorMessage(error, "Failed to add grade"));
         }
     };
 
@@ -282,9 +286,9 @@ const Grades = () => {
                 ? '✅ Grade updated successfully! The student can now see their complete grade.' 
                 : '⏳ Grade updated as incomplete. The final grade will be calculated when all assessments are filled.');
             
-        } catch (error: any) {
+        } catch (error) {
             console.error("❌ Error updating grade:", error);
-            alert(error.response?.data?.error || "Failed to update grade");
+            alert(getApiErrorMessage(error, "Failed to update grade"));
         }
     };
 

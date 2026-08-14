@@ -49,10 +49,10 @@ const ChatWindow: React.FC = () => {
         }
     };
 
-    const scrollToBottom = () => {
+    function scrollToBottom() {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
         setShowScrollButton(false);
-    };
+    }
 
     useEffect(() => {
         if (selectedUser) {

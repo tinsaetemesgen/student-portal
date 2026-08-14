@@ -25,7 +25,6 @@ import {
     BookMarked,
     FolderOpen,
     FileCheck,
-    PieChart,
     UserCheck,
 } from "lucide-react";
 
@@ -95,11 +94,9 @@ const Sidebar: React.FC<SidebarProps> = ({
                     ...commonItems,
                     { path: "/admin/students", label: "Students", icon: <Users size={20} /> },
                     { path: "/admin/teachers", label: "Teachers", icon: <UserPlus size={20} /> },
-                    { path: "/admin/classes", label: "Classes", icon: <School size={20} /> },
                     { path: "/admin/attendance", label: "Attendance", icon: <Clock size={20} /> },
                     { path: "/admin/grades", label: "Grades", icon: <Award size={20} /> },
                     { path: "/admin/payments", label: "Payments", icon: <CreditCard size={20} /> },
-                    { path: "/admin/reports", label: "Reports", icon: <PieChart size={20} /> },
                     { path: "/admin/settings", label: "Settings", icon: <Settings size={20} /> },
                 ];
 
@@ -149,8 +146,6 @@ const Sidebar: React.FC<SidebarProps> = ({
                     { path: "/parent/attendance", label: "Attendance", icon: <Calendar size={20} /> },
                     { path: "/parent/grades", label: "Grades", icon: <Award size={20} /> },
                     { path: "/parent/payments", label: "Payments", icon: <DollarSign size={20} /> },
-                    { path: "/parent/resources", label: "Resources", icon: <BookOpen size={20} /> },
-                    { path: "/parent/report-cards", label: "Report Cards", icon: <FileText size={20} /> },
                 ];
 
             default:

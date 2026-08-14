@@ -1,9 +1,10 @@
 // src/pages/teacher/WorksheetResults.tsx
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Users, Award, TrendingUp, PieChart, Clock, FileText, Download, X } from "lucide-react";
+import { ArrowLeft, Users, Award, TrendingUp, PieChart, Download, X } from "lucide-react";
 import DashboardLayout from "../../layout/DashboardLayout";
 import axios from "axios";
+import { getApiErrorMessage } from "../../services/error";
 
 interface Attempt {
     _id: string;
@@ -52,11 +53,7 @@ const TeacherWorksheetResults = () => {
     const [data, setData] = useState<ResultData | null>(null);
     const [selectedStudent, setSelectedStudent] = useState<Attempt | null>(null);
 
-    useEffect(() => {
-        fetchResults();
-    }, [id]);
-
-    const fetchResults = async () => {
+    async function fetchResults() {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.get(`http://localhost:7000/api/worksheets/${id}/results`, {
@@ -64,12 +61,19 @@ const TeacherWorksheetResults = () => {
             });
             setData(response.data.data);
             setLoading(false);
-        } catch (error: any) {
+        } catch (error) {
             console.error("Error fetching results:", error);
-            setError(error.response?.data?.error || "Failed to load results");
+            setError(getApiErrorMessage(error, "Failed to load results"));
             setLoading(false);
         }
-    };
+    }
+
+    useEffect(() => {
+        async function load() {
+            await fetchResults();
+        }
+        load();
+    }, [id]);
 
     const formatTime = (seconds: number) => {
         const mins = Math.floor(seconds / 60);

@@ -1,8 +1,9 @@
 // src/pages/teacher/TeacherAnnouncements.tsx
 import { useState, useEffect } from "react";
-import { Megaphone, Calendar, Clock, AlertCircle, Plus, X, Edit2, Trash2 } from "lucide-react";
+import { Megaphone, Calendar, Clock, Plus, X, Edit2, Trash2 } from "lucide-react";
 import DashboardLayout from "../../layout/DashboardLayout";
 import axios from "axios";
+import { getApiErrorMessage } from "../../services/error";
 
 interface Announcement {
     _id: string;
@@ -25,7 +26,7 @@ interface Announcement {
 const TeacherAnnouncements = () => {
     const [announcements, setAnnouncements] = useState<Announcement[]>([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
+    const [, setError] = useState("");
     const [showModal, setShowModal] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
     const [formData, setFormData] = useState({
@@ -40,7 +41,7 @@ const TeacherAnnouncements = () => {
         fetchAnnouncements();
     }, []);
 
-    const fetchAnnouncements = async () => {
+    async function fetchAnnouncements() {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.get('http://localhost:7000/api/announcements', {
@@ -48,12 +49,12 @@ const TeacherAnnouncements = () => {
             });
             setAnnouncements(response.data.data || []);
             setLoading(false);
-        } catch (error: any) {
+        } catch (error) {
             console.error("Error fetching announcements:", error);
-            setError(error.response?.data?.error || "Failed to load announcements");
+            setError(getApiErrorMessage(error, "Failed to load announcements"));
             setLoading(false);
         }
-    };
+    }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -79,8 +80,8 @@ const TeacherAnnouncements = () => {
             });
             fetchAnnouncements();
             alert(editingId ? '✅ Announcement updated!' : '✅ Announcement created!');
-        } catch (error: any) {
-            alert(error.response?.data?.error || "Failed to save announcement");
+        } catch (error) {
+            alert(getApiErrorMessage(error, "Failed to save announcement"));
         }
     };
 
@@ -93,8 +94,8 @@ const TeacherAnnouncements = () => {
             });
             fetchAnnouncements();
             alert('✅ Announcement deleted!');
-        } catch (error: any) {
-            alert(error.response?.data?.error || "Failed to delete announcement");
+        } catch (error) {
+            alert(getApiErrorMessage(error, "Failed to delete announcement"));
         }
     };
 

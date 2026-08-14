@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import DashboardLayout from "../../layout/DashboardLayout";
 import axios from "axios";
+import { getApiErrorMessage } from "../../services/error";
 
 interface Resource {
     _id: string;
@@ -70,11 +71,14 @@ const TeacherResources = () => {
     const [uploading, setUploading] = useState(false);
 
     useEffect(() => {
-        fetchResources();
-        fetchTeacherClasses();
+        async function load() {
+            await fetchResources();
+            await fetchTeacherClasses();
+        }
+        load();
     }, [filterClassLevel, filterSubject]);
 
-    const fetchResources = async () => {
+    async function fetchResources() {
         try {
             const token = localStorage.getItem('token');
             let url = 'http://localhost:7000/api/resources';
@@ -89,14 +93,14 @@ const TeacherResources = () => {
             });
             setResources(response.data.data || []);
             setLoading(false);
-        } catch (error: any) {
+        } catch (error) {
             console.error("Error fetching resources:", error);
             setLoading(false);
         }
-    };
+    }
 
     // ✅ Fetch teacher's assigned classes
-    const fetchTeacherClasses = async () => {
+    async function fetchTeacherClasses() {
         try {
             const token = localStorage.getItem('token');
             
@@ -125,7 +129,7 @@ const TeacherResources = () => {
             console.error("Error fetching teacher classes:", error);
             setTeacherClasses([]);
         }
-    };
+    }
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
@@ -218,8 +222,8 @@ const TeacherResources = () => {
                 setSuccess(false);
                 setSuccessMessage("");
             }, 5000);
-        } catch (error: any) {
-            alert(error.response?.data?.error || "Failed to upload resource");
+        } catch (error) {
+            alert(getApiErrorMessage(error, "Failed to upload resource"));
         } finally {
             setUploading(false);
         }
@@ -250,8 +254,8 @@ const TeacherResources = () => {
             });
             fetchResources();
             alert('✅ Resource deleted successfully!');
-        } catch (error: any) {
-            alert(error.response?.data?.error || "Failed to delete resource");
+        } catch (error) {
+            alert(getApiErrorMessage(error, "Failed to delete resource"));
         }
     };
 
@@ -271,8 +275,8 @@ const TeacherResources = () => {
             link.click();
             link.remove();
             window.URL.revokeObjectURL(url);
-        } catch (error: any) {
-            alert(error.response?.data?.error || "Failed to download resource");
+        } catch (error) {
+            alert(getApiErrorMessage(error, "Failed to download resource"));
         }
     };
 
@@ -585,9 +589,6 @@ const TeacherResources = () => {
                                         value={formData.grade}
                                         onChange={(e) => {
                                             const grade = e.target.value;
-                                            const sections = teacherClasses
-                                                .filter(c => String(c.grade) === grade)
-                                                .map(c => c.section);
                                             const gradeNum = parseInt(grade);
                                             setFormData({ 
                                                 ...formData, 

@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { GraduationCap, BookOpen, Trophy, Filter, BarChart3, PieChart } from "lucide-react";
+import { GraduationCap, BookOpen, Trophy, Filter, BarChart3 } from "lucide-react";
 import DashboardLayout from "../../layout/DashboardLayout";
 import axios from "axios";
+import { getApiErrorMessage } from "../../services/error";
 
 interface Assessment {
     score: number;
@@ -44,30 +45,29 @@ const MyGrades = () => {
     const [expandedGrade, setExpandedGrade] = useState<string | null>(null);
 
     useEffect(() => {
-        fetchMyGrades();
-    }, []);
+        async function load() {
+            try {
+                const token = localStorage.getItem('token');
+                
+                const response = await axios.get('http://localhost:7000/api/grades/my-grades', {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
 
-    const fetchMyGrades = async () => {
-        try {
-            const token = localStorage.getItem('token');
-            
-            const response = await axios.get('http://localhost:7000/api/grades/my-grades', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+                const grades: GradeRecord[] = response.data.data || [];
+                setGradeRecords(grades);
 
-            const grades: GradeRecord[] = response.data.data || [];
-            setGradeRecords(grades);
+                const uniqueSubjects = [...new Set(grades.map((g: GradeRecord) => g.subject).filter(Boolean))];
+                setSubjects(uniqueSubjects);
 
-            const uniqueSubjects = [...new Set(grades.map((g: GradeRecord) => g.subject).filter(Boolean))];
-            setSubjects(uniqueSubjects);
-
-            setLoading(false);
-        } catch (error: any) {
-            console.error("Error fetching grades:", error);
-            setError(error.response?.data?.error || "Failed to load grades");
-            setLoading(false);
+                setLoading(false);
+            } catch (error) {
+                console.error("Error fetching grades:", error);
+                setError(getApiErrorMessage(error, "Failed to load grades"));
+                setLoading(false);
+            }
         }
-    };
+        load();
+    }, []);
 
     const getFilteredGrades = () => {
         let filtered = gradeRecords;

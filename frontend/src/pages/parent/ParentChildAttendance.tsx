@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, ClipboardCheck, CheckCircle, XCircle, Clock } from "lucide-react";
 import DashboardLayout from "../../layout/DashboardLayout";
 import axios from "axios";
+import { getApiErrorMessage } from "../../services/error";
 
 interface AttendanceRecord {
     _id: string;
@@ -12,41 +13,46 @@ interface AttendanceRecord {
     remarks?: string;
 }
 
+interface Student {
+    _id: string;
+    name: string;
+    email: string;
+    class: string;
+}
+
 const ParentChildAttendance = () => {
     const { childId } = useParams();
     const navigate = useNavigate();
     const [attendance, setAttendance] = useState<AttendanceRecord[]>([]);
-    const [student, setStudent] = useState<any>(null);
+    const [student, setStudent] = useState<Student | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
     useEffect(() => {
+        async function fetchData() {
+            try {
+                const token = localStorage.getItem('token');
+                
+                const userRes = await axios.get(`http://localhost:7000/api/users/${childId}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                setStudent(userRes.data.data);
+
+                const attendanceRes = await axios.get(
+                    `http://localhost:7000/api/attendance/child/${childId}/attendance`,
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
+                setAttendance(attendanceRes.data.data?.records || []);
+                setLoading(false);
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                setError(getApiErrorMessage(error, "Failed to load attendance"));
+                setLoading(false);
+            }
+        }
+
         fetchData();
     }, [childId]);
-
-    const fetchData = async () => {
-        try {
-            const token = localStorage.getItem('token');
-            
-            // Fetch child info
-            const userRes = await axios.get(`http://localhost:7000/api/users/${childId}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            setStudent(userRes.data.data);
-
-            // Fetch child's attendance
-            const attendanceRes = await axios.get(
-                `http://localhost:7000/api/attendance/child/${childId}/attendance`,
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-            setAttendance(attendanceRes.data.data?.records || []);
-            setLoading(false);
-        } catch (error: any) {
-            console.error("Error fetching data:", error);
-            setError(error.response?.data?.error || "Failed to load attendance");
-            setLoading(false);
-        }
-    };
 
     const getStatusBadge = (status: string) => {
         const styles: Record<string, string> = {

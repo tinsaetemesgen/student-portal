@@ -5,6 +5,7 @@ import { Search, Users, MessageCircle, Bell } from 'lucide-react';
 import { useChat } from '../../context/ChatContext';
 import type { User } from '../../context/ChatContext';
 import axios from 'axios';
+import { getSocket } from '../../services/socket';
 
 interface UnreadCounts {
     [userId: string]: number;
@@ -15,25 +16,24 @@ const ChatList: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState<string>("");
     const [unreadCounts, setUnreadCounts] = useState<UnreadCounts>({});
 
-    // ✅ Fetch unread counts per user
-    const fetchUnreadCounts = async () => {
-        try {
-            const token = localStorage.getItem('token');
-            const response = await axios.get<{ success: boolean; data: { unreadCounts: UnreadCounts } }>(
-                'http://localhost:7000/api/messages/unread/per-user',
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-            setUnreadCounts(response.data.data?.unreadCounts || {});
-        } catch (error) {
-            console.error('Error fetching unread counts:', error);
-        }
-    };
-
+    // ✅ Listen for unread count updates
     useEffect(() => {
-        fetchUnreadCounts();
+        async function load() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await axios.get<{ success: boolean; data: { unreadCounts: UnreadCounts } }>(
+                    'http://localhost:7000/api/messages/unread/per-user',
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
+                setUnreadCounts(response.data.data?.unreadCounts || {});
+            } catch (error) {
+                console.error('Error fetching unread counts:', error);
+            }
+        }
+        load();
 
         // ✅ Listen for unread count updates
-        const socket = (window as any).socket;
+        const socket = getSocket();
         if (socket) {
             socket.on('message:unread', (data: { count: number; userId?: string }) => {
                 const userId = data.userId;
@@ -43,7 +43,7 @@ const ChatList: React.FC = () => {
                         [userId]: data.count
                     }));
                 } else {
-                    fetchUnreadCounts();
+                    load();
                 }
             });
         }

@@ -1,9 +1,10 @@
 // src/pages/registrar/RegistrarTeachers.tsx - COMPLETE WITH CLASS DROPDOWN
 
 import { useState, useEffect } from "react";
-import { Plus, Edit2, Trash2, Search, UserPlus, X, Check, BookOpen } from "lucide-react";
+import { Search, UserPlus, X, Check, BookOpen } from "lucide-react";
 import DashboardLayout from "../../layout/DashboardLayout";
 import axios from "axios";
+import { getApiErrorMessage } from "../../services/error";
 
 interface Teacher {
     _id: string;
@@ -27,7 +28,7 @@ const RegistrarTeachers = () => {
     const [teachers, setTeachers] = useState<Teacher[]>([]);
     const [classes, setClasses] = useState<Class[]>([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
+    const [, setError] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
     const [showModal, setShowModal] = useState(false);
     const [success, setSuccess] = useState(false);
@@ -47,7 +48,7 @@ const RegistrarTeachers = () => {
         fetchClasses();
     }, []);
 
-    const fetchTeachers = async () => {
+    async function fetchTeachers() {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.get('http://localhost:7000/api/registrar/teachers', {
@@ -55,14 +56,14 @@ const RegistrarTeachers = () => {
             });
             setTeachers(response.data.data || []);
             setLoading(false);
-        } catch (error: any) {
+        } catch (error) {
             console.error("Error fetching teachers:", error);
-            setError(error.response?.data?.error || "Failed to load teachers");
+            setError(getApiErrorMessage(error, "Failed to load teachers"));
             setLoading(false);
         }
-    };
+    }
 
-    const fetchClasses = async () => {
+    async function fetchClasses() {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.get('http://localhost:7000/api/registrar/classes', {
@@ -72,7 +73,7 @@ const RegistrarTeachers = () => {
         } catch (error) {
             console.error("Error fetching classes:", error);
         }
-    };
+    }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -101,8 +102,8 @@ const RegistrarTeachers = () => {
                 setSuccess(false);
                 setSuccessMessage("");
             }, 5000);
-        } catch (error: any) {
-            alert(error.response?.data?.error || "Failed to add teacher");
+        } catch (error) {
+            alert(getApiErrorMessage(error, "Failed to add teacher"));
         }
     };
 
@@ -115,8 +116,8 @@ const RegistrarTeachers = () => {
             });
             fetchTeachers();
             alert('✅ Teacher deleted successfully!');
-        } catch (error: any) {
-            alert(error.response?.data?.error || "Failed to delete teacher");
+        } catch (error) {
+            alert(getApiErrorMessage(error, "Failed to delete teacher"));
         }
     };
 
@@ -215,7 +216,7 @@ const RegistrarTeachers = () => {
                                             <td className="px-4 py-3">
                                                 {teacher.assignedClasses && teacher.assignedClasses.length > 0 ? (
                                                     <div className="flex flex-wrap gap-1">
-                                                        {teacher.assignedClasses.map((cls: any) => (
+                                                        {teacher.assignedClasses.map((cls) => (
                                                             <span key={cls._id} className="px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded text-xs">
                                                                 {cls.name}
                                                             </span>

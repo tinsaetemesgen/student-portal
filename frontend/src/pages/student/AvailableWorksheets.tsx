@@ -1,9 +1,10 @@
 // src/pages/student/AvailableWorksheets.tsx
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FileText, Clock, Award, Calendar, Users, CheckCircle, XCircle } from "lucide-react";
+import { FileText, Clock, Calendar, CheckCircle } from "lucide-react";
 import DashboardLayout from "../../layout/DashboardLayout";
 import axios from "axios";
+import { getApiErrorMessage } from "../../services/error";
 
 interface Worksheet {
     _id: string;
@@ -32,23 +33,22 @@ const StudentAvailableWorksheets = () => {
     const [error, setError] = useState("");
 
     useEffect(() => {
-        fetchWorksheets();
-    }, []);
-
-    const fetchWorksheets = async () => {
-        try {
-            const token = localStorage.getItem('token');
-            const response = await axios.get('http://localhost:7000/api/worksheets/available', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            setWorksheets(response.data.data || []);
-            setLoading(false);
-        } catch (error: any) {
-            console.error("Error fetching worksheets:", error);
-            setError(error.response?.data?.error || "Failed to load worksheets");
-            setLoading(false);
+        async function load() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await axios.get('http://localhost:7000/api/worksheets/available', {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                setWorksheets(response.data.data || []);
+                setLoading(false);
+            } catch (error) {
+                console.error("Error fetching worksheets:", error);
+                setError(getApiErrorMessage(error, "Failed to load worksheets"));
+                setLoading(false);
+            }
         }
-    };
+        load();
+    }, []);
 
     const handleStart = async (worksheetId: string) => {
         try {
@@ -57,8 +57,8 @@ const StudentAvailableWorksheets = () => {
                 headers: { Authorization: `Bearer ${token}` }
             });
             navigate(`/student/worksheet/${worksheetId}/attempt`);
-        } catch (error: any) {
-            alert(error.response?.data?.error || "Failed to start worksheet");
+        } catch (error) {
+            alert(getApiErrorMessage(error, "Failed to start worksheet"));
         }
     };
 

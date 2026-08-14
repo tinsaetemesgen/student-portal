@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import DashboardLayout from "../../layout/DashboardLayout";
 import axios from "axios";
+import { getApiErrorMessage } from "../../services/error";
 
 interface FeeStatus {
     feeName: string;
@@ -10,6 +11,14 @@ interface FeeStatus {
     statusText: string;
     statusColor: string;
     dueDate: string;
+}
+
+interface FeeInput {
+    feeName?: string;
+    status: string;
+    isOverdue?: boolean;
+    dueDate?: string;
+    endDate?: string;
 }
 
 interface FeeSummary {
@@ -26,74 +35,73 @@ const MyFees = () => {
     const [fees, setFees] = useState<FeeStatus[]>([]);
 
     useEffect(() => {
-        fetchFeeStatus();
-    }, []);
+        async function load() {
+            try {
+                const token = localStorage.getItem('token');
+                const userStr = localStorage.getItem('user');
+                const user = userStr ? JSON.parse(userStr) : null;
+                const studentId = user?._id;
 
-    const fetchFeeStatus = async () => {
-        try {
-            const token = localStorage.getItem('token');
-            const userStr = localStorage.getItem('user');
-            const user = userStr ? JSON.parse(userStr) : null;
-            const studentId = user?._id;
+                if (!studentId) {
+                    setError("Student ID not found");
+                    setLoading(false);
+                    return;
+                }
 
-            if (!studentId) {
-                setError("Student ID not found");
+                // ✅ Use the correct finance route for student fees
+                const response = await axios.get(
+                    `http://localhost:7000/api/finance/parent/student-fees?studentId=${studentId}`,
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
+
+                if (response.data.success) {
+                    const feesData = response.data.data || [];
+                    
+                    // ✅ Transform data to match the UI
+                    const transformedFees: FeeStatus[] = feesData.map((fee: FeeInput) => {
+                        let statusText = 'Pending';
+                        let statusColor = 'yellow';
+                        
+                        if (fee.status === 'paid') {
+                            statusText = 'Paid';
+                            statusColor = 'green';
+                        } else if (fee.isOverdue || fee.status === 'overdue') {
+                            statusText = 'Overdue';
+                            statusColor = 'red';
+                        }
+                        
+                        return {
+                            feeName: fee.feeName || 'Unknown Fee',
+                            status: fee.status,
+                            statusText: statusText,
+                            statusColor: statusColor,
+                            dueDate: fee.dueDate || fee.endDate || new Date().toISOString(),
+                        };
+                    });
+
+                    // ✅ Calculate summary
+                    const totalFees = transformedFees.length;
+                    const paid = transformedFees.filter(f => f.status === 'paid').length;
+                    const pending = transformedFees.filter(f => f.status === 'pending').length;
+                    const overdue = transformedFees.filter(f => f.status === 'overdue' || f.statusColor === 'red').length;
+
+                    setSummary({
+                        totalFees,
+                        paid,
+                        pending,
+                        overdue,
+                    });
+                    setFees(transformedFees);
+                }
                 setLoading(false);
-                return;
+            } catch (error) {
+                console.error("Error fetching fee status:", error);
+                setError(getApiErrorMessage(error, "Failed to load fee status"));
+                setLoading(false);
             }
-
-            // ✅ Use the correct finance route for student fees
-            const response = await axios.get(
-                `http://localhost:7000/api/finance/parent/student-fees?studentId=${studentId}`,
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-
-            if (response.data.success) {
-                const feesData = response.data.data || [];
-                
-                // ✅ Transform data to match the UI
-                const transformedFees = feesData.map((fee: any) => {
-                    let statusText = 'Pending';
-                    let statusColor = 'yellow';
-                    
-                    if (fee.status === 'paid') {
-                        statusText = 'Paid';
-                        statusColor = 'green';
-                    } else if (fee.isOverdue || fee.status === 'overdue') {
-                        statusText = 'Overdue';
-                        statusColor = 'red';
-                    }
-                    
-                    return {
-                        feeName: fee.feeName || 'Unknown Fee',
-                        status: fee.status,
-                        statusText: statusText,
-                        statusColor: statusColor,
-                        dueDate: fee.dueDate || fee.endDate || new Date().toISOString(),
-                    };
-                });
-
-                // ✅ Calculate summary
-                const totalFees = transformedFees.length;
-                const paid = transformedFees.filter(f => f.status === 'paid').length;
-                const pending = transformedFees.filter(f => f.status === 'pending').length;
-                const overdue = transformedFees.filter(f => f.status === 'overdue' || f.statusColor === 'red').length;
-
-                setSummary({
-                    totalFees,
-                    paid,
-                    pending,
-                    overdue,
-                });
-                setFees(transformedFees);
-            }
-            setLoading(false);
-        } catch (error: any) {
-            console.error("Error fetching fee status:", error);
-            setError(error.response?.data?.error || "Failed to load fee status");
-            setLoading(false);
         }
-    };
+        load();
+    }, []);
 
     const getStatusBadge = (status: string, color: string) => {
         const colorMap: Record<string, string> = {

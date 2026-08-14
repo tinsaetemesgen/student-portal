@@ -6,18 +6,17 @@ import {
     ArrowLeft, 
     CheckCircle, 
     XCircle, 
-    Award,
     Clock,
     FileText,
     Calendar,
     User,
     AlertCircle,
     ChevronDown,
-    ChevronUp,
-    Eye
+    ChevronUp
 } from "lucide-react";
 import DashboardLayout from "../../layout/DashboardLayout";
 import axios from "axios";
+import { getApiErrorMessage } from "../../services/error";
 
 interface Answer {
     questionIndex: number;
@@ -64,29 +63,28 @@ const WorksheetReview = () => {
     const [expandedQuestion, setExpandedQuestion] = useState<number | null>(null);
 
     useEffect(() => {
-        fetchWorksheetResult();
-    }, [id]);
+        async function load() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await axios.get(
+                    `http://localhost:7000/api/worksheets/${id}/result`,
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
 
-    const fetchWorksheetResult = async () => {
-        try {
-            const token = localStorage.getItem('token');
-            const response = await axios.get(
-                `http://localhost:7000/api/worksheets/${id}/result`,
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-
-            if (response.data.success) {
-                const data = response.data.data;
-                setResult(data.result);
-                setQuestions(data.questions || []);
+                if (response.data.success) {
+                    const data = response.data.data;
+                    setResult(data.result);
+                    setQuestions(data.questions || []);
+                }
+                setLoading(false);
+            } catch (error) {
+                console.error("Error fetching worksheet result:", error);
+                setError(getApiErrorMessage(error, "Failed to load worksheet review"));
+                setLoading(false);
             }
-            setLoading(false);
-        } catch (error: any) {
-            console.error("Error fetching worksheet result:", error);
-            setError(error.response?.data?.error || "Failed to load worksheet review");
-            setLoading(false);
         }
-    };
+        load();
+    }, [id]);
 
     const formatTime = (seconds: number) => {
         const mins = Math.floor(seconds / 60);

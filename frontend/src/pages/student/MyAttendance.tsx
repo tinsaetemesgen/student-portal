@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { Calendar, CheckCircle, XCircle, Clock, AlertCircle, BarChart3 } from "lucide-react";
 import DashboardLayout from "../../layout/DashboardLayout";
 import axios from "axios";
+import { getApiErrorMessage } from "../../services/error";
 
 interface SummaryData {
     present: number;
@@ -32,28 +32,27 @@ const MyAttendance = () => {
     const [selectedPeriod, setSelectedPeriod] = useState<string>("all");
 
     useEffect(() => {
-        fetchAttendanceSummary();
-    }, []);
+        async function load() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await axios.get(
+                    'http://localhost:7000/api/attendance/my-summary',
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
 
-    const fetchAttendanceSummary = async () => {
-        try {
-            const token = localStorage.getItem('token');
-            const response = await axios.get(
-                'http://localhost:7000/api/attendance/my-summary',
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-
-            if (response.data.success) {
-                setOverall(response.data.data.overall);
-                setBreakdown(response.data.data.breakdown || []);
+                if (response.data.success) {
+                    setOverall(response.data.data.overall);
+                    setBreakdown(response.data.data.breakdown || []);
+                }
+                setLoading(false);
+            } catch (error) {
+                console.error("Error fetching attendance summary:", error);
+                setError(getApiErrorMessage(error, "Failed to load attendance"));
+                setLoading(false);
             }
-            setLoading(false);
-        } catch (error: any) {
-            console.error("Error fetching attendance summary:", error);
-            setError(error.response?.data?.error || "Failed to load attendance");
-            setLoading(false);
         }
-    };
+        load();
+    }, []);
 
     const getFilteredBreakdown = () => {
         if (selectedPeriod === "all") return breakdown;
@@ -72,21 +71,6 @@ const MyAttendance = () => {
                 return `Annual ${item.academicYear}`;
             default:
                 return '';
-        }
-    };
-
-    const getStatusIcon = (status: string) => {
-        switch (status) {
-            case 'present':
-                return <CheckCircle size={18} className="text-green-600" />;
-            case 'absent':
-                return <XCircle size={18} className="text-red-600" />;
-            case 'late':
-                return <Clock size={18} className="text-yellow-600" />;
-            case 'excused':
-                return <AlertCircle size={18} className="text-blue-600" />;
-            default:
-                return null;
         }
     };
 

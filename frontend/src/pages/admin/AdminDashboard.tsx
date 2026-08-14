@@ -4,6 +4,12 @@ import UserRegistrationModal from "../../components/forms/UserRegistrationModal"
 import type { UserData } from "../../types/user";
 import axios from "axios";
 
+interface RecentActivity {
+    activity: string;
+    user: string;
+    time: string;
+}
+
 const AdminDashboard = () => {
     const [modalOpen, setModalOpen] = useState(false);
     const [modalRole, setModalRole] = useState<"student" | "teacher">("student");
@@ -14,14 +20,14 @@ const AdminDashboard = () => {
         { title: "Attendance Today", value: "0%" },
         { title: "Announcements", value: "0" },
     ]);
-    const [recentActivities, setRecentActivities] = useState<any[]>([]);
+    const [recentActivities, setRecentActivities] = useState<RecentActivity[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         fetchDashboardData();
     }, []);
 
-    const fetchDashboardData = async () => {
+    async function fetchDashboardData() {
         try {
             const token = localStorage.getItem('token');
 
@@ -41,7 +47,7 @@ const AdminDashboard = () => {
                 { title: "Announcements", value: "10" },
             ]);
 
-            const activities = usersRes.data.data.slice(0, 5).map((user: any) => ({
+            const activities = usersRes.data.data.slice(0, 5).map((user: { role: string; name: string; createdAt: string }) => ({
                 activity: `New ${user.role} registered`,
                 user: user.name,
                 time: new Date(user.createdAt).toLocaleDateString(),
@@ -53,7 +59,7 @@ const AdminDashboard = () => {
             console.error("Error fetching dashboard data:", error);
             setLoading(false);
         }
-    };
+    }
 
     // ✅ UPDATED: Handles age properly
     const handleSave = async (data: UserData) => {
@@ -61,7 +67,7 @@ const AdminDashboard = () => {
             const token = localStorage.getItem('token');
 
             // ✅ Map frontend fields to backend schema
-            const userData: any = {
+            const userData: Record<string, string | number> = {
                 name: `${data.firstName} ${data.lastName}`.trim(),
                 email: data.email,
                 password: data.password || "password123",
@@ -103,10 +109,11 @@ const AdminDashboard = () => {
             await fetchDashboardData();
             alert(`${modalRole.charAt(0).toUpperCase() + modalRole.slice(1)} added successfully!`);
 
-        } catch (error: any) {
+        } catch (error) {
             console.error("❌ Error saving user:", error);
-            const errorMsg = error.response?.data?.error ||
-                error.response?.data?.errors?.join(', ') ||
+            const errObj = error as { response?: { data?: { error?: string; errors?: string[] } } };
+            const errorMsg = errObj.response?.data?.error ||
+                errObj.response?.data?.errors?.join(', ') ||
                 "Failed to add user";
             alert(errorMsg);
         }

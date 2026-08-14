@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Plus, X, ClipboardCheck } from "lucide-react";
 import DashboardLayout from "../../layout/DashboardLayout";
 import axios from "axios";
+import { getApiErrorMessage } from "../../services/error";
 
 interface AttendanceRecord {
     _id: string;
@@ -26,10 +27,33 @@ interface AttendanceForm {
     remarks: string;
 }
 
+interface Student {
+    _id: string;
+    name: string;
+}
+
+interface ClassItem {
+    _id: string;
+    name: string;
+}
+
+interface AttendanceRecordItem {
+    studentId: { _id: string; name: string };
+    status: "present" | "absent" | "late" | "excused";
+    remarks?: string;
+}
+
+interface AttendanceGroup {
+    _id: string;
+    date: string;
+    classId: { _id: string; name: string };
+    records: AttendanceRecordItem[];
+}
+
 const Attendance = () => {
     const [attendanceRecords, setAttendanceRecords] = useState<AttendanceRecord[]>([]);
-    const [students, setStudents] = useState<any[]>([]);
-    const [classes, setClasses] = useState<any[]>([]);
+    const [students, setStudents] = useState<Student[]>([]);
+    const [classes, setClasses] = useState<ClassItem[]>([]);
     const [showModal, setShowModal] = useState(false);
     const [loading, setLoading] = useState(true);
     const [formData, setFormData] = useState<AttendanceForm>({
@@ -46,7 +70,7 @@ const Attendance = () => {
         fetchStudentsAndClasses();
     }, []);
 
-    const fetchAttendanceData = async () => {
+    async function fetchAttendanceData() {
         try {
             const token = localStorage.getItem('token');
             
@@ -64,8 +88,8 @@ const Attendance = () => {
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
                 
-                setAttendanceRecords(attendanceRes.data.data.flatMap((record: any) => 
-                    record.records.map((r: any) => ({
+                setAttendanceRecords(attendanceRes.data.data.flatMap((record: AttendanceGroup) => 
+                    record.records.map((r: AttendanceRecordItem) => ({
                         ...r,
                         _id: record._id,
                         date: record.date,
@@ -79,9 +103,9 @@ const Attendance = () => {
             console.error("Error fetching attendance:", error);
             setLoading(false);
         }
-    };
+    }
 
-    const fetchStudentsAndClasses = async () => {
+    async function fetchStudentsAndClasses() {
         try {
             const token = localStorage.getItem('token');
             
@@ -103,7 +127,7 @@ const Attendance = () => {
         } catch (error) {
             console.error("Error fetching students/classes:", error);
         }
-    };
+    }
 
     // ✅ Mark attendance (POST to backend)
     const handleSubmit = async (e: React.FormEvent) => {
@@ -140,9 +164,9 @@ const Attendance = () => {
             // Refresh attendance data
             await fetchAttendanceData();
             
-        } catch (error: any) {
+        } catch (error) {
             console.error("Error marking attendance:", error);
-            alert(error.response?.data?.error || "Failed to mark attendance");
+            alert(getApiErrorMessage(error, "Failed to mark attendance"));
         }
     };
 

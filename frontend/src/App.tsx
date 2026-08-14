@@ -13,9 +13,6 @@ import ForgotPassword from "./pages/ForgotPassword";
 // 📌 CHAT PAGES
 // ============================================
 import Chat from './pages/Chat';
-import ParentChat from "./pages/parent/ParentChat";
-import AdminChat from "./pages/admin/AdminChat";
-import TeacherChat from "./pages/teacher/TeacherChat";
 
 // ============================================
 // 📌 ADMIN PAGES
@@ -170,7 +167,7 @@ function App() {
         } />
         <Route path="/admin/chat" element={
           <PrivateRoute allowedRoles={['admin']}>
-            <AdminChat />
+            <Chat role="admin" />
           </PrivateRoute>
         } />
 
@@ -208,6 +205,11 @@ function App() {
             <RegistrarPasswordReset />
           </PrivateRoute>
         } />
+        <Route path="/registrar/chat" element={
+          <PrivateRoute allowedRoles={['admin', 'registrar']}>
+            <Chat role="registrar" />
+          </PrivateRoute>
+        } />
 
         {/* ============================================
             FINANCE OFFICER ROUTES
@@ -230,6 +232,11 @@ function App() {
         <Route path="/finance/reports" element={
           <PrivateRoute allowedRoles={['admin', 'finance_officer']}>
             <FinanceDashboard />
+          </PrivateRoute>
+        } />
+        <Route path="/finance/chat" element={
+          <PrivateRoute allowedRoles={['admin', 'finance_officer']}>
+            <Chat role="finance_officer" />
           </PrivateRoute>
         } />
 
@@ -268,7 +275,7 @@ function App() {
         } />
 <Route path="/teacher/chat" element={
     <PrivateRoute allowedRoles={['admin', 'teacher']}>
-        <TeacherChat />
+        <Chat role="teacher" />
     </PrivateRoute>
 } />
 <Route path="/teacher/resources" element={
@@ -334,6 +341,11 @@ function App() {
         <StudentReportCards />
     </PrivateRoute>
 } />  
+<Route path="/student/chat" element={
+    <PrivateRoute allowedRoles={['admin', 'student']}>
+        <Chat role="student" />
+    </PrivateRoute>
+} />
         {/* ============================================
             PARENT ROUTES
             ============================================ */}
@@ -379,7 +391,7 @@ function App() {
         } />
         <Route path="/parent/chat" element={
           <PrivateRoute allowedRoles={['admin', 'parent']}>
-            <ParentChat />
+            <Chat role="parent" />
           </PrivateRoute>
         } />
 

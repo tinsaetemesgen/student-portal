@@ -5,6 +5,7 @@ import { DollarSign, Clock, AlertCircle, TrendingUp, Plus, Users, FileText, Chec
 import DashboardLayout from "../../layout/DashboardLayout";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import { getApiErrorMessage } from "../../services/error";
 
 interface DashboardStats {
     totalCollected: number;
@@ -27,13 +28,9 @@ const FinanceDashboard = () => {
         pendingCount: 0,
     });
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
+    const [, setError] = useState("");
 
-    useEffect(() => {
-        fetchStats();
-    }, []);
-
-    const fetchStats = async () => {
+    async function fetchStats() {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.get('http://localhost:7000/api/finance/dashboard/stats', {
@@ -50,12 +47,19 @@ const FinanceDashboard = () => {
                 pendingCount: 0,
             });
             setLoading(false);
-        } catch (error: any) {
+        } catch (error) {
             console.error("Error fetching stats:", error);
-            setError(error.response?.data?.error || "Failed to load stats");
+            setError(getApiErrorMessage(error, "Failed to load stats"));
             setLoading(false);
         }
-    };
+    }
+
+    useEffect(() => {
+        async function load() {
+            await fetchStats();
+        }
+        load();
+    }, []);
 
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('en-ET', { style: 'currency', currency: 'ETB' }).format(amount || 0);

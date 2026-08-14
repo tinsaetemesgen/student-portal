@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Mail, ArrowLeft, AlertCircle, CheckCircle, GraduationCap, Sparkles } from "lucide-react";
 import axios from "axios";
+import { getApiErrorMessage } from "../services/error";
 
 const SCHOOL_LOGO = 'src/assets/logo.png';
 const SCHOOL_NAME = 'Elevate Skills Academy';
@@ -30,9 +31,9 @@ const ForgotPassword = () => {
                 setSuccess(true);
                 setRequestId(response.data.data.requestId);
             }
-        } catch (error: any) {
+        } catch (error) {
             console.error("Error requesting reset:", error);
-            setError(error.response?.data?.error || "Failed to request password reset");
+            setError(getApiErrorMessage(error, "Failed to request password reset"));
         } finally {
             setLoading(false);
         }

@@ -7,7 +7,6 @@ import {
     Menu,
     LogOut,
     MessageCircle,
-    User as UserIcon,
     Settings,
     ChevronDown,
     Check,
@@ -82,6 +81,18 @@ const roleInfo = {
         userRole: "Parent",
         chatPath: "/parent/chat",
     },
+};
+
+const formatTime = (date: string): string => {
+    const diff = Date.now() - new Date(date).getTime();
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+
+    if (minutes < 1) return 'Just now';
+    if (minutes < 60) return `${minutes}m ago`;
+    if (hours < 24) return `${hours}h ago`;
+    return `${days}d ago`;
 };
 
 const Navbar = ({ role, toggleSidebar }: NavbarProps) => {
@@ -186,25 +197,16 @@ const Navbar = ({ role, toggleSidebar }: NavbarProps) => {
     // 📌 FORMAT TIME
     // ============================================
 
-    const formatTime = (date: string): string => {
-        const diff = Date.now() - new Date(date).getTime();
-        const minutes = Math.floor(diff / 60000);
-        const hours = Math.floor(diff / 3600000);
-        const days = Math.floor(diff / 86400000);
-
-        if (minutes < 1) return 'Just now';
-        if (minutes < 60) return `${minutes}m ago`;
-        if (hours < 24) return `${hours}h ago`;
-        return `${days}d ago`;
-    };
-
     // ============================================
     // 📡 SOCKET LISTENERS
     // ============================================
 
     useEffect(() => {
-        fetchUnreadCount();
-        fetchNotifications();
+        async function load() {
+            await fetchUnreadCount();
+            await fetchNotifications();
+        }
+        load();
 
         const socket = getSocket();
         if (socket) {
@@ -485,22 +487,16 @@ const Navbar = ({ role, toggleSidebar }: NavbarProps) => {
 
                                 {/* Menu Items */}
                                 <div className="py-2">
-                                    <Link
-                                        to={`/${role}/profile`}
-                                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700 transition text-sm text-gray-700 dark:text-gray-200"
-                                        onClick={() => setShowUserDropdown(false)}
-                                    >
-                                        <UserIcon size={16} className="text-gray-400 dark:text-gray-500" />
-                                        Profile
-                                    </Link>
-                                    <Link
-                                        to={`/${role}/settings`}
-                                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700 transition text-sm text-gray-700 dark:text-gray-200"
-                                        onClick={() => setShowUserDropdown(false)}
-                                    >
-                                        <Settings size={16} className="text-gray-400 dark:text-gray-500" />
-                                        Settings
-                                    </Link>
+                                    {role === "admin" && (
+                                        <Link
+                                            to={`/${role}/settings`}
+                                            className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700 transition text-sm text-gray-700 dark:text-gray-200"
+                                            onClick={() => setShowUserDropdown(false)}
+                                        >
+                                            <Settings size={16} className="text-gray-400 dark:text-gray-500" />
+                                            Settings
+                                        </Link>
+                                    )}
                                     <Link
                                         to={`/${role}/chat`}
                                         className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700 transition text-sm text-gray-700 dark:text-gray-200"

@@ -1,9 +1,10 @@
 // src/pages/student/Announcements.tsx - ENHANCED UI
 
 import { useState, useEffect } from "react";
-import { Megaphone, Calendar, Clock, AlertCircle, Bell, Users, Sparkles, ChevronRight } from "lucide-react";
+import { Megaphone, Calendar, Clock, AlertCircle, Bell, Users } from "lucide-react";
 import DashboardLayout from "../../layout/DashboardLayout";
 import axios from "axios";
+import { getApiErrorMessage } from "../../services/error";
 
 interface Announcement {
     _id: string;
@@ -43,23 +44,22 @@ const StudentAnnouncements = () => {
     const [error, setError] = useState("");
 
     useEffect(() => {
-        fetchAnnouncements();
-    }, []);
-
-    const fetchAnnouncements = async () => {
-        try {
-            const token = localStorage.getItem('token');
-            const response = await axios.get('http://localhost:7000/api/announcements', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            setAnnouncements(response.data.data || []);
-            setLoading(false);
-        } catch (error: any) {
-            console.error("Error fetching announcements:", error);
-            setError(error.response?.data?.error || "Failed to load announcements");
-            setLoading(false);
+        async function load() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await axios.get('http://localhost:7000/api/announcements', {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                setAnnouncements(response.data.data || []);
+                setLoading(false);
+            } catch (error) {
+                console.error("Error fetching announcements:", error);
+                setError(getApiErrorMessage(error, "Failed to load announcements"));
+                setLoading(false);
+            }
         }
-    };
+        load();
+    }, []);
 
     const getPriorityBadge = (priority: string) => {
         const style = PRIORITY_BADGES[priority] || PRIORITY_BADGES.low;

@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import DashboardLayout from "../../layout/DashboardLayout";
 import axios from "axios";
+import { getApiErrorMessage } from "../../services/error";
 
 interface Resource {
     _id: string;
@@ -40,6 +41,19 @@ interface Resource {
 const CLASS_LEVELS = ['primary', 'middle', 'secondary'];
 const SUBJECTS = ['Mathematics', 'English', 'Science', 'Physics', 'Chemistry', 'Biology', 'History', 'Geography', 'ICT', 'Physical Education', 'Art', 'Music'];
 
+const getTimeAgo = (date: string) => {
+    const diff = Date.now() - new Date(date).getTime();
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+    
+    if (minutes < 1) return 'Just now';
+    if (minutes < 60) return `${minutes}m ago`;
+    if (hours < 24) return `${hours}h ago`;
+    if (days < 7) return `${days}d ago`;
+    return new Date(date).toLocaleDateString();
+};
+
 const StudentResources = () => {
     const [resources, setResources] = useState<Resource[]>([]);
     const [loading, setLoading] = useState(true);
@@ -47,31 +61,29 @@ const StudentResources = () => {
     const [filterSubject, setFilterSubject] = useState<string>("");
     const [filterClassLevel, setFilterClassLevel] = useState<string>("");
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-    const [expandedId, setExpandedId] = useState<string | null>(null);
 
     useEffect(() => {
-        fetchResources();
-    }, [filterSubject, filterClassLevel]);
+        async function load() {
+            try {
+                const token = localStorage.getItem('token');
+                let url = 'http://localhost:7000/api/resources';
+                const params = new URLSearchParams();
+                if (filterSubject) params.append('subject', filterSubject);
+                if (filterClassLevel) params.append('classLevel', filterClassLevel);
+                if (params.toString()) url += `?${params.toString()}`;
 
-    const fetchResources = async () => {
-        try {
-            const token = localStorage.getItem('token');
-            let url = 'http://localhost:7000/api/resources';
-            const params = new URLSearchParams();
-            if (filterSubject) params.append('subject', filterSubject);
-            if (filterClassLevel) params.append('classLevel', filterClassLevel);
-            if (params.toString()) url += `?${params.toString()}`;
-
-            const response = await axios.get(url, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            setResources(response.data.data || []);
-            setLoading(false);
-        } catch (error: any) {
-            console.error("Error fetching resources:", error);
-            setLoading(false);
+                const response = await axios.get(url, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                setResources(response.data.data || []);
+                setLoading(false);
+            } catch (error) {
+                console.error("Error fetching resources:", error);
+                setLoading(false);
+            }
         }
-    };
+        load();
+    }, [filterSubject, filterClassLevel]);
 
     const handleDownload = async (id: string, fileName: string) => {
         try {
@@ -89,8 +101,8 @@ const StudentResources = () => {
             link.click();
             link.remove();
             window.URL.revokeObjectURL(url);
-        } catch (error: any) {
-            alert(error.response?.data?.error || "Failed to download resource");
+        } catch (error) {
+            alert(getApiErrorMessage(error, "Failed to download resource"));
         }
     };
 
@@ -116,19 +128,6 @@ const StudentResources = () => {
             secondary: 'Secondary (9-12)',
         };
         return labels[level] || level;
-    };
-
-    const getTimeAgo = (date: string) => {
-        const diff = Date.now() - new Date(date).getTime();
-        const minutes = Math.floor(diff / 60000);
-        const hours = Math.floor(diff / 3600000);
-        const days = Math.floor(diff / 86400000);
-        
-        if (minutes < 1) return 'Just now';
-        if (minutes < 60) return `${minutes}m ago`;
-        if (hours < 24) return `${hours}h ago`;
-        if (days < 7) return `${days}d ago`;
-        return new Date(date).toLocaleDateString();
     };
 
     const filteredResources = resources.filter(r => {

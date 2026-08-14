@@ -51,10 +51,11 @@ const Login = () => {
             } else {
                 setError(response.data.error || "Login failed");
             }
-        } catch (err: any) {
-            if (err.response) {
-                setError(err.response.data?.error || "Login failed. Please try again.");
-            } else if (err.request) {
+        } catch (err) {
+            const errObj = err as { response?: { data?: { error?: string } }; request?: unknown };
+            if (errObj.response) {
+                setError(errObj.response.data?.error || "Login failed. Please try again.");
+            } else if (errObj.request) {
                 setError("Cannot connect to server. Please check if backend is running.");
             } else {
                 setError("Login failed. Please try again.");

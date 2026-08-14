@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { GraduationCap, BookOpen, Users, Filter, BarChart3 } from "lucide-react";
 import DashboardLayout from "../../layout/DashboardLayout";
 import axios from "axios";
+import { getApiErrorMessage } from "../../services/error";
 
 interface Assessment {
     score: number;
@@ -57,45 +58,6 @@ const ParentGrades = () => {
     const [subjects, setSubjects] = useState<string[]>([]);
     const [expandedGrade, setExpandedGrade] = useState<string | null>(null);
 
-    useEffect(() => {
-        fetchParentData();
-    }, []);
-
-    const fetchParentData = async () => {
-        try {
-            const token = localStorage.getItem('token');
-            const userStr = localStorage.getItem('user');
-            const user = userStr ? JSON.parse(userStr) : null;
-            const userId = user?._id;
-
-            if (!userId) {
-                setError("User ID not found");
-                setLoading(false);
-                return;
-            }
-
-            const childrenRes = await axios.get(
-                `http://localhost:7000/api/parents/${userId}/children`,
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-
-            const childrenData: Child[] = (childrenRes.data?.data || []) as Child[];
-            setChildren(childrenData);
-
-            if (childrenData.length > 0) {
-                const firstChildId = childrenData[0]._id;
-                setSelectedChild(firstChildId);
-                await fetchChildGrades(firstChildId, token ?? undefined);
-            } else {
-                setLoading(false);
-            }
-        } catch (error: any) {
-            console.error("Error fetching parent data:", error);
-            setError(error.response?.data?.error || "Failed to load data");
-            setLoading(false);
-        }
-    };
-
     const fetchChildGrades = async (childId: string, token?: string) => {
         try {
             const authToken = token || localStorage.getItem('token');
@@ -114,12 +76,51 @@ const ParentGrades = () => {
             setSelectedSemester("");
 
             setLoading(false);
-        } catch (error: any) {
+        } catch (error) {
             console.error("Error fetching child grades:", error);
-            setError(error.response?.data?.error || "Failed to load grades");
+            setError(getApiErrorMessage(error, "Failed to load grades"));
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        async function fetchParentData() {
+            try {
+                const token = localStorage.getItem('token');
+                const userStr = localStorage.getItem('user');
+                const user = userStr ? JSON.parse(userStr) : null;
+                const userId = user?._id;
+
+                if (!userId) {
+                    setError("User ID not found");
+                    setLoading(false);
+                    return;
+                }
+
+                const childrenRes = await axios.get(
+                    `http://localhost:7000/api/parents/${userId}/children`,
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
+
+                const childrenData: Child[] = (childrenRes.data?.data || []) as Child[];
+                setChildren(childrenData);
+
+                if (childrenData.length > 0) {
+                    const firstChildId = childrenData[0]._id;
+                    setSelectedChild(firstChildId);
+                    await fetchChildGrades(firstChildId, token ?? undefined);
+                } else {
+                    setLoading(false);
+                }
+            } catch (error) {
+                console.error("Error fetching parent data:", error);
+                setError(getApiErrorMessage(error, "Failed to load data"));
+                setLoading(false);
+            }
+        }
+
+        fetchParentData();
+    }, []);
 
     const handleChildChange = (childId: string) => {
         setSelectedChild(childId);

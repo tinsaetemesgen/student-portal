@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { Users, UserPlus, BookOpen, GraduationCap, School, Plus, Edit2, Trash2 } from "lucide-react";
+import { Users, UserPlus, BookOpen } from "lucide-react";
 import DashboardLayout from "../../layout/DashboardLayout";
 import axios from "axios";
+import { getApiErrorMessage } from "../../services/error";
 
 interface UserData {
     _id: string;
@@ -30,38 +31,37 @@ const RegistrarDashboard = () => {
     const [error, setError] = useState("");
 
     useEffect(() => {
-        fetchDashboardData();
-    }, []);
+        async function load() {
+            try {
+                const token = localStorage.getItem('token');
 
-    const fetchDashboardData = async () => {
-        try {
-            const token = localStorage.getItem('token');
+                // Fetch students
+                const studentsRes = await axios.get('http://localhost:7000/api/registrar/students', {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                setStudents(studentsRes.data.data || []);
 
-            // Fetch students
-            const studentsRes = await axios.get('http://localhost:7000/api/registrar/students', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            setStudents(studentsRes.data.data || []);
+                // Fetch teachers
+                const teachersRes = await axios.get('http://localhost:7000/api/registrar/teachers', {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                setTeachers(teachersRes.data.data || []);
 
-            // Fetch teachers
-            const teachersRes = await axios.get('http://localhost:7000/api/registrar/teachers', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            setTeachers(teachersRes.data.data || []);
+                // Fetch classes
+                const classesRes = await axios.get('http://localhost:7000/api/registrar/classes', {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                setClasses(classesRes.data.data || []);
 
-            // Fetch classes
-            const classesRes = await axios.get('http://localhost:7000/api/registrar/classes', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            setClasses(classesRes.data.data || []);
-
-            setLoading(false);
-        } catch (error: any) {
-            console.error("Error fetching dashboard data:", error);
-            setError(error.response?.data?.error || "Failed to load data");
-            setLoading(false);
+                setLoading(false);
+            } catch (error) {
+                console.error("Error fetching dashboard data:", error);
+                setError(getApiErrorMessage(error, "Failed to load data"));
+                setLoading(false);
+            }
         }
-    };
+        load();
+    }, []);
 
     const stats = [
         { title: "Total Students", value: students.length, icon: <Users size={24} className="text-blue-600" />, color: "bg-blue-50" },

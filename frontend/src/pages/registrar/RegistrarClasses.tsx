@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from "react";
 import {
-    Plus, Edit2, Trash2, Search, School, Users, BookOpen, X
+    Plus, School, Users, BookOpen, X
 } from "lucide-react"; // ✅ ADDED X HERE
 import DashboardLayout from "../../layout/DashboardLayout";
 import axios from "axios";
+import { getApiErrorMessage } from "../../services/error";
 
 interface ClassData {
     _id: string;
@@ -29,7 +30,7 @@ const RegistrarClasses = () => {
     const [classes, setClasses] = useState<ClassData[]>([]);
     const [teachers, setTeachers] = useState<{ _id: string; name: string; subject: string }[]>([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
+    const [, setError] = useState("");
     const [showModal, setShowModal] = useState(false);
     const [success, setSuccess] = useState(false);
     const [successMessage, setSuccessMessage] = useState("");
@@ -48,7 +49,7 @@ const RegistrarClasses = () => {
         fetchTeachers();
     }, []);
 
-    const fetchClasses = async () => {
+    async function fetchClasses() {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.get('http://localhost:7000/api/registrar/classes', {
@@ -56,14 +57,14 @@ const RegistrarClasses = () => {
             });
             setClasses(response.data.data || []);
             setLoading(false);
-        } catch (error: any) {
+        } catch (error) {
             console.error("Error fetching classes:", error);
-            setError(error.response?.data?.error || "Failed to load classes");
+            setError(getApiErrorMessage(error, "Failed to load classes"));
             setLoading(false);
         }
-    };
+    }
 
-    const fetchTeachers = async () => {
+    async function fetchTeachers() {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.get('http://localhost:7000/api/registrar/teachers', {
@@ -73,7 +74,7 @@ const RegistrarClasses = () => {
         } catch (error) {
             console.error("Error fetching teachers:", error);
         }
-    };
+    }
 
     // ✅ Auto-generate class name from grade + section
     const generateClassName = (grade: string, section: string) => {
@@ -162,8 +163,8 @@ const RegistrarClasses = () => {
                 setSuccess(false);
                 setSuccessMessage("");
             }, 5000);
-        } catch (error: any) {
-            alert(error.response?.data?.error || "Failed to create class");
+        } catch (error) {
+            alert(getApiErrorMessage(error, "Failed to create class"));
         }
     };
 
@@ -269,7 +270,7 @@ const RegistrarClasses = () => {
                                             <td className="px-4 py-3">
                                                 {cls.teacherIds?.length > 0 ? (
                                                     <div className="flex flex-wrap gap-1">
-                                                        {cls.teacherIds.map((t: any) => (
+                                                        {cls.teacherIds.map((t) => (
                                                             <span key={t._id} className="px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded text-xs">
                                                                 {t.name}
                                                             </span>

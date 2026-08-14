@@ -1,14 +1,20 @@
 // src/pages/teacher/Worksheets.tsx
 import { useState, useEffect } from "react";
-import { Plus, Edit2, Trash2, Eye, Send, Clock, Users, FileText, X } from "lucide-react";
+import { Plus, Edit2, Trash2, Eye, Clock, Users, FileText, X } from "lucide-react";
 import DashboardLayout from "../../layout/DashboardLayout";
 import axios from "axios";
+import { getApiErrorMessage } from "../../services/error";
 
 interface Question {
     question: string;
     options: string[];
     correctAnswer: number;
     marks: number;
+}
+
+interface ClassItem {
+    _id: string;
+    name: string;
 }
 
 interface Worksheet {
@@ -37,10 +43,10 @@ interface Worksheet {
 const TeacherWorksheets = () => {
     const [worksheets, setWorksheets] = useState<Worksheet[]>([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
+    const [, setError] = useState("");
     const [showModal, setShowModal] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
-    const [classes, setClasses] = useState<any[]>([]);
+    const [classes, setClasses] = useState<ClassItem[]>([]);
     const [formData, setFormData] = useState({
         title: "",
         description: "",
@@ -63,7 +69,7 @@ const TeacherWorksheets = () => {
         fetchClasses();
     }, []);
 
-    const fetchWorksheets = async () => {
+    async function fetchWorksheets() {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.get('http://localhost:7000/api/worksheets', {
@@ -71,14 +77,14 @@ const TeacherWorksheets = () => {
             });
             setWorksheets(response.data.data || []);
             setLoading(false);
-        } catch (error: any) {
+        } catch (error) {
             console.error("Error fetching worksheets:", error);
-            setError(error.response?.data?.error || "Failed to load worksheets");
+            setError(getApiErrorMessage(error, "Failed to load worksheets"));
             setLoading(false);
         }
-    };
+    }
 
-    const fetchClasses = async () => {
+    async function fetchClasses() {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.get('http://localhost:7000/api/classes', {
@@ -88,7 +94,7 @@ const TeacherWorksheets = () => {
         } catch (error) {
             console.error("Error fetching classes:", error);
         }
-    };
+    }
 
     const handleAddQuestion = () => {
         if (!currentQuestion.question.trim() || currentQuestion.options.some(o => !o.trim())) {
@@ -128,7 +134,7 @@ const TeacherWorksheets = () => {
                 : 'http://localhost:7000/api/worksheets';
             const method = editingId ? 'put' : 'post';
 
-            const response = await axios[method](url, formData, {
+            await axios[method](url, formData, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
@@ -137,8 +143,8 @@ const TeacherWorksheets = () => {
             resetForm();
             fetchWorksheets();
             alert(editingId ? '✅ Worksheet updated!' : '✅ Worksheet created!');
-        } catch (error: any) {
-            alert(error.response?.data?.error || "Failed to save worksheet");
+        } catch (error) {
+            alert(getApiErrorMessage(error, "Failed to save worksheet"));
         }
     };
 
@@ -150,8 +156,8 @@ const TeacherWorksheets = () => {
             });
             fetchWorksheets();
             alert('✅ Worksheet published!');
-        } catch (error: any) {
-            alert(error.response?.data?.error || "Failed to publish");
+        } catch (error) {
+            alert(getApiErrorMessage(error, "Failed to publish"));
         }
     };
 
@@ -163,8 +169,8 @@ const TeacherWorksheets = () => {
             });
             fetchWorksheets();
             alert('✅ Worksheet closed!');
-        } catch (error: any) {
-            alert(error.response?.data?.error || "Failed to close");
+        } catch (error) {
+            alert(getApiErrorMessage(error, "Failed to close"));
         }
     };
 
@@ -177,8 +183,8 @@ const TeacherWorksheets = () => {
             });
             fetchWorksheets();
             alert('✅ Worksheet deleted!');
-        } catch (error: any) {
-            alert(error.response?.data?.error || "Failed to delete");
+        } catch (error) {
+            alert(getApiErrorMessage(error, "Failed to delete"));
         }
     };
 

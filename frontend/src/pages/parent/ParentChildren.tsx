@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { Users, User, BookOpen, Eye, GraduationCap, ClipboardCheck } from "lucide-react";
+import { Users, GraduationCap, ClipboardCheck } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import DashboardLayout from "../../layout/DashboardLayout";
 import axios from "axios";
+import { getApiErrorMessage } from "../../services/error";
 
 interface Child {
     _id: string;
@@ -21,34 +22,34 @@ const ParentChildren = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
+        async function fetchChildren() {
+            try {
+                const token = localStorage.getItem('token');
+                const userStr = localStorage.getItem('user');
+                const user = userStr ? JSON.parse(userStr) : null;
+                const userId = user?._id;
+
+                if (!userId) {
+                    setError("User not found");
+                    setLoading(false);
+                    return;
+                }
+
+                const response = await axios.get(
+                    `http://localhost:7000/api/parents/${userId}/children`,
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
+                setChildren(response.data.data || []);
+                setLoading(false);
+            } catch (error) {
+                console.error("Error fetching children:", error);
+                setError(getApiErrorMessage(error, "Failed to load children"));
+                setLoading(false);
+            }
+        }
+
         fetchChildren();
     }, []);
-
-    const fetchChildren = async () => {
-        try {
-            const token = localStorage.getItem('token');
-            const userStr = localStorage.getItem('user');
-            const user = userStr ? JSON.parse(userStr) : null;
-            const userId = user?._id;
-
-            if (!userId) {
-                setError("User not found");
-                setLoading(false);
-                return;
-            }
-
-            const response = await axios.get(
-                `http://localhost:7000/api/parents/${userId}/children`,
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-            setChildren(response.data.data || []);
-            setLoading(false);
-        } catch (error: any) {
-            console.error("Error fetching children:", error);
-            setError(error.response?.data?.error || "Failed to load children");
-            setLoading(false);
-        }
-    };
 
     // ✅ Navigate to child's grades
     const viewGrades = (childId: string) => {

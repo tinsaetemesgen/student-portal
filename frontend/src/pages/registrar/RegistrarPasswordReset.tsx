@@ -7,16 +7,14 @@ import {
     XCircle, 
     Clock, 
     Mail, 
-    User, 
     Key,
     Search,
-    Filter,
-    AlertCircle,
     Eye,
     EyeOff
 } from "lucide-react";
 import DashboardLayout from "../../layout/DashboardLayout";
 import axios from "axios";
+import { getApiErrorMessage } from "../../services/error";
 
 interface ResetRequest {
     _id: string;
@@ -41,7 +39,7 @@ interface ResetRequest {
 const RegistrarPasswordReset = () => {
     const [requests, setRequests] = useState<ResetRequest[]>([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
+    const [, setError] = useState("");
     const [filter, setFilter] = useState<'all' | 'pending' | 'resolved' | 'cancelled'>('pending');
     const [searchTerm, setSearchTerm] = useState("");
     const [showResetModal, setShowResetModal] = useState(false);
@@ -57,7 +55,7 @@ const RegistrarPasswordReset = () => {
         fetchRequests();
     }, []);
 
-    const fetchRequests = async () => {
+    async function fetchRequests() {
         try {
             setLoading(true);
             const token = localStorage.getItem('token');
@@ -66,12 +64,12 @@ const RegistrarPasswordReset = () => {
             });
             setRequests(response.data.data || []);
             setLoading(false);
-        } catch (error: any) {
+        } catch (error) {
             console.error("Error fetching requests:", error);
-            setError(error.response?.data?.error || "Failed to load requests");
+            setError(getApiErrorMessage(error, "Failed to load requests"));
             setLoading(false);
         }
-    };
+    }
 
     const handleResetPassword = async () => {
         if (!selectedRequest) return;
@@ -83,7 +81,7 @@ const RegistrarPasswordReset = () => {
         setSubmitting(true);
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.post(
+            await axios.post(
                 `http://localhost:7000/api/password-reset/${selectedRequest._id}/reset`,
                 { newPassword, notes },
                 { headers: { Authorization: `Bearer ${token}` } }
@@ -101,8 +99,8 @@ const RegistrarPasswordReset = () => {
                 setSuccess(false);
                 setSuccessMessage("");
             }, 5000);
-        } catch (error: any) {
-            alert(error.response?.data?.error || "Failed to reset password");
+        } catch (error) {
+            alert(getApiErrorMessage(error, "Failed to reset password"));
         } finally {
             setSubmitting(false);
         }
@@ -118,8 +116,8 @@ const RegistrarPasswordReset = () => {
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             fetchRequests();
-        } catch (error: any) {
-            alert(error.response?.data?.error || "Failed to cancel request");
+        } catch (error) {
+            alert(getApiErrorMessage(error, "Failed to cancel request"));
         }
     };
 
@@ -224,10 +222,10 @@ const RegistrarPasswordReset = () => {
                         />
                     </div>
                     <div className="flex gap-2 flex-wrap">
-                        {['all', 'pending', 'resolved', 'cancelled'].map((f) => (
+                        {(['all', 'pending', 'resolved', 'cancelled'] as const).map((f) => (
                             <button
                                 key={f}
-                                onClick={() => setFilter(f as any)}
+                                onClick={() => setFilter(f)}
                                 className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
                                     filter === f ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
                                 }`}

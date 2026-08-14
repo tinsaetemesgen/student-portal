@@ -1,9 +1,10 @@
 // src/pages/registrar/RegistrarStudents.tsx - WITH GRADE & SECTION DROPDOWNS
 
 import { useState, useEffect } from "react";
-import { Plus, Edit2, Trash2, Search, UserPlus, X, Check, Users } from "lucide-react";
+import { Search, UserPlus, X, Check, Users } from "lucide-react";
 import DashboardLayout from "../../layout/DashboardLayout";
 import axios from "axios";
+import { getApiErrorMessage } from "../../services/error";
 
 interface Student {
     _id: string;
@@ -38,7 +39,7 @@ const RegistrarStudents = () => {
     const [students, setStudents] = useState<Student[]>([]);
     const [classes, setClasses] = useState<Class[]>([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
+    const [, setError] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
     const [showModal, setShowModal] = useState(false);
     const [success, setSuccess] = useState(false);
@@ -61,7 +62,7 @@ const RegistrarStudents = () => {
         fetchClasses();
     }, []);
 
-    const fetchStudents = async () => {
+    async function fetchStudents() {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.get('http://localhost:7000/api/registrar/students', {
@@ -69,14 +70,14 @@ const RegistrarStudents = () => {
             });
             setStudents(response.data.data || []);
             setLoading(false);
-        } catch (error: any) {
+        } catch (error) {
             console.error("Error fetching students:", error);
-            setError(error.response?.data?.error || "Failed to load students");
+            setError(getApiErrorMessage(error, "Failed to load students"));
             setLoading(false);
         }
-    };
+    }
 
-    const fetchClasses = async () => {
+    async function fetchClasses() {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.get('http://localhost:7000/api/registrar/classes', {
@@ -86,7 +87,7 @@ const RegistrarStudents = () => {
         } catch (error) {
             console.error("Error fetching classes:", error);
         }
-    };
+    }
 
     // ✅ Generate class name from grade + section
     const generateClassName = (grade: string, section: string) => {
@@ -174,8 +175,8 @@ const RegistrarStudents = () => {
                 setSuccess(false);
                 setSuccessMessage("");
             }, 5000);
-        } catch (error: any) {
-            alert(error.response?.data?.error || "Failed to register student");
+        } catch (error) {
+            alert(getApiErrorMessage(error, "Failed to register student"));
         }
     };
 
@@ -188,8 +189,8 @@ const RegistrarStudents = () => {
             });
             fetchStudents();
             alert('✅ Student deleted successfully!');
-        } catch (error: any) {
-            alert(error.response?.data?.error || "Failed to delete student");
+        } catch (error) {
+            alert(getApiErrorMessage(error, "Failed to delete student"));
         }
     };
 

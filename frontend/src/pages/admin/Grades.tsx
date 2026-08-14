@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import DashboardLayout from "../../layout/DashboardLayout";
 import axios from "axios";
+import { getApiErrorMessage } from "../../services/error";
 
 interface GradeStats {
     totalGrades: number;
@@ -40,7 +41,6 @@ const AdminGrades = () => {
     const [error, setError] = useState("");
     const [stats, setStats] = useState<GradeStats | null>(null);
     const [grades, setGrades] = useState<GradeRecord[]>([]);
-    const [filteredGrades, setFilteredGrades] = useState<GradeRecord[]>([]);
 
     const [selectedClass, setSelectedClass] = useState<string>("");
     const [selectedSubject, setSelectedSubject] = useState<string>("");
@@ -50,11 +50,7 @@ const AdminGrades = () => {
     const [classes, setClasses] = useState<ClassData[]>([]);
     const [subjects, setSubjects] = useState<string[]>([]);
 
-    useEffect(() => {
-        fetchData();
-    }, []);
-
-    const fetchData = async () => {
+    async function fetchData() {
         try {
             const token = localStorage.getItem('token');
 
@@ -65,7 +61,6 @@ const AdminGrades = () => {
 
             const allGrades: GradeRecord[] = gradesRes.data.data || [];
             setGrades(allGrades);
-            setFilteredGrades(allGrades);
 
             // 2️⃣ Get grade statistics
             const statsRes = await axios.get('http://localhost:7000/api/grades/stats', {
@@ -85,38 +80,25 @@ const AdminGrades = () => {
             setClasses(classesRes.data.data || []);
 
             setLoading(false);
-        } catch (error: any) {
+        } catch (error) {
             console.error("Error fetching grade data:", error);
-            setError(error.response?.data?.error || "Failed to load grade data");
+            setError(getApiErrorMessage(error, "Failed to load grade data"));
             setLoading(false);
         }
-    };
+    }
 
-    const applyFilters = () => {
-        let filtered = [...grades];
-
-        if (selectedClass) {
-            filtered = filtered.filter(g => g.studentId?.class === selectedClass);
+    useEffect(() => {
+        async function load() {
+            await fetchData();
         }
-        if (selectedSubject) {
-            filtered = filtered.filter(g => g.subject === selectedSubject);
-        }
-        if (selectedSemester) {
-            filtered = filtered.filter(g => g.semester === selectedSemester);
-        }
-        if (selectedAcademicYear) {
-            filtered = filtered.filter(g => g.academicYear === selectedAcademicYear);
-        }
-
-        setFilteredGrades(filtered);
-    };
+        load();
+    }, []);
 
     const resetFilters = () => {
         setSelectedClass("");
         setSelectedSubject("");
         setSelectedSemester("");
         setSelectedAcademicYear("");
-        setFilteredGrades(grades);
     };
 
     const gradeColors: Record<string, string> = {
@@ -137,11 +119,13 @@ const AdminGrades = () => {
         return gradeColors[grade] || 'bg-gray-100 text-gray-700';
     };
 
-    useEffect(() => {
-        if (grades.length > 0) {
-            applyFilters();
-        }
-    }, [selectedClass, selectedSubject, selectedSemester, selectedAcademicYear]);
+    const filteredGrades = grades.filter((g) => {
+        if (selectedClass && g.studentId?.class !== selectedClass) return false;
+        if (selectedSubject && g.subject !== selectedSubject) return false;
+        if (selectedSemester && g.semester !== selectedSemester) return false;
+        if (selectedAcademicYear && g.academicYear !== selectedAcademicYear) return false;
+        return true;
+    });
 
     if (loading) {
         return (

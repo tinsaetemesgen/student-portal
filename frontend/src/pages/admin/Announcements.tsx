@@ -1,13 +1,14 @@
 // src/pages/admin/AdminAnnouncements.tsx - ENHANCED UI
 
 import { useState, useEffect } from "react";
+import type { ReactElement } from "react";
 import {
     Plus, Megaphone, CheckCircle, Clock, X, Calendar, Users,
-    Edit2, Trash2, Eye, EyeOff, Send, Bell, Sparkles,
-    Filter, Search, ChevronDown, ChevronUp, Award
+    Edit2, Trash2, EyeOff, Send, Bell, Sparkles,
+    Search, ChevronDown, ChevronUp
 } from "lucide-react";
 import DashboardLayout from "../../layout/DashboardLayout";
-import axios from "axios";
+import { getApiErrorMessage } from "../../services/error";
 
 interface Announcement {
     _id: string;
@@ -36,6 +37,8 @@ interface AnnouncementForm {
     expiresAt: string;
 }
 
+const generateAnnouncementId = () => Date.now().toString();
+
 const AUDIENCE_BADGES: Record<string, { bg: string; text: string; icon: string }> = {
     All: { bg: "bg-purple-100", text: "text-purple-700", icon: "🌐" },
     Students: { bg: "bg-blue-100", text: "text-blue-700", icon: "🎓" },
@@ -51,7 +54,7 @@ const PRIORITY_STYLES: Record<string, { bg: string; text: string; border: string
     Urgent: { bg: "bg-red-100", text: "text-red-600", border: "border-red-300", icon: "🚨" },
 };
 
-const STATUS_STYLES: Record<string, { bg: string; text: string; icon: JSX.Element }> = {
+const STATUS_STYLES: Record<string, { bg: string; text: string; icon: ReactElement }> = {
     Published: { bg: "bg-green-100", text: "text-green-700", icon: <CheckCircle size={14} /> },
     Draft: { bg: "bg-gray-100", text: "text-gray-600", icon: <Clock size={14} /> },
     Archived: { bg: "bg-gray-100", text: "text-gray-400", icon: <EyeOff size={14} /> },
@@ -80,13 +83,8 @@ const AdminAnnouncements = () => {
         expiresAt: "",
     });
 
-    useEffect(() => {
-        fetchAnnouncements();
-    }, []);
-
-    const fetchAnnouncements = async () => {
+    async function fetchAnnouncements() {
         try {
-            const token = localStorage.getItem('token');
             // API call - replace with actual endpoint
             // const response = await axios.get('http://localhost:7000/api/announcements', {
             //     headers: { Authorization: `Bearer ${token}` }
@@ -140,19 +138,25 @@ const AdminAnnouncements = () => {
             console.error("Error fetching announcements:", error);
             setLoading(false);
         }
-    };
+    }
+
+    useEffect(() => {
+        async function load() {
+            await fetchAnnouncements();
+        }
+        load();
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const token = localStorage.getItem('token');
             // API call - replace with actual endpoint
             // await axios.post('http://localhost:7000/api/announcements', formData, {
             //     headers: { Authorization: `Bearer ${token}` }
             // });
 
             const newAnnouncement: Announcement = {
-                _id: Date.now().toString(),
+                _id: generateAnnouncementId(),
                 ...formData,
                 createdBy: { _id: user?._id || 'current', name: user?.name || 'You' },
                 createdAt: new Date().toISOString(),
@@ -169,8 +173,8 @@ const AdminAnnouncements = () => {
 
             setShowModal(false);
             resetForm();
-        } catch (error: any) {
-            alert(error.response?.data?.error || "Failed to save announcement");
+        } catch (error) {
+            alert(getApiErrorMessage(error, "Failed to save announcement"));
         }
     };
 
@@ -509,7 +513,7 @@ const AdminAnnouncements = () => {
                                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Audience</label>
                                     <select
                                         value={formData.audience}
-                                        onChange={(e) => setFormData({ ...formData, audience: e.target.value as any })}
+                                        onChange={(e) => setFormData({ ...formData, audience: e.target.value as Announcement['audience'] })}
                                         className="w-full border border-gray-200 dark:border-gray-600 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:text-gray-100"
                                     >
                                         <option value="All">🌐 All</option>
@@ -523,7 +527,7 @@ const AdminAnnouncements = () => {
                                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Priority</label>
                                     <select
                                         value={formData.priority}
-                                        onChange={(e) => setFormData({ ...formData, priority: e.target.value as any })}
+                                        onChange={(e) => setFormData({ ...formData, priority: e.target.value as Announcement['priority'] })}
                                         className="w-full border border-gray-200 dark:border-gray-600 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:text-gray-100"
                                     >
                                         <option value="Low">📌 Low</option>
@@ -548,7 +552,7 @@ const AdminAnnouncements = () => {
                                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Status</label>
                                     <select
                                         value={formData.status}
-                                        onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
+                                        onChange={(e) => setFormData({ ...formData, status: e.target.value as Announcement['status'] })}
                                         className="w-full border border-gray-200 dark:border-gray-600 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:text-gray-100"
                                     >
                                         <option value="Published">✅ Published</option>

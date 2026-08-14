@@ -12,14 +12,12 @@ import {
     ChevronRight,
     Clock,
     User,
-    Sparkles,
-    TrendingUp,
-    GraduationCap,
-    AlertCircle
+    Sparkles
 } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import DashboardLayout from "../../layout/DashboardLayout";
 import axios from "axios";
+import { getApiErrorMessage } from "../../services/error";
 
 // ============================================
 // 📌 INTERFACES
@@ -63,12 +61,29 @@ interface GradeSummary {
     completed: number;
 }
 
+interface FeeItem {
+    status: string;
+    isOverdue?: boolean;
+}
+
+const getTimeAgo = (date: string) => {
+    const diff = Date.now() - new Date(date).getTime();
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+    
+    if (minutes < 1) return 'Just now';
+    if (minutes < 60) return `${minutes}m ago`;
+    if (hours < 24) return `${hours}h ago`;
+    if (days < 7) return `${days}d ago`;
+    return new Date(date).toLocaleDateString();
+};
+
 // ============================================
 // 📌 MAIN COMPONENT
 // ============================================
 
 const StudentDashboard = () => {
-    const navigate = useNavigate();
     const [announcements, setAnnouncements] = useState<Announcement[]>([]);
     const [recentResources, setRecentResources] = useState<Resource[]>([]);
     const [feeStatus, setFeeStatus] = useState<FeeStatus | null>(null);
@@ -84,66 +99,68 @@ const StudentDashboard = () => {
 
     // ✅ Set greeting based on time
     useEffect(() => {
-        const hour = new Date().getHours();
-        if (hour < 12) setGreeting("Good Morning ☀️");
-        else if (hour < 17) setGreeting("Good Afternoon 🌤️");
-        else setGreeting("Good Evening 🌙");
+        async function setGreetingByTime() {
+            const hour = new Date().getHours();
+            if (hour < 12) setGreeting("Good Morning ☀️");
+            else if (hour < 17) setGreeting("Good Afternoon 🌤️");
+            else setGreeting("Good Evening 🌙");
+        }
+        setGreetingByTime();
     }, []);
 
     // ✅ Fetch all data
     useEffect(() => {
-        fetchAllData();
-    }, []);
-
-    const fetchAllData = async () => {
-        try {
-            const token = localStorage.getItem('token');
-            
-            // 1️⃣ Fetch announcements
-            const annRes = await axios.get('http://localhost:7000/api/announcements', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            const announcementsData = annRes.data.data || [];
-            setAnnouncements(announcementsData.slice(0, 3));
-            setNotificationCount(announcementsData.length);
-
-            // 2️⃣ Fetch recent resources
-            const resRes = await axios.get('http://localhost:7000/api/resources/recent?limit=5', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            setRecentResources(resRes.data.data || []);
-
-            // 3️⃣ Fetch fee status
+        async function load() {
             try {
-                const feeRes = await axios.get('http://localhost:7000/api/finance/parent/student-fees', {
+                const token = localStorage.getItem('token');
+                
+                // 1️⃣ Fetch announcements
+                const annRes = await axios.get('http://localhost:7000/api/announcements', {
                     headers: { Authorization: `Bearer ${token}` }
                 });
-                const fees = feeRes.data.data || [];
-                const total = fees.length;
-                const paid = fees.filter((f: any) => f.status === 'paid').length;
-                const pending = fees.filter((f: any) => f.status === 'pending').length;
-                const overdue = fees.filter((f: any) => f.isOverdue).length;
-                setFeeStatus({ totalFees: total, paid, pending, overdue });
-            } catch (error) {
-                console.error("Error fetching fees:", error);
-            }
+                const announcementsData = annRes.data.data || [];
+                setAnnouncements(announcementsData.slice(0, 3));
+                setNotificationCount(announcementsData.length);
 
-            // 4️⃣ Fetch grade summary
-            try {
-                const gradeRes = await axios.get('http://localhost:7000/api/grades/my-summary', {
+                // 2️⃣ Fetch recent resources
+                const resRes = await axios.get('http://localhost:7000/api/resources/recent?limit=5', {
                     headers: { Authorization: `Bearer ${token}` }
                 });
-                setGradeSummary(gradeRes.data.data || null);
-            } catch (error) {
-                console.error("Error fetching grades:", error);
-            }
+                setRecentResources(resRes.data.data || []);
 
-            setLoading(false);
-        } catch (error) {
-            console.error("Error fetching dashboard data:", error);
-            setLoading(false);
+                // 3️⃣ Fetch fee status
+                try {
+                    const feeRes = await axios.get('http://localhost:7000/api/finance/parent/student-fees', {
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+                    const fees = feeRes.data.data || [];
+                    const total = fees.length;
+                    const paid = fees.filter((f: FeeItem) => f.status === 'paid').length;
+                    const pending = fees.filter((f: FeeItem) => f.status === 'pending').length;
+                    const overdue = fees.filter((f: FeeItem) => f.isOverdue).length;
+                    setFeeStatus({ totalFees: total, paid, pending, overdue });
+                } catch (error) {
+                    console.error("Error fetching fees:", error);
+                }
+
+                // 4️⃣ Fetch grade summary
+                try {
+                    const gradeRes = await axios.get('http://localhost:7000/api/grades/my-summary', {
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+                    setGradeSummary(gradeRes.data.data || null);
+                } catch (error) {
+                    console.error("Error fetching grades:", error);
+                }
+
+                setLoading(false);
+            } catch (error) {
+                console.error("Error fetching dashboard data:", error);
+                setLoading(false);
+            }
         }
-    };
+        load();
+    }, []);
 
     // ============================================
     // 📌 HELPERS
@@ -184,19 +201,6 @@ const StudentDashboard = () => {
         return icons[priority] || '📌';
     };
 
-    const getTimeAgo = (date: string) => {
-        const diff = Date.now() - new Date(date).getTime();
-        const minutes = Math.floor(diff / 60000);
-        const hours = Math.floor(diff / 3600000);
-        const days = Math.floor(diff / 86400000);
-        
-        if (minutes < 1) return 'Just now';
-        if (minutes < 60) return `${minutes}m ago`;
-        if (hours < 24) return `${hours}h ago`;
-        if (days < 7) return `${days}d ago`;
-        return new Date(date).toLocaleDateString();
-    };
-
     const handleDownload = async (id: string, fileName: string) => {
         try {
             const token = localStorage.getItem('token');
@@ -213,8 +217,8 @@ const StudentDashboard = () => {
             link.click();
             link.remove();
             window.URL.revokeObjectURL(url);
-        } catch (error: any) {
-            alert(error.response?.data?.error || "Failed to download resource");
+        } catch (error) {
+            alert(getApiErrorMessage(error, "Failed to download resource"));
         }
     };
 

@@ -70,6 +70,10 @@ const seed = async () => {
     age: 16,
     parentId: parent._id,
   });
+  const finance = await findOrCreateUser('finance@school.test', {
+    name: 'Finance Officer',
+    role: 'finance',
+  });
 
   if (!parent.children.some((id) => id.equals(student._id))) {
     parent.children.push(student._id);

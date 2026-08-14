@@ -1,9 +1,10 @@
 // src/pages/parent/ParentPayments.tsx - COMPLETE WITH SAFE RENDERING
 
 import { useState, useEffect } from "react";
-import { X, Check, Upload, Download, Eye, AlertCircle, Banknote, Users, Plus, FileText } from "lucide-react";
+import { X, Check, Upload, Download, AlertCircle, Banknote, Users, Plus, FileText } from "lucide-react";
 import DashboardLayout from "../../layout/DashboardLayout";
 import axios from "axios";
+import { getApiErrorMessage } from "../../services/error";
 
 interface Child {
     _id: string;
@@ -75,7 +76,7 @@ const ParentPayments = () => {
     const [payments, setPayments] = useState<Payment[]>([]);
     const [studentFees, setStudentFees] = useState<StudentFee[]>([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
+    const [, setError] = useState("");
     const [success, setSuccess] = useState(false);
     const [successMessage, setSuccessMessage] = useState("");
 
@@ -92,53 +93,42 @@ const ParentPayments = () => {
     const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null);
     const [modalError, setModalError] = useState("");
 
-    const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
-    const [showDetailsModal, setShowDetailsModal] = useState(false);
-
     useEffect(() => {
+        async function fetchParentData() {
+            try {
+                const token = localStorage.getItem('token');
+                const userStr = localStorage.getItem('user');
+                const user = userStr ? JSON.parse(userStr) : null;
+                const userId = user?._id;
+
+                if (!userId) {
+                    setError("User not found");
+                    setLoading(false);
+                    return;
+                }
+
+                const childrenRes = await axios.get(
+                    `http://localhost:7000/api/parents/${userId}/children`,
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
+
+                const childrenData = childrenRes.data.data || [];
+                setChildren(childrenData);
+
+                if (childrenData.length > 0) {
+                    setSelectedChild(childrenData[0]._id);
+                }
+
+                setLoading(false);
+            } catch (error) {
+                console.error("❌ Error fetching parent data:", error);
+                setError(getApiErrorMessage(error, "Failed to load data"));
+                setLoading(false);
+            }
+        }
+
         fetchParentData();
     }, []);
-
-    useEffect(() => {
-        if (selectedChild) {
-            console.log('🔄 Selected child changed:', selectedChild);
-            fetchChildFees(selectedChild);
-            fetchChildPayments(selectedChild);
-        }
-    }, [selectedChild]);
-
-    const fetchParentData = async () => {
-        try {
-            const token = localStorage.getItem('token');
-            const userStr = localStorage.getItem('user');
-            const user = userStr ? JSON.parse(userStr) : null;
-            const userId = user?._id;
-
-            if (!userId) {
-                setError("User not found");
-                setLoading(false);
-                return;
-            }
-
-            const childrenRes = await axios.get(
-                `http://localhost:7000/api/parents/${userId}/children`,
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-
-            const childrenData = childrenRes.data.data || [];
-            setChildren(childrenData);
-
-            if (childrenData.length > 0) {
-                setSelectedChild(childrenData[0]._id);
-            }
-
-            setLoading(false);
-        } catch (error: any) {
-            console.error("❌ Error fetching parent data:", error);
-            setError(error.response?.data?.error || "Failed to load data");
-            setLoading(false);
-        }
-    };
 
     const fetchChildFees = async (childId: string) => {
         try {
@@ -148,10 +138,10 @@ const ParentPayments = () => {
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             
-            const fees = response.data.data || [];
+            const fees: StudentFee[] = response.data.data || [];
             setStudentFees(fees);
 
-            const pendingFee = fees.find((f: any) => f.status !== 'paid');
+            const pendingFee = fees.find((f) => f.status !== 'paid');
             if (pendingFee) {
                 setFormData(prev => ({
                     ...prev,
@@ -159,9 +149,9 @@ const ParentPayments = () => {
                     amount: pendingFee.amount.toString(),
                 }));
             }
-        } catch (error: any) {
+        } catch (error) {
             console.error("❌ Error fetching child fees:", error);
-            setError(error.response?.data?.error || "Failed to load fees");
+            setError(getApiErrorMessage(error, "Failed to load fees"));
         }
     };
 
@@ -173,10 +163,22 @@ const ParentPayments = () => {
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             setPayments(response.data.data || []);
-        } catch (error: any) {
+        } catch (error) {
             console.error("❌ Error fetching child payments:", error);
         }
     };
+
+    useEffect(() => {
+        async function loadChildData() {
+            if (selectedChild) {
+                console.log('🔄 Selected child changed:', selectedChild);
+                await fetchChildFees(selectedChild);
+                await fetchChildPayments(selectedChild);
+            }
+        }
+
+        loadChildData();
+    }, [selectedChild]);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -255,8 +257,8 @@ const ParentPayments = () => {
                 setSuccessMessage("");
             }, 5000);
 
-        } catch (err: any) {
-            const errorMsg = err.response?.data?.error || "Failed to submit payment";
+        } catch (err) {
+            const errorMsg = getApiErrorMessage(err, "Failed to submit payment");
             setModalError(errorMsg);
         } finally {
             setSubmitting(false);
@@ -296,9 +298,9 @@ const ParentPayments = () => {
             link.click();
             link.remove();
             window.URL.revokeObjectURL(url);
-        } catch (error: any) {
+        } catch (error) {
             console.error("Error downloading receipt:", error);
-            alert(error.response?.data?.error || "Failed to download receipt");
+            alert(getApiErrorMessage(error, "Failed to download receipt"));
         }
     };
 

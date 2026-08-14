@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { FileText, Download, Eye, Calendar, Award, BookOpen, X } from "lucide-react";
 import DashboardLayout from "../../layout/DashboardLayout";
 import axios from "axios";
+import { getApiErrorMessage } from "../../services/error";
 
 interface ReportCard {
     _id: string;
@@ -29,23 +30,22 @@ const StudentReportCards = () => {
     const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {
-        fetchReportCards();
-    }, []);
-
-    const fetchReportCards = async () => {
-        try {
-            const token = localStorage.getItem('token');
-            const response = await axios.get('http://localhost:7000/api/report-cards', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            setReportCards(response.data.data || []);
-            setLoading(false);
-        } catch (error: any) {
-            console.error("Error fetching report cards:", error);
-            setError(error.response?.data?.error || "Failed to load report cards");
-            setLoading(false);
+        async function load() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await axios.get('http://localhost:7000/api/report-cards', {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                setReportCards(response.data.data || []);
+                setLoading(false);
+            } catch (error) {
+                console.error("Error fetching report cards:", error);
+                setError(getApiErrorMessage(error, "Failed to load report cards"));
+                setLoading(false);
+            }
         }
-    };
+        load();
+    }, []);
 
     const handleDownload = async (id: string) => {
         try {
@@ -63,8 +63,8 @@ const StudentReportCards = () => {
             link.click();
             link.remove();
             window.URL.revokeObjectURL(url);
-        } catch (error: any) {
-            alert(error.response?.data?.error || "Failed to download report card");
+        } catch (error) {
+            alert(getApiErrorMessage(error, "Failed to download report card"));
         }
     };
 
