@@ -43,7 +43,7 @@ const Login = () => {
                 const role = data.role;
                 if (role === 'admin') navigate('/admin');
                 else if (role === 'registrar') navigate('/registrar');
-                else if (role === 'finance_officer') navigate('/finance');
+                else if (role === 'finance_officer' || role === 'finance') navigate('/finance');
                 else if (role === 'teacher') navigate('/teacher');
                 else if (role === 'student') navigate('/student');
                 else if (role === 'parent') navigate('/parent');

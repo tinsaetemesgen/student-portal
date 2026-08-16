@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { type ReactElement } from "react";
 
 // ============================================
@@ -94,7 +94,13 @@ const PrivateRoute = ({ children, allowedRoles }: { children: ReactElement, allo
     return null;
   }
 
-  if (allowedRoles && !allowedRoles.includes(user.role)) {
+  // Normalize the legacy 'finance' role so older sessions still match guards.
+  const normalizedRole = user.role === 'finance' ? 'finance_officer' : user.role;
+  if (user.role === 'finance') {
+    localStorage.setItem('user', JSON.stringify({ ...user, role: 'finance_officer' }));
+  }
+
+  if (allowedRoles && !allowedRoles.includes(normalizedRole)) {
     window.location.href = '/';
     return null;
   }
@@ -403,6 +409,11 @@ function App() {
             <Chat />
           </PrivateRoute>
         } />
+
+        {/* ============================================
+            CATCH-ALL - Redirect unknown paths to login
+            ============================================ */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );

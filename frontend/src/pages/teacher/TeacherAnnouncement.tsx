@@ -113,12 +113,12 @@ const TeacherAnnouncements = () => {
 
     const getPriorityColor = (priority: string) => {
         const colors: Record<string, string> = {
-            low: 'bg-gray-100 text-gray-700',
-            medium: 'bg-blue-100 text-blue-700',
-            high: 'bg-yellow-100 text-yellow-700',
-            urgent: 'bg-red-100 text-red-700',
+            low: 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300',
+            medium: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
+            high: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400',
+            urgent: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400',
         };
-        return colors[priority] || 'bg-gray-100 text-gray-700';
+        return colors[priority] || 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300';
     };
 
     const getAudienceLabel = (audience: string) => {
@@ -136,7 +136,7 @@ const TeacherAnnouncements = () => {
         return (
             <DashboardLayout role="teacher">
                 <div className="flex items-center justify-center min-h-[60vh]">
-                    <div className="text-xl text-gray-500">Loading announcements...</div>
+                    <div className="text-xl text-gray-500 dark:text-gray-400">Loading announcements...</div>
                 </div>
             </DashboardLayout>
         );
@@ -144,45 +144,45 @@ const TeacherAnnouncements = () => {
 
     const modalContent = (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => setShowModal(false)}>
-            <div className="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
                 <div className="flex items-center justify-between p-5 border-b">
-                    <h2 className="text-lg font-semibold">
+                    <h2 className="text-lg font-semibold dark:text-gray-100">
                         {editingId ? "Edit Announcement" : "New Announcement"}
                     </h2>
-                    <button onClick={() => setShowModal(false)} className="p-1 rounded-lg hover:bg-gray-100">
-                        <X size={20} className="text-gray-500" />
+                    <button onClick={() => setShowModal(false)} className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <X size={20} className="text-gray-500 dark:text-gray-400" />
                     </button>
                 </div>
                 <form onSubmit={handleSubmit} className="p-5 space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Title</label>
                         <input
                             type="text"
                             required
                             value={formData.title}
                             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                            className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
                             placeholder="Announcement title"
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Content</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Content</label>
                         <textarea
                             required
                             rows={4}
                             value={formData.content}
                             onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                            className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
                             placeholder="Announcement content"
                         />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Audience</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Audience</label>
                             <select
                                 value={formData.audience}
                                 onChange={(e) => setFormData({ ...formData, audience: e.target.value })}
-                                className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
                             >
                                 <option value="all">All Users</option>
                                 <option value="students">Students</option>
@@ -192,11 +192,11 @@ const TeacherAnnouncements = () => {
                             </select>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Priority</label>
                             <select
                                 value={formData.priority}
                                 onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
-                                className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
                             >
                                 <option value="low">Low</option>
                                 <option value="medium">Medium</option>
@@ -206,12 +206,12 @@ const TeacherAnnouncements = () => {
                         </div>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Expires At</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Expires At</label>
                         <input
                             type="date"
                             value={formData.expiresAt}
                             onChange={(e) => setFormData({ ...formData, expiresAt: e.target.value })}
-                            className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
                         />
                     </div>
                     <div className="flex justify-end gap-3 pt-2">
@@ -228,8 +228,8 @@ const TeacherAnnouncements = () => {
             <div className="space-y-6">
                 <div className="flex justify-between items-center">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-800">Announcements</h1>
-                        <p className="text-gray-500">Create and manage school announcements</p>
+                        <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Announcements</h1>
+                        <p className="text-gray-500 dark:text-gray-400">Create and manage school announcements</p>
                     </div>
                     <button
                         onClick={() => setShowModal(true)}
@@ -240,35 +240,35 @@ const TeacherAnnouncements = () => {
                 </div>
 
                 {announcements.length === 0 ? (
-                    <div className="bg-white rounded-xl shadow-sm p-8 text-center">
-                        <Megaphone size={48} className="mx-auto text-gray-300" />
-                        <h3 className="mt-4 text-lg font-medium text-gray-700">No Announcements</h3>
-                        <p className="text-gray-500">Create your first announcement to communicate with students and parents.</p>
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-8 text-center">
+                        <Megaphone size={48} className="mx-auto text-gray-300 dark:text-gray-600" />
+                        <h3 className="mt-4 text-lg font-medium text-gray-700 dark:text-gray-200">No Announcements</h3>
+                        <p className="text-gray-500 dark:text-gray-400">Create your first announcement to communicate with students and parents.</p>
                     </div>
                 ) : (
                     <div className="space-y-4">
                         {announcements.map((announcement) => (
                             <div
                                 key={announcement._id}
-                                className={`bg-white rounded-xl shadow-sm p-6 border-l-4 ${
+                                className={`bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border-l-4 ${
                                     announcement.priority === 'urgent' ? 'border-red-500' :
                                     announcement.priority === 'high' ? 'border-yellow-500' :
                                     announcement.priority === 'medium' ? 'border-blue-500' :
-                                    'border-gray-300'
+                                    'border-gray-300 dark:border-gray-600'
                                 }`}
                             >
                                 <div className="flex items-start justify-between">
                                     <div className="flex-1">
                                         <div className="flex items-center gap-2 mb-1">
-                                            <h3 className="text-lg font-semibold text-gray-800">
+                                            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
                                                 {announcement.title}
                                             </h3>
                                             <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getPriorityColor(announcement.priority)}`}>
                                                 {announcement.priority.toUpperCase()}
                                             </span>
                                         </div>
-                                        <p className="text-gray-600 mt-1">{announcement.content}</p>
-                                        <div className="flex flex-wrap items-center gap-3 mt-3 text-sm text-gray-500">
+                                        <p className="text-gray-600 dark:text-gray-300 mt-1">{announcement.content}</p>
+                                        <div className="flex flex-wrap items-center gap-3 mt-3 text-sm text-gray-500 dark:text-gray-400">
                                             <span className="flex items-center gap-1">
                                                 <Calendar size={14} />
                                                 {new Date(announcement.createdAt).toLocaleDateString()}
@@ -286,13 +286,13 @@ const TeacherAnnouncements = () => {
                                     <div className="flex items-center gap-2">
                                         <button
                                             onClick={() => openEditModal(announcement)}
-                                            className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg"
+                                            className="p-1.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg"
                                         >
                                             <Edit2 size={16} />
                                         </button>
                                         <button
                                             onClick={() => handleDelete(announcement._id)}
-                                            className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg"
+                                            className="p-1.5 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg"
                                         >
                                             <Trash2 size={16} />
                                         </button>

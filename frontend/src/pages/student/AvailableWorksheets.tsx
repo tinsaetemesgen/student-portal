@@ -77,7 +77,7 @@ const StudentAvailableWorksheets = () => {
         return (
             <DashboardLayout role="student">
                 <div className="flex items-center justify-center min-h-[60vh]">
-                    <div className="text-xl text-gray-500">Loading available worksheets...</div>
+                    <div className="text-xl text-gray-500 dark:text-gray-400">Loading available worksheets...</div>
                 </div>
             </DashboardLayout>
         );
@@ -97,41 +97,41 @@ const StudentAvailableWorksheets = () => {
         <DashboardLayout role="student">
             <div className="space-y-6">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-800">Available Worksheets</h1>
-                    <p className="text-gray-500">Complete worksheets to test your knowledge</p>
+                    <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Available Worksheets</h1>
+                    <p className="text-gray-500 dark:text-gray-400">Complete worksheets to test your knowledge</p>
                 </div>
 
                 {worksheets.length === 0 ? (
-                    <div className="bg-white rounded-xl shadow-sm p-8 text-center">
-                        <FileText size={48} className="mx-auto text-gray-300" />
-                        <h3 className="mt-4 text-lg font-medium text-gray-700">No Worksheets Available</h3>
-                        <p className="text-gray-500">Your teacher hasn't assigned any worksheets yet.</p>
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-8 text-center">
+                        <FileText size={48} className="mx-auto text-gray-300 dark:text-gray-500" />
+                        <h3 className="mt-4 text-lg font-medium text-gray-700 dark:text-gray-200">No Worksheets Available</h3>
+                        <p className="text-gray-500 dark:text-gray-400">Your teacher hasn't assigned any worksheets yet.</p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {worksheets.map((ws) => (
-                            <div key={ws._id} className={`bg-white rounded-xl shadow-sm p-6 border ${
-                                ws.attempted ? 'border-gray-200' : 'border-blue-200 hover:shadow-md transition'
+                            <div key={ws._id} className={`bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border ${
+                                ws.attempted ? 'border-gray-200 dark:border-gray-700' : 'border-blue-200 dark:border-blue-800 hover:shadow-md transition'
                             }`}>
                                 <div className="flex justify-between items-start">
                                     <div className="flex-1">
-                                        <h3 className="text-lg font-semibold text-gray-800">{ws.title}</h3>
-                                        <p className="text-sm text-gray-500">{ws.subject} • {ws.teacherId?.name || 'Unknown'}</p>
-                                        <p className="text-sm text-gray-400 mt-1">{ws.totalQuestions} questions • {ws.totalMarks} marks</p>
+                                        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{ws.title}</h3>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400">{ws.subject} • {ws.teacherId?.name || 'Unknown'}</p>
+                                        <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">{ws.totalQuestions} questions • {ws.totalMarks} marks</p>
                                     </div>
                                     {ws.attempted && ws.attemptStatus === 'submitted' ? (
                                         <div className="flex flex-col items-end">
-                                            <span className="text-sm font-bold text-green-600">{ws.percentage}%</span>
-                                            <span className="text-xs text-gray-400">{ws.score}/{ws.totalMarks}</span>
+                                            <span className="text-sm font-bold text-green-600 dark:text-green-400">{ws.percentage}%</span>
+                                            <span className="text-xs text-gray-400 dark:text-gray-500">{ws.score}/{ws.totalMarks}</span>
                                         </div>
                                     ) : ws.attempted && ws.attemptStatus === 'in_progress' ? (
-                                        <span className="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-medium">
+                                        <span className="px-2 py-1 bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400 rounded-full text-xs font-medium">
                                             In Progress
                                         </span>
                                     ) : null}
                                 </div>
 
-                                <div className="flex items-center gap-4 mt-3 text-xs text-gray-500">
+                                <div className="flex items-center gap-4 mt-3 text-xs text-gray-500 dark:text-gray-400">
                                     <span className="flex items-center gap-1">
                                         <Clock size={14} /> {ws.duration} min
                                     </span>
@@ -144,7 +144,7 @@ const StudentAvailableWorksheets = () => {
                                     {ws.attempted && ws.attemptStatus === 'submitted' ? (
                                         <button
                                             disabled
-                                            className="w-full px-4 py-2 bg-gray-100 text-gray-500 rounded-lg cursor-not-allowed flex items-center justify-center gap-2"
+                                            className="w-full px-4 py-2 bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400 rounded-lg cursor-not-allowed flex items-center justify-center gap-2"
                                         >
                                             <CheckCircle size={16} /> Completed
                                         </button>

@@ -306,12 +306,12 @@ const ParentPayments = () => {
 
     const getStatusBadge = (status: string) => {
         const styles: Record<string, string> = {
-            pending: 'bg-yellow-100 text-yellow-700',
-            confirmed: 'bg-green-100 text-green-700',
-            rejected: 'bg-red-100 text-red-700',
-            failed: 'bg-gray-100 text-gray-700',
+            pending: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400',
+            confirmed: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400',
+            rejected: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400',
+            failed: 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300',
         };
-        return styles[status] || 'bg-gray-100 text-gray-700';
+        return styles[status] || 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300';
     };
 
     const getStatusIcon = (status: string) => {
@@ -327,7 +327,7 @@ const ParentPayments = () => {
         return (
             <DashboardLayout role="parent">
                 <div className="flex items-center justify-center min-h-[60vh]">
-                    <div className="text-xl text-gray-500">Loading payments...</div>
+                    <div className="text-xl text-gray-500 dark:text-gray-400">Loading payments...</div>
                 </div>
             </DashboardLayout>
         );
@@ -338,13 +338,13 @@ const ParentPayments = () => {
             <DashboardLayout role="parent">
                 <div className="space-y-6">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-800">Payments</h1>
-                        <p className="text-gray-500">Manage your children's school fees</p>
+                        <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Payments</h1>
+                        <p className="text-gray-500 dark:text-gray-400">Manage your children's school fees</p>
                     </div>
-                    <div className="bg-white rounded-xl shadow-sm p-8 text-center">
-                        <Users size={48} className="mx-auto text-gray-400" />
-                        <h3 className="mt-4 text-lg font-medium text-gray-700">No Children Linked</h3>
-                        <p className="mt-1 text-gray-500">Please contact the school registrar to link your children.</p>
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-8 text-center">
+                        <Users size={48} className="mx-auto text-gray-400 dark:text-gray-500" />
+                        <h3 className="mt-4 text-lg font-medium text-gray-700 dark:text-gray-200">No Children Linked</h3>
+                        <p className="mt-1 text-gray-500 dark:text-gray-400">Please contact the school registrar to link your children.</p>
                     </div>
                 </div>
             </DashboardLayout>
@@ -362,7 +362,7 @@ const ParentPayments = () => {
         <DashboardLayout role="parent">
             <div className="space-y-6">
                 {success && (
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-green-700 flex items-center gap-3">
+                    <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 text-green-700 dark:text-green-400 flex items-center gap-3">
                         <Check size={24} />
                         <div>
                             <p className="font-medium">{successMessage}</p>
@@ -370,11 +370,11 @@ const ParentPayments = () => {
                     </div>
                 )}
 
-                <div className="bg-white rounded-xl shadow-sm p-6">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div>
-                            <h1 className="text-2xl font-bold text-gray-800">Outstanding Balance</h1>
-                            <p className="text-gray-500">Review your child's current school dues.</p>
+                            <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Outstanding Balance</h1>
+                            <p className="text-gray-500 dark:text-gray-400">Review your child's current school dues.</p>
                         </div>
                         <button
                             onClick={() => setShowModal(true)}
@@ -385,7 +385,7 @@ const ParentPayments = () => {
                     </div>
 
                     <div className="mt-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Select Child</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Select Child</label>
                         <div className="flex flex-wrap gap-2">
                             {children.map((child) => (
                                 <button
@@ -394,7 +394,7 @@ const ParentPayments = () => {
                                     className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
                                         selectedChild === child._id
                                             ? 'bg-blue-600 text-white'
-                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
                                     }`}
                                 >
                                     {child.name} ({child.class || 'No Class'})
@@ -405,12 +405,12 @@ const ParentPayments = () => {
 
                     <div className="mt-6 grid gap-3">
                         {!Array.isArray(studentFees) || studentFees.length === 0 ? (
-                            <div className="text-center py-8 text-gray-500">
+                            <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                                 <Check size={48} className="mx-auto text-green-300 mb-2" />
                                 <p>No fees assigned to this child.</p>
                             </div>
                         ) : studentFees.filter(f => f?.status !== 'paid').length === 0 ? (
-                            <div className="text-center py-8 text-green-600">
+                            <div className="text-center py-8 text-green-600 dark:text-green-400">
                                 <Check size={48} className="mx-auto text-green-300 mb-2" />
                                 <p>🎉 All fees are paid for this child!</p>
                             </div>
@@ -418,19 +418,19 @@ const ParentPayments = () => {
                             studentFees
                                 .filter(fee => fee?.status !== 'paid')
                                 .map((fee) => (
-                                    <div key={fee._id} className="flex items-center justify-between rounded-lg border border-gray-200 p-4">
+                                    <div key={fee._id} className="flex items-center justify-between rounded-lg border border-gray-200 dark:border-gray-700 p-4">
                                         <div>
-                                            <span className="font-medium text-gray-700">{fee.feeName || 'Unknown Fee'}</span>
-                                            <span className={`ml-3 text-xs px-2 py-0.5 rounded-full ${fee.status === 'pending' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'}`}>
+                                            <span className="font-medium text-gray-700 dark:text-gray-200">{fee.feeName || 'Unknown Fee'}</span>
+                                            <span className={`ml-3 text-xs px-2 py-0.5 rounded-full ${fee.status === 'pending' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400' : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'}`}>
                                                 {fee.status || 'pending'}
                                             </span>
                                             {fee.isOverdue && (
-                                                <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-700">
+                                                <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400">
                                                     ⚠️ Late Fee: {fee.lateFeeAmount || 0} ETB
                                                 </span>
                                             )}
                                         </div>
-                                        <span className="font-semibold text-gray-900">
+                                        <span className="font-semibold text-gray-900 dark:text-gray-100">
                                             {fee.totalAmount || fee.amount || 0} ETB
                                         </span>
                                     </div>
@@ -439,37 +439,37 @@ const ParentPayments = () => {
                     </div>
 
                     {Array.isArray(studentFees) && studentFees.filter(f => f?.status !== 'paid').length > 0 && (
-                        <div className="mt-6 border-t border-gray-200 pt-4">
-                            <p className="text-sm text-gray-500">Total Due</p>
-                            <p className="text-3xl font-bold text-gray-900">{totalOutstanding} ETB</p>
+                        <div className="mt-6 border-t border-gray-200 dark:border-gray-700 pt-4">
+                            <p className="text-sm text-gray-500 dark:text-gray-400">Total Due</p>
+                            <p className="text-3xl font-bold text-gray-900 dark:text-gray-100">{totalOutstanding} ETB</p>
                         </div>
                     )}
                 </div>
 
-                <div className="bg-white rounded-xl shadow-sm p-6">
-                    <h2 className="text-lg font-semibold flex items-center gap-2">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+                    <h2 className="text-lg font-semibold flex items-center gap-2 dark:text-gray-100">
                         <FileText size={20} /> Payment History
                     </h2>
 
                     {!Array.isArray(payments) || payments.length === 0 ? (
-                        <div className="mt-4 text-center py-8 text-gray-500">
+                        <div className="mt-4 text-center py-8 text-gray-500 dark:text-gray-400">
                             <p>No payment records found for this child.</p>
                         </div>
                     ) : (
                         <div className="mt-4 space-y-3">
                             {payments.slice(0, 10).map((payment) => (
-                                <div key={payment._id} className="flex items-center justify-between rounded-lg border border-gray-200 p-4 hover:bg-gray-50">
+                                <div key={payment._id} className="flex items-center justify-between rounded-lg border border-gray-200 dark:border-gray-700 p-4 hover:bg-gray-50 dark:hover:bg-gray-700">
                                     <div>
-                                        <p className="font-medium text-gray-800">{payment.studentFeeId?.feeName || 'N/A'}</p>
-                                        <p className="text-sm text-gray-500">
+                                        <p className="font-medium text-gray-800 dark:text-gray-100">{payment.studentFeeId?.feeName || 'N/A'}</p>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400">
                                             {payment.bankName || 'N/A'} • {payment.referenceNumber || 'N/A'}
                                         </p>
-                                        <p className="text-xs text-gray-400">
+                                        <p className="text-xs text-gray-400 dark:text-gray-500">
                                             {payment.createdAt ? new Date(payment.createdAt).toLocaleDateString() : 'N/A'}
                                         </p>
                                     </div>
                                     <div className="text-right">
-                                        <p className="font-semibold text-gray-900">{payment.amount || 0} ETB</p>
+                                        <p className="font-semibold text-gray-900 dark:text-gray-100">{payment.amount || 0} ETB</p>
                                         <p className={`text-sm flex items-center gap-1 justify-end ${getStatusBadge(payment.status || 'pending')} px-2 py-0.5 rounded-full`}>
                                             {getStatusIcon(payment.status)}
                                             {payment.status ? payment.status.charAt(0).toUpperCase() + payment.status.slice(1) : 'Pending'}
@@ -477,7 +477,7 @@ const ParentPayments = () => {
                                         {payment.receiptNumber && payment.status === 'confirmed' && (
                                             <button
                                                 onClick={() => downloadReceipt(payment._id)}
-                                                className="text-blue-600 hover:text-blue-800 text-xs flex items-center gap-1 mt-1"
+                                                className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-xs flex items-center gap-1 mt-1"
                                             >
                                                 <Download size={12} /> Download Receipt
                                             </button>
@@ -497,25 +497,25 @@ const ParentPayments = () => {
                     onClick={() => setShowModal(false)}
                 >
                     <div
-                        className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+                        className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <div className="flex items-center justify-between p-5 border-b sticky top-0 bg-white z-10">
-                            <h2 className="text-lg font-semibold text-gray-800">Submit Payment</h2>
+                        <div className="flex items-center justify-between p-5 border-b dark:border-gray-700 sticky top-0 bg-white dark:bg-gray-800 z-10">
+                            <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Submit Payment</h2>
                             <button
                                 onClick={() => setShowModal(false)}
-                                className="p-1 rounded-lg hover:bg-gray-100 transition"
+                                className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
                             >
-                                <X size={20} className="text-gray-500" />
+                                <X size={20} className="text-gray-500 dark:text-gray-400" />
                             </button>
                         </div>
 
                         <form onSubmit={handleSubmitPayment} className="p-5 space-y-4">
-                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                                <p className="font-semibold text-blue-800 flex items-center gap-2">
+                            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                                <p className="font-semibold text-blue-800 dark:text-blue-400 flex items-center gap-2">
                                     <Banknote size={18} /> Transfer to School Account
                                 </p>
-                                <div className="mt-2 text-sm text-blue-700 space-y-1">
+                                <div className="mt-2 text-sm text-blue-700 dark:text-blue-400 space-y-1">
                                     <p><span className="font-medium">Bank:</span> {SCHOOL_BANK.bankName}</p>
                                     <p><span className="font-medium">Account Name:</span> {SCHOOL_BANK.accountName}</p>
                                     <p><span className="font-medium">Account Number:</span> {SCHOOL_BANK.accountNumber}</p>
@@ -524,7 +524,7 @@ const ParentPayments = () => {
                             </div>
 
                             {modalError && (
-                                <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-red-700 text-sm flex items-center gap-2">
+                                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 text-red-700 dark:text-red-400 text-sm flex items-center gap-2">
                                     <X size={18} />
                                     <span>{modalError}</span>
                                 </div>
@@ -532,11 +532,11 @@ const ParentPayments = () => {
 
                             {children.length > 1 && (
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Select Child</label>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Select Child</label>
                                     <select
                                         value={selectedChild}
                                         onChange={(e) => setSelectedChild(e.target.value)}
-                                        className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full border dark:border-gray-600 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100"
                                         required
                                     >
                                         {children.map((child) => (
@@ -549,7 +549,7 @@ const ParentPayments = () => {
                             )}
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Select Fee</label>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Select Fee</label>
                                 <select
                                     value={formData.studentFeeId}
                                     onChange={(e) => {
@@ -560,7 +560,7 @@ const ParentPayments = () => {
                                             amount: fee ? fee.amount.toString() : "",
                                         });
                                     }}
-                                    className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full border dark:border-gray-600 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100"
                                     required
                                 >
                                     <option value="">Select a fee</option>
@@ -574,11 +574,11 @@ const ParentPayments = () => {
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Bank</label>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Bank</label>
                                     <select
                                         value={formData.bankName}
                                         onChange={(e) => setFormData({ ...formData, bankName: e.target.value })}
-                                        className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full border dark:border-gray-600 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100"
                                     >
                                         {BANK_OPTIONS.map((bank) => (
                                             <option key={bank.id} value={bank.id}>{bank.name}</option>
@@ -586,12 +586,12 @@ const ParentPayments = () => {
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Reference Number</label>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Reference Number</label>
                                     <input
                                         type="text"
                                         value={formData.referenceNumber}
                                         onChange={(e) => setFormData({ ...formData, referenceNumber: e.target.value })}
-                                        className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full border dark:border-gray-600 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100"
                                         placeholder="e.g., CBE2026001"
                                         required
                                     />
@@ -600,31 +600,31 @@ const ParentPayments = () => {
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Amount (ETB)</label>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Amount (ETB)</label>
                                     <input
                                         type="number"
                                         value={formData.amount}
                                         onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                                        className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full border dark:border-gray-600 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100"
                                         required
                                         min="1"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Payment Date</label>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Payment Date</label>
                                     <input
                                         type="date"
                                         value={formData.paymentDate}
                                         onChange={(e) => setFormData({ ...formData, paymentDate: e.target.value })}
-                                        className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full border dark:border-gray-600 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100"
                                         required
                                     />
                                 </div>
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Upload Payment Screenshot</label>
-                                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Upload Payment Screenshot</label>
+                                <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 text-center">
                                     <input
                                         type="file"
                                         accept="image/*"
@@ -640,24 +640,24 @@ const ParentPayments = () => {
                                                     alt="Screenshot"
                                                     className="max-h-32 mx-auto rounded-lg"
                                                 />
-                                                <p className="text-sm text-gray-500">Click to change</p>
+                                                <p className="text-sm text-gray-500 dark:text-gray-400">Click to change</p>
                                             </div>
                                         ) : (
                                             <div className="space-y-2 py-4">
-                                                <Upload size={32} className="mx-auto text-gray-400" />
-                                                <p className="text-gray-500">Click to upload screenshot</p>
-                                                <p className="text-xs text-gray-400">PNG, JPG, WEBP (Max 5MB)</p>
+                                                <Upload size={32} className="mx-auto text-gray-400 dark:text-gray-500" />
+                                                <p className="text-gray-500 dark:text-gray-400">Click to upload screenshot</p>
+                                                <p className="text-xs text-gray-400 dark:text-gray-500">PNG, JPG, WEBP (Max 5MB)</p>
                                             </div>
                                         )}
                                     </label>
                                 </div>
                             </div>
 
-                            <div className="flex justify-end gap-3 pt-2 border-t">
+                            <div className="flex justify-end gap-3 pt-2 border-t dark:border-gray-700">
                                 <button
                                     type="button"
                                     onClick={() => setShowModal(false)}
-                                    className="px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-50 transition"
+                                    className="px-4 py-2 border dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
                                 >
                                     Cancel
                                 </button>
@@ -666,7 +666,7 @@ const ParentPayments = () => {
                                     disabled={submitting}
                                     className={`px-4 py-2 rounded-lg transition font-medium ${
                                         submitting
-                                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                            ? 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
                                             : 'bg-blue-600 text-white hover:bg-blue-700'
                                     }`}
                                 >

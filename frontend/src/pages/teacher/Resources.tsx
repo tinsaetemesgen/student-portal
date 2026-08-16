@@ -515,33 +515,33 @@ const TeacherResources = () => {
             {/* Upload Modal - Only show if we have classes */}
             {showModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => setShowModal(false)}>
-                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-                        <div className="flex items-center justify-between p-6 border-b sticky top-0 bg-white z-10">
-                            <h2 className="text-xl font-bold text-gray-800">
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-700 sticky top-0 bg-white dark:bg-gray-800 z-10">
+                            <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">
                                 {editingId ? "Edit Resource" : "Upload Resource"}
                             </h2>
-                            <button onClick={() => setShowModal(false)} className="p-2 rounded-xl hover:bg-gray-100 transition">
-                                <X size={20} className="text-gray-500" />
+                            <button onClick={() => setShowModal(false)} className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                                <X size={20} className="text-gray-500 dark:text-gray-400" />
                             </button>
                         </div>
 
                         <form onSubmit={handleSubmit} className="p-6 space-y-4">
                             {/* Title */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Title *</label>
                                 <input
                                     type="text"
                                     required
                                     value={formData.title}
                                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                                    className="w-full border rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 bg-white dark:bg-gray-700 dark:text-gray-100 outline-none focus:ring-2 focus:ring-blue-500"
                                     placeholder="e.g., Mathematics Notes - Chapter 5"
                                 />
                             </div>
 
                             {/* Description */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Description</label>
                                 <textarea
                                     rows={2}
                                     value={formData.description}
@@ -554,23 +554,23 @@ const TeacherResources = () => {
                             {/* Subject & Topic */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Subject *</label>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Subject *</label>
                                     <input
                                         type="text"
                                         required
                                         value={formData.subject}
                                         onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                                        className="w-full border rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 bg-white dark:bg-gray-700 dark:text-gray-100 outline-none focus:ring-2 focus:ring-blue-500"
                                         placeholder="e.g., Mathematics"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Topic</label>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Topic</label>
                                     <input
                                         type="text"
                                         value={formData.topic}
                                         onChange={(e) => setFormData({ ...formData, topic: e.target.value })}
-                                        className="w-full border rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 bg-white dark:bg-gray-700 dark:text-gray-100 outline-none focus:ring-2 focus:ring-blue-500"
                                         placeholder="e.g., Quadratic Equations"
                                     />
                                 </div>
@@ -578,9 +578,9 @@ const TeacherResources = () => {
 
                             {/* Grade Selection - SAFE */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Grade *</label>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Grade *</label>
                                 {!hasClasses ? (
-                                    <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-xl text-yellow-700 text-sm">
+                                    <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl text-yellow-700 dark:text-yellow-400 text-sm">
                                         ⚠️ You don't have any assigned classes. Please contact the registrar.
                                     </div>
                                 ) : (
@@ -598,7 +598,7 @@ const TeacherResources = () => {
                                                            gradeNum >= 5 ? 'middle' : 'primary'
                                             });
                                         }}
-                                        className="w-full border rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 bg-white dark:bg-gray-700 dark:text-gray-100 outline-none focus:ring-2 focus:ring-blue-500"
                                     >
                                         <option value="">Select Grade</option>
                                         {availableGrades.map((grade: string) => (
@@ -612,9 +612,9 @@ const TeacherResources = () => {
                             {formData.grade && hasClasses && (
                                 <div>
                                     <div className="flex items-center justify-between mb-2">
-                                        <label className="block text-sm font-medium text-gray-700">
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                                             Select Sections *
-                                            <span className="text-xs text-gray-400 ml-2">
+                                            <span className="text-xs text-gray-400 dark:text-gray-500 ml-2">
                                                 ({teacherClasses.filter(c => String(c.grade) === formData.grade).length} available)
                                             </span>
                                         </label>
@@ -622,21 +622,21 @@ const TeacherResources = () => {
                                             <button
                                                 type="button"
                                                 onClick={selectAllSections}
-                                                className="text-xs text-blue-600 hover:text-blue-800 font-medium"
+                                                className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
                                             >
                                                 Select All
                                             </button>
                                             <button
                                                 type="button"
                                                 onClick={deselectAllSections}
-                                                className="text-xs text-red-600 hover:text-red-800 font-medium"
+                                                className="text-xs text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 font-medium"
                                             >
                                                 Deselect All
                                             </button>
                                         </div>
                                     </div>
                                     
-                                    <div className="grid grid-cols-4 md:grid-cols-6 gap-2 p-4 bg-gray-50 rounded-xl max-h-40 overflow-y-auto border border-gray-200">
+                                    <div className="grid grid-cols-4 md:grid-cols-6 gap-2 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl max-h-40 overflow-y-auto border border-gray-200 dark:border-gray-700">
                                         {teacherClasses
                                             .filter(c => String(c.grade) === formData.grade)
                                             .map((cls) => {
@@ -646,8 +646,8 @@ const TeacherResources = () => {
                                                         key={cls._id}
                                                         className={`flex items-center gap-2 p-2 rounded-lg border cursor-pointer transition ${
                                                             isSelected 
-                                                                ? 'border-blue-500 bg-blue-50 shadow-sm' 
-                                                                : 'border-gray-200 hover:bg-gray-100'
+                                                                ? 'border-blue-500 bg-blue-50 shadow-sm dark:bg-blue-900/20' 
+                                                                : 'border-gray-200 hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-700'
                                                         }`}
                                                     >
                                                         <input
@@ -664,12 +664,12 @@ const TeacherResources = () => {
                                             })}
                                     </div>
                                     {formData.sections.length === 0 && (
-                                        <p className="text-xs text-red-500 mt-1">
+                                        <p className="text-xs text-red-500 dark:text-red-400 mt-1">
                                             ⚠️ Please select at least one section
                                         </p>
                                     )}
                                     {formData.sections.length > 0 && (
-                                        <p className="text-xs text-green-600 mt-1">
+                                        <p className="text-xs text-green-600 dark:text-green-400 mt-1">
                                             ✅ {formData.sections.length} section{formData.sections.length > 1 ? 's' : ''} selected: {formData.sections.join(', ')}
                                         </p>
                                     )}
@@ -679,11 +679,11 @@ const TeacherResources = () => {
                             {/* Semester & Academic Year */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Semester</label>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Semester</label>
                                     <select
                                         value={formData.semester}
                                         onChange={(e) => setFormData({ ...formData, semester: e.target.value })}
-                                        className="w-full border rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 bg-white dark:bg-gray-700 dark:text-gray-100 outline-none focus:ring-2 focus:ring-blue-500"
                                     >
                                         {SEMESTERS.map(s => (
                                             <option key={s} value={s}>{s}</option>
@@ -691,11 +691,11 @@ const TeacherResources = () => {
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Academic Year</label>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Academic Year</label>
                                     <select
                                         value={formData.academicYear}
                                         onChange={(e) => setFormData({ ...formData, academicYear: e.target.value })}
-                                        className="w-full border rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 bg-white dark:bg-gray-700 dark:text-gray-100 outline-none focus:ring-2 focus:ring-blue-500"
                                     >
                                         {ACADEMIC_YEARS.map(year => (
                                             <option key={year} value={year}>{year}</option>
@@ -706,8 +706,8 @@ const TeacherResources = () => {
 
                             {/* File Upload */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">File *</label>
-                                <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-blue-400 transition">
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">File *</label>
+                                <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-6 text-center hover:border-blue-400 transition">
                                     <input
                                         type="file"
                                         onChange={handleFileChange}
@@ -718,16 +718,16 @@ const TeacherResources = () => {
                                         {selectedFile ? (
                                             <div className="flex items-center justify-center gap-3">
                                                 <span className="text-2xl">📄</span>
-                                                <span className="text-gray-700 font-medium">{selectedFile.name}</span>
-                                                <span className="text-sm text-gray-400">
+                                                <span className="text-gray-700 dark:text-gray-200 font-medium">{selectedFile.name}</span>
+                                                <span className="text-sm text-gray-400 dark:text-gray-500">
                                                     ({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)
                                                 </span>
                                             </div>
                                         ) : (
                                             <div>
-                                                <Upload size={32} className="mx-auto text-gray-400 mb-2" />
-                                                <p className="text-gray-500">Click to upload or drag and drop</p>
-                                                <p className="text-xs text-gray-400 mt-1">PDF, Word, Excel, PowerPoint, Images, Videos (Max 50MB)</p>
+                                                <Upload size={32} className="mx-auto text-gray-400 dark:text-gray-500 mb-2" />
+                                                <p className="text-gray-500 dark:text-gray-400">Click to upload or drag and drop</p>
+                                                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">PDF, Word, Excel, PowerPoint, Images, Videos (Max 50MB)</p>
                                             </div>
                                         )}
                                     </label>
@@ -735,11 +735,11 @@ const TeacherResources = () => {
                             </div>
 
                             {/* Actions */}
-                            <div className="flex justify-end gap-3 pt-4 border-t">
+                            <div className="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-700">
                                 <button
                                     type="button"
                                     onClick={() => setShowModal(false)}
-                                    className="px-6 py-2.5 border rounded-xl text-gray-700 hover:bg-gray-50 transition font-medium"
+                                    className="px-6 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition font-medium"
                                 >
                                     Cancel
                                 </button>

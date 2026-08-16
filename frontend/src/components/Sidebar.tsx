@@ -163,7 +163,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
     return (
         <aside
-            className={`bg-linear-to-b from-blue-900 to-indigo-900 text-white flex flex-col h-screen transition-all duration-300 shadow-2xl ${isOpen ? 'w-64' : 'w-20'
+            className={`bg-linear-to-b from-blue-900 to-indigo-900 text-white flex flex-col h-full shrink-0 transition-all duration-300 shadow-2xl ${isOpen ? 'w-64' : 'w-20'
                 }`}
         >
             {/* School Logo & Branding */}

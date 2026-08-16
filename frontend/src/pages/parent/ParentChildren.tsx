@@ -65,7 +65,7 @@ const ParentChildren = () => {
         return (
             <DashboardLayout role="parent">
                 <div className="flex items-center justify-center min-h-[60vh]">
-                    <div className="text-xl text-gray-500">Loading children...</div>
+                    <div className="text-xl text-gray-500 dark:text-gray-400">Loading children...</div>
                 </div>
             </DashboardLayout>
         );
@@ -85,32 +85,32 @@ const ParentChildren = () => {
         <DashboardLayout role="parent">
             <div className="space-y-6">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-800">My Children</h1>
-                    <p className="text-gray-500">View your children's academic progress</p>
+                    <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">My Children</h1>
+                    <p className="text-gray-500 dark:text-gray-400">View your children's academic progress</p>
                 </div>
 
                 {children.length === 0 ? (
-                    <div className="bg-white rounded-xl shadow-sm p-8 text-center">
-                        <Users size={48} className="mx-auto text-gray-400" />
-                        <h3 className="mt-4 text-lg font-medium text-gray-700">No Children Linked</h3>
-                        <p className="mt-1 text-gray-500">Please contact the school registrar to link your children.</p>
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-8 text-center">
+                        <Users size={48} className="mx-auto text-gray-400 dark:text-gray-500" />
+                        <h3 className="mt-4 text-lg font-medium text-gray-700 dark:text-gray-200">No Children Linked</h3>
+                        <p className="mt-1 text-gray-500 dark:text-gray-400">Please contact the school registrar to link your children.</p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {children.map((child) => (
                             <div
                                 key={child._id}
-                                className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition cursor-pointer"
+                                className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 hover:shadow-md transition cursor-pointer"
                                 onClick={() => setSelectedChild(child)}
                             >
                                 <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-lg">
+                                    <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-lg">
                                         {child.name.charAt(0).toUpperCase()}
                                     </div>
                                     <div>
-                                        <h3 className="font-semibold text-gray-800">{child.name}</h3>
-                                        <p className="text-sm text-gray-500">{child.class || 'No class'}</p>
-                                        <p className="text-xs text-gray-400">{child.email}</p>
+                                        <h3 className="font-semibold text-gray-800 dark:text-gray-100">{child.name}</h3>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400">{child.class || 'No class'}</p>
+                                        <p className="text-xs text-gray-400 dark:text-gray-500">{child.email}</p>
                                     </div>
                                 </div>
                                 <div className="mt-4 flex flex-wrap gap-2">
@@ -120,7 +120,7 @@ const ParentChildren = () => {
                                             e.stopPropagation();
                                             viewGrades(child._id);
                                         }}
-                                        className="flex items-center gap-1 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-sm hover:bg-blue-100 transition"
+                                        className="flex items-center gap-1 px-3 py-1.5 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-lg text-sm hover:bg-blue-100 dark:hover:bg-blue-900/40 transition"
                                     >
                                         <GraduationCap size={14} /> View Grades
                                     </button>
@@ -131,7 +131,7 @@ const ParentChildren = () => {
                                             e.stopPropagation();
                                             viewAttendance(child._id);
                                         }}
-                                        className="flex items-center gap-1 px-3 py-1.5 bg-green-50 text-green-600 rounded-lg text-sm hover:bg-green-100 transition"
+                                        className="flex items-center gap-1 px-3 py-1.5 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 rounded-lg text-sm hover:bg-green-100 dark:hover:bg-green-900/40 transition"
                                     >
                                         <ClipboardCheck size={14} /> View Attendance
                                     </button>
@@ -144,13 +144,13 @@ const ParentChildren = () => {
                 {/* Child Details Modal */}
                 {selectedChild && (
                     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                        <div className="bg-white rounded-xl p-6 w-full max-w-md">
-                            <h2 className="text-xl font-bold mb-4">{selectedChild.name}</h2>
+                        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md">
+                            <h2 className="text-xl font-bold mb-4 dark:text-gray-100">{selectedChild.name}</h2>
                             <div className="space-y-2">
-                                <p><span className="font-medium">Email:</span> {selectedChild.email}</p>
-                                <p><span className="font-medium">Class:</span> {selectedChild.class || 'N/A'}</p>
-                                <p><span className="font-medium">Age:</span> {selectedChild.age || 'N/A'}</p>
-                                <p><span className="font-medium">Parent:</span> {selectedChild.parentName || 'N/A'}</p>
+                                <p className="dark:text-gray-200"><span className="font-medium">Email:</span> {selectedChild.email}</p>
+                                <p className="dark:text-gray-200"><span className="font-medium">Class:</span> {selectedChild.class || 'N/A'}</p>
+                                <p className="dark:text-gray-200"><span className="font-medium">Age:</span> {selectedChild.age || 'N/A'}</p>
+                                <p className="dark:text-gray-200"><span className="font-medium">Parent:</span> {selectedChild.parentName || 'N/A'}</p>
                             </div>
                             <div className="mt-4 flex gap-2">
                                 <button
@@ -173,7 +173,7 @@ const ParentChildren = () => {
                                 </button>
                                 <button
                                     onClick={() => setSelectedChild(null)}
-                                    className="px-4 py-2 border rounded-lg hover:bg-gray-50"
+                                    className="px-4 py-2 border dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
                                 >
                                     Close
                                 </button>

@@ -39,7 +39,7 @@ router.get('/role/:role', async (req, res) => {
   try {
     const { role } = req.params;
     
-    const validRoles = ['student', 'teacher', 'parent', 'admin'];
+    const validRoles = ['student', 'teacher', 'parent', 'admin', 'registrar', 'finance_officer', 'finance'];
     if (!validRoles.includes(role)) {
       return res.status(400).json({
         success: false,

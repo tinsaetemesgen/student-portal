@@ -8,6 +8,8 @@ const authRoutes = require('./routes/authRoutes');
 const parentRoutes = require('./routes/parentRoutes');
 const classRoutes = require('./routes/classRoutes');
 const gradeRoutes = require('./routes/gradeRoutes');
+const financeRoutes = require('./routes/financeRoutes');
+const paymentsRoutes = require('./routes/paymentsRoutes');
 const app = express();
 const cors = require("cors");
 const PORT = process.env.PORT || 7000;
@@ -26,6 +28,9 @@ const startServer = async () => {
     );
     app.use(express.json());
 
+    // Serve uploaded files (payment screenshots, etc.)
+    app.use('/uploads', express.static('uploads'));
+
     // Logger middleware (optional)
     app.use((req, res, next) => {
       console.log(`📝 [${new Date().toLocaleTimeString()}] ${req.method} ${req.url}`);
@@ -38,6 +43,8 @@ const startServer = async () => {
     app.use('/api/parents', parentRoutes);
     app.use('/api/classes', classRoutes);
     app.use('/api/grades', gradeRoutes);
+    app.use('/api/finance', financeRoutes);
+    app.use('/api/payments', paymentsRoutes);
 
     // Home route
     app.get('/', (req, res) => {

@@ -177,7 +177,7 @@ const FinanceDashboard = () => {
                                 to="/finance/payments"
                                 className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition"
                             >
-                                <FileText size={20} className="text-gray-600" />
+                                <FileText size={20} className="text-gray-600 dark:text-gray-400" />
                                 <div>
                                     <p className="font-medium text-gray-700 dark:text-gray-200">View All Payments</p>
                                     <p className="text-sm text-gray-500 dark:text-gray-400">View payment history</p>

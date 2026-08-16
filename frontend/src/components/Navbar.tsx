@@ -308,7 +308,7 @@ const Navbar = ({ role, toggleSidebar }: NavbarProps) => {
                     {theme === 'dark' ? (
                         <Sun size={20} className="text-yellow-400" />
                     ) : (
-                        <Moon size={20} className="text-gray-600" />
+                        <Moon size={20} className="text-gray-600 dark:text-gray-300" />
                     )}
                 </button>
 

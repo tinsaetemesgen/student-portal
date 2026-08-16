@@ -82,24 +82,24 @@ const TeacherWorksheetResults = () => {
     };
 
     const getGradeColor = (percentage: number) => {
-        if (percentage >= 80) return 'text-green-600';
-        if (percentage >= 60) return 'text-blue-600';
-        if (percentage >= 40) return 'text-yellow-600';
-        return 'text-red-600';
+        if (percentage >= 80) return 'text-green-600 dark:text-green-400';
+        if (percentage >= 60) return 'text-blue-600 dark:text-blue-400';
+        if (percentage >= 40) return 'text-yellow-600 dark:text-yellow-400';
+        return 'text-red-600 dark:text-red-400';
     };
 
     const getGradeBadge = (percentage: number) => {
-        if (percentage >= 80) return 'bg-green-100 text-green-700';
-        if (percentage >= 60) return 'bg-blue-100 text-blue-700';
-        if (percentage >= 40) return 'bg-yellow-100 text-yellow-700';
-        return 'bg-red-100 text-red-700';
+        if (percentage >= 80) return 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400';
+        if (percentage >= 60) return 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400';
+        if (percentage >= 40) return 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400';
+        return 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400';
     };
 
     if (loading) {
         return (
             <DashboardLayout role="teacher">
                 <div className="flex items-center justify-center min-h-[60vh]">
-                    <div className="text-xl text-gray-500">Loading results...</div>
+                    <div className="text-xl text-gray-500 dark:text-gray-400">Loading results...</div>
                 </div>
             </DashboardLayout>
         );
@@ -109,7 +109,7 @@ const TeacherWorksheetResults = () => {
         return (
             <DashboardLayout role="teacher">
                 <div className="flex items-center justify-center min-h-[60vh]">
-                    <div className="text-xl text-red-600">{error || "Failed to load results"}</div>
+                    <div className="text-xl text-red-600 dark:text-red-400">{error || "Failed to load results"}</div>
                 </div>
             </DashboardLayout>
         );
@@ -124,27 +124,27 @@ const TeacherWorksheetResults = () => {
                 <div className="flex items-center gap-4">
                     <button
                         onClick={() => navigate('/teacher/worksheets')}
-                        className="p-2 hover:bg-gray-100 rounded-lg"
+                        className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
                     >
                         <ArrowLeft size={20} />
                     </button>
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-800">{worksheet.title}</h1>
-                        <p className="text-gray-500">{worksheet.subject} • {worksheet.totalQuestions} questions • {worksheet.totalMarks} marks</p>
+                        <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">{worksheet.title}</h1>
+                        <p className="text-gray-500 dark:text-gray-400">{worksheet.subject} • {worksheet.totalQuestions} questions • {worksheet.totalMarks} marks</p>
                     </div>
                 </div>
 
                 {/* Stats Cards */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="bg-white rounded-xl shadow-sm p-4">
-                        <div className="flex items-center gap-2 text-gray-500">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
+                        <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
                             <Users size={18} />
                             <span className="text-sm">Total Students</span>
                         </div>
                         <p className="text-2xl font-bold mt-1">{summary.totalStudents}</p>
                     </div>
-                    <div className="bg-white rounded-xl shadow-sm p-4">
-                        <div className="flex items-center gap-2 text-gray-500">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
+                        <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
                             <Award size={18} />
                             <span className="text-sm">Average Score</span>
                         </div>
@@ -152,55 +152,55 @@ const TeacherWorksheetResults = () => {
                             {summary.averageScore}%
                         </p>
                     </div>
-                    <div className="bg-white rounded-xl shadow-sm p-4">
-                        <div className="flex items-center gap-2 text-gray-500">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
+                        <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
                             <TrendingUp size={18} />
                             <span className="text-sm">Highest Score</span>
                         </div>
-                        <p className="text-2xl font-bold mt-1 text-green-600">{summary.highestScore}%</p>
+                        <p className="text-2xl font-bold mt-1 text-green-600 dark:text-green-400">{summary.highestScore}%</p>
                     </div>
-                    <div className="bg-white rounded-xl shadow-sm p-4">
-                        <div className="flex items-center gap-2 text-gray-500">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
+                        <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
                             <PieChart size={18} />
                             <span className="text-sm">Pass Rate</span>
                         </div>
-                        <p className={`text-2xl font-bold mt-1 ${summary.passRate >= 70 ? 'text-green-600' : 'text-yellow-600'}`}>
+                        <p className={`text-2xl font-bold mt-1 ${summary.passRate >= 70 ? 'text-green-600 dark:text-green-400' : 'text-yellow-600 dark:text-yellow-400'}`}>
                             {summary.passRate}%
                         </p>
                     </div>
                 </div>
 
                 {/* Student List */}
-                <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-                    <div className="px-6 py-4 border-b flex justify-between items-center">
-                        <h2 className="text-lg font-semibold text-gray-800">Student Results</h2>
-                        <button className="flex items-center gap-2 text-blue-600 hover:text-blue-800 text-sm">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
+                    <div className="px-6 py-4 border-b dark:border-gray-700 flex justify-between items-center">
+                        <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Student Results</h2>
+                        <button className="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm">
                             <Download size={16} /> Export
                         </button>
                     </div>
                     <div className="overflow-x-auto">
                         <table className="w-full border-collapse">
-                            <thead className="bg-gray-50">
+                            <thead className="bg-gray-50 dark:bg-gray-700">
                                 <tr>
-                                    <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600">Student</th>
-                                    <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600">Class</th>
-                                    <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600">Score</th>
-                                    <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600">Percentage</th>
-                                    <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600">Time Taken</th>
-                                    <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600">Status</th>
-                                    <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600">Actions</th>
+                                    <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Student</th>
+                                    <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Class</th>
+                                    <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Score</th>
+                                    <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Percentage</th>
+                                    <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Time Taken</th>
+                                    <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Status</th>
+                                    <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-100">
+                            <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                                 {attempts.length === 0 ? (
                                     <tr>
-                                        <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
+                                        <td colSpan={7} className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
                                             No students have attempted this worksheet yet.
                                         </td>
                                     </tr>
                                 ) : (
                                     attempts.map((attempt) => (
-                                        <tr key={attempt._id} className="hover:bg-gray-50">
+                                        <tr key={attempt._id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                                             <td className="px-6 py-4 font-medium">{attempt.studentId?.name || 'Unknown'}</td>
                                             <td className="px-6 py-4">{attempt.studentId?.class || 'N/A'}</td>
                                             <td className="px-6 py-4">{attempt.score}/{attempt.totalMarks}</td>
@@ -209,10 +209,10 @@ const TeacherWorksheetResults = () => {
                                                     {attempt.percentage}%
                                                 </span>
                                             </td>
-                                            <td className="px-6 py-4 text-gray-600">{formatTime(attempt.timeTaken)}</td>
+                                            <td className="px-6 py-4 text-gray-600 dark:text-gray-300">{formatTime(attempt.timeTaken)}</td>
                                             <td className="px-6 py-4">
                                                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                                    attempt.status === 'submitted' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                                                    attempt.status === 'submitted' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400'
                                                 }`}>
                                                     {attempt.status}
                                                 </span>
@@ -220,7 +220,7 @@ const TeacherWorksheetResults = () => {
                                             <td className="px-6 py-4">
                                                 <button
                                                     onClick={() => setSelectedStudent(attempt)}
-                                                    className="text-blue-600 hover:text-blue-800 text-sm"
+                                                    className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm"
                                                 >
                                                     View Details
                                                 </button>
@@ -237,23 +237,23 @@ const TeacherWorksheetResults = () => {
             {/* Student Details Modal */}
             {selectedStudent && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => setSelectedStudent(null)}>
-                    <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-                        <div className="flex items-center justify-between p-5 border-b">
-                            <h2 className="text-lg font-semibold">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center justify-between p-5 border-b dark:border-gray-700">
+                            <h2 className="text-lg font-semibold dark:text-gray-100">
                                 {selectedStudent.studentId?.name} - Results
                             </h2>
-                            <button onClick={() => setSelectedStudent(null)} className="p-1 rounded-lg hover:bg-gray-100">
-                                <X size={20} className="text-gray-500" />
+                            <button onClick={() => setSelectedStudent(null)} className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <X size={20} className="text-gray-500 dark:text-gray-400" />
                             </button>
                         </div>
                         <div className="p-5 space-y-4">
                             <div className="grid grid-cols-2 gap-4">
-                                <div className="bg-gray-50 p-3 rounded-lg text-center">
-                                    <p className="text-sm text-gray-500">Score</p>
+                                <div className="bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg text-center">
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">Score</p>
                                     <p className="text-2xl font-bold">{selectedStudent.score}/{selectedStudent.totalMarks}</p>
                                 </div>
-                                <div className="bg-gray-50 p-3 rounded-lg text-center">
-                                    <p className="text-sm text-gray-500">Percentage</p>
+                                <div className="bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg text-center">
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">Percentage</p>
                                     <p className={`text-2xl font-bold ${getGradeColor(selectedStudent.percentage)}`}>
                                         {selectedStudent.percentage}%
                                     </p>
@@ -261,12 +261,12 @@ const TeacherWorksheetResults = () => {
                             </div>
 
                             <div className="border-t pt-4">
-                                <h4 className="text-sm font-semibold text-gray-700 mb-3">Answer Breakdown</h4>
+                                <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3">Answer Breakdown</h4>
                                 <div className="space-y-2">
                                     {selectedStudent.answers.map((ans, idx) => (
-                                        <div key={idx} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                                        <div key={idx} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                                             <span className="text-sm">Q{idx + 1}</span>
-                                            <span className={`text-sm font-medium ${ans.isCorrect ? 'text-green-600' : 'text-red-600'}`}>
+                                            <span className={`text-sm font-medium ${ans.isCorrect ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
                                                 {ans.isCorrect ? '✅' : '❌'} {ans.marksObtained} marks
                                             </span>
                                         </div>

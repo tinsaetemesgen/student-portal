@@ -56,19 +56,19 @@ const ParentChildAttendance = () => {
 
     const getStatusBadge = (status: string) => {
         const styles: Record<string, string> = {
-            present: "bg-green-100 text-green-700",
-            absent: "bg-red-100 text-red-700",
-            late: "bg-yellow-100 text-yellow-700",
-            excused: "bg-blue-100 text-blue-700",
+            present: "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400",
+            absent: "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400",
+            late: "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400",
+            excused: "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400",
         };
-        return styles[status] || "bg-gray-100 text-gray-700";
+        return styles[status] || "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300";
     };
 
     const getStatusIcon = (status: string) => {
         switch (status) {
-            case 'present': return <CheckCircle size={16} className="text-green-600" />;
-            case 'absent': return <XCircle size={16} className="text-red-600" />;
-            case 'late': return <Clock size={16} className="text-yellow-600" />;
+            case 'present': return <CheckCircle size={16} className="text-green-600 dark:text-green-400" />;
+            case 'absent': return <XCircle size={16} className="text-red-600 dark:text-red-400" />;
+            case 'late': return <Clock size={16} className="text-yellow-600 dark:text-yellow-400" />;
             default: return null;
         }
     };
@@ -86,7 +86,7 @@ const ParentChildAttendance = () => {
         return (
             <DashboardLayout role="parent">
                 <div className="flex items-center justify-center min-h-[60vh]">
-                    <div className="text-xl text-gray-500">Loading attendance...</div>
+                    <div className="text-xl text-gray-500 dark:text-gray-400">Loading attendance...</div>
                 </div>
             </DashboardLayout>
         );
@@ -107,60 +107,60 @@ const ParentChildAttendance = () => {
             <div className="space-y-6">
                 <button
                     onClick={() => navigate('/parent/children')}
-                    className="flex items-center gap-2 text-blue-600 hover:text-blue-800"
+                    className="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
                 >
                     <ArrowLeft size={18} /> Back to Children
                 </button>
 
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-800">{student?.name}'s Attendance</h1>
-                    <p className="text-gray-500">{student?.class} • {student?.email}</p>
+                    <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">{student?.name}'s Attendance</h1>
+                    <p className="text-gray-500 dark:text-gray-400">{student?.class} • {student?.email}</p>
                 </div>
 
                 {/* Summary Cards */}
                 {attendance.length > 0 && (
                     <div className="grid grid-cols-4 gap-4">
-                        <div className="bg-white rounded-xl shadow-sm p-4 text-center border-l-4 border-green-500">
-                            <p className="text-gray-500 text-sm">Present</p>
-                            <h2 className="text-2xl font-bold text-green-600">{summary.present}</h2>
+                        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 text-center border-l-4 border-green-500">
+                            <p className="text-gray-500 dark:text-gray-400 text-sm">Present</p>
+                            <h2 className="text-2xl font-bold text-green-600 dark:text-green-400">{summary.present}</h2>
                         </div>
-                        <div className="bg-white rounded-xl shadow-sm p-4 text-center border-l-4 border-red-500">
-                            <p className="text-gray-500 text-sm">Absent</p>
-                            <h2 className="text-2xl font-bold text-red-600">{summary.absent}</h2>
+                        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 text-center border-l-4 border-red-500">
+                            <p className="text-gray-500 dark:text-gray-400 text-sm">Absent</p>
+                            <h2 className="text-2xl font-bold text-red-600 dark:text-red-400">{summary.absent}</h2>
                         </div>
-                        <div className="bg-white rounded-xl shadow-sm p-4 text-center border-l-4 border-yellow-500">
-                            <p className="text-gray-500 text-sm">Late</p>
-                            <h2 className="text-2xl font-bold text-yellow-600">{summary.late}</h2>
+                        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 text-center border-l-4 border-yellow-500">
+                            <p className="text-gray-500 dark:text-gray-400 text-sm">Late</p>
+                            <h2 className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{summary.late}</h2>
                         </div>
-                        <div className="bg-white rounded-xl shadow-sm p-4 text-center border-l-4 border-blue-500">
-                            <p className="text-gray-500 text-sm">Total Days</p>
-                            <h2 className="text-2xl font-bold text-blue-600">{summary.total}</h2>
+                        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 text-center border-l-4 border-blue-500">
+                            <p className="text-gray-500 dark:text-gray-400 text-sm">Total Days</p>
+                            <h2 className="text-2xl font-bold text-blue-600 dark:text-blue-400">{summary.total}</h2>
                         </div>
                     </div>
                 )}
 
                 {attendance.length === 0 ? (
-                    <div className="bg-white rounded-xl shadow-sm p-8 text-center">
-                        <ClipboardCheck size={48} className="mx-auto text-gray-400" />
-                        <h3 className="mt-4 text-lg font-medium text-gray-700">No Attendance Records</h3>
-                        <p className="mt-1 text-gray-500">No attendance has been recorded for this student yet.</p>
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-8 text-center">
+                        <ClipboardCheck size={48} className="mx-auto text-gray-400 dark:text-gray-500" />
+                        <h3 className="mt-4 text-lg font-medium text-gray-700 dark:text-gray-200">No Attendance Records</h3>
+                        <p className="mt-1 text-gray-500 dark:text-gray-400">No attendance has been recorded for this student yet.</p>
                     </div>
                 ) : (
-                    <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
                         <div className="overflow-x-auto">
                             <table className="w-full border-collapse">
-                                <thead className="bg-gray-50">
+                                <thead className="bg-gray-50 dark:bg-gray-700">
                                     <tr>
-                                        <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600">Date</th>
-                                        <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600">Class</th>
-                                        <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600">Status</th>
-                                        <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600">Remarks</th>
+                                        <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Date</th>
+                                        <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Class</th>
+                                        <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Status</th>
+                                        <th className="text-left px-6 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Remarks</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-gray-100">
+                                <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                                     {attendance.slice(0, 10).map((record) => (
-                                        <tr key={record._id} className="hover:bg-gray-50">
-                                            <td className="px-6 py-4 text-gray-600">
+                                        <tr key={record._id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                            <td className="px-6 py-4 text-gray-600 dark:text-gray-300">
                                                 {new Date(record.date).toLocaleDateString()}
                                             </td>
                                             <td className="px-6 py-4">{record.classId?.name || 'N/A'}</td>
@@ -170,13 +170,13 @@ const ParentChildAttendance = () => {
                                                     {record.status.charAt(0).toUpperCase() + record.status.slice(1)}
                                                 </span>
                                             </td>
-                                            <td className="px-6 py-4 text-gray-500">{record.remarks || '—'}</td>
+                                            <td className="px-6 py-4 text-gray-500 dark:text-gray-400">{record.remarks || '—'}</td>
                                         </tr>
                                     ))}
                                 </tbody>
                             </table>
                             {attendance.length > 10 && (
-                                <p className="px-6 py-2 text-sm text-gray-400">Showing 10 of {attendance.length} records</p>
+                                <p className="px-6 py-2 text-sm text-gray-400 dark:text-gray-500">Showing 10 of {attendance.length} records</p>
                             )}
                         </div>
                     </div>

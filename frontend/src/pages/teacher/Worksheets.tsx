@@ -224,18 +224,18 @@ const TeacherWorksheets = () => {
 
     const getStatusBadge = (status: string) => {
         const styles: Record<string, string> = {
-            draft: 'bg-gray-100 text-gray-700',
-            published: 'bg-green-100 text-green-700',
-            closed: 'bg-red-100 text-red-700',
+            draft: 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300',
+            published: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400',
+            closed: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400',
         };
-        return styles[status] || 'bg-gray-100 text-gray-700';
+        return styles[status] || 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300';
     };
 
     if (loading) {
         return (
             <DashboardLayout role="teacher">
                 <div className="flex items-center justify-center min-h-[60vh]">
-                    <div className="text-xl text-gray-500">Loading worksheets...</div>
+                    <div className="text-xl text-gray-500 dark:text-gray-400">Loading worksheets...</div>
                 </div>
             </DashboardLayout>
         );
@@ -243,46 +243,46 @@ const TeacherWorksheets = () => {
 
     const modalContent = (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => setShowModal(false)}>
-            <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
                 <div className="flex items-center justify-between p-5 border-b">
-                    <h2 className="text-lg font-semibold">
+                    <h2 className="text-lg font-semibold dark:text-gray-100">
                         {editingId ? "Edit Worksheet" : "Create New Worksheet"}
                     </h2>
-                    <button onClick={() => setShowModal(false)} className="p-1 rounded-lg hover:bg-gray-100">
-                        <X size={20} className="text-gray-500" />
+                    <button onClick={() => setShowModal(false)} className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <X size={20} className="text-gray-500 dark:text-gray-400" />
                     </button>
                 </div>
                 <form onSubmit={handleSubmit} className="p-5 space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Title</label>
                             <input
                                 type="text"
                                 required
                                 value={formData.title}
                                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                                className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Subject</label>
                             <input
                                 type="text"
                                 required
                                 value={formData.subject}
                                 onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                                className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
                             />
                         </div>
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Class</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Class</label>
                         <select
                             required
                             value={formData.classId}
                             onChange={(e) => setFormData({ ...formData, classId: e.target.value })}
-                            className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
                         >
                             <option value="">Select Class</option>
                             {classes.map((cls) => (
@@ -292,38 +292,38 @@ const TeacherWorksheets = () => {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Description</label>
                         <textarea
                             rows={2}
                             value={formData.description}
                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                            className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
                         />
                     </div>
 
                     <div className="grid grid-cols-3 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Start Date</label>
                             <input
                                 type="date"
                                 required
                                 value={formData.startDate}
                                 onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                                className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">End Date</label>
                             <input
                                 type="date"
                                 required
                                 value={formData.endDate}
                                 onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                                className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Duration (minutes)</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Duration (minutes)</label>
                             <input
                                 type="number"
                                 required
@@ -331,24 +331,24 @@ const TeacherWorksheets = () => {
                                 max="180"
                                 value={formData.duration}
                                 onChange={(e) => setFormData({ ...formData, duration: parseInt(e.target.value) })}
-                                className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
                             />
                         </div>
                     </div>
 
                     {/* Questions Section */}
                     <div className="border-t pt-4 mt-4">
-                        <h4 className="text-sm font-semibold text-gray-700 mb-3">Questions ({formData.questions.length})</h4>
+                        <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3">Questions ({formData.questions.length})</h4>
 
                         {/* Add Question Form */}
-                        <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-4">
+                        <div className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg border border-gray-200 dark:border-gray-700 mb-4">
                             <div className="grid grid-cols-1 gap-3">
                                 <input
                                     type="text"
                                     placeholder="Question"
                                     value={currentQuestion.question}
                                     onChange={(e) => setCurrentQuestion({ ...currentQuestion, question: e.target.value })}
-                                    className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
                                 />
                                 <div className="grid grid-cols-2 gap-2">
                                     {currentQuestion.options.map((opt, idx) => (
@@ -362,19 +362,19 @@ const TeacherWorksheets = () => {
                                                 newOptions[idx] = e.target.value;
                                                 setCurrentQuestion({ ...currentQuestion, options: newOptions });
                                             }}
-                                            className={`w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 ${
-                                                currentQuestion.correctAnswer === idx ? 'border-green-500 bg-green-50' : ''
+                                            className={`w-full border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600 ${
+                                                currentQuestion.correctAnswer === idx ? 'border-green-500 bg-green-50 dark:bg-green-900/20' : ''
                                             }`}
                                         />
                                     ))}
                                 </div>
                                 <div className="flex items-center gap-4">
                                     <div className="flex items-center gap-2">
-                                        <label className="text-sm text-gray-600">Correct Answer:</label>
+                                        <label className="text-sm text-gray-600 dark:text-gray-300">Correct Answer:</label>
                                         <select
                                             value={currentQuestion.correctAnswer}
                                             onChange={(e) => setCurrentQuestion({ ...currentQuestion, correctAnswer: parseInt(e.target.value) })}
-                                            className="border rounded-lg px-3 py-1 outline-none focus:ring-2 focus:ring-blue-500"
+                                            className="border rounded-lg px-3 py-1 outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
                                         >
                                             {currentQuestion.options.map((_, idx) => (
                                                 <option key={idx} value={idx}>
@@ -384,13 +384,13 @@ const TeacherWorksheets = () => {
                                         </select>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <label className="text-sm text-gray-600">Marks:</label>
+                                        <label className="text-sm text-gray-600 dark:text-gray-300">Marks:</label>
                                         <input
                                             type="number"
                                             min="1"
                                             value={currentQuestion.marks}
                                             onChange={(e) => setCurrentQuestion({ ...currentQuestion, marks: parseInt(e.target.value) || 1 })}
-                                            className="w-16 border rounded-lg px-2 py-1 outline-none focus:ring-2 focus:ring-blue-500"
+                                            className="w-16 border rounded-lg px-2 py-1 outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
                                         />
                                     </div>
                                     <button
@@ -407,19 +407,19 @@ const TeacherWorksheets = () => {
                         {/* Question List */}
                         <div className="space-y-2 max-h-40 overflow-y-auto">
                             {formData.questions.map((q, idx) => (
-                                <div key={idx} className="flex items-center justify-between bg-white p-3 rounded-lg border border-gray-200">
+                                <div key={idx} className="flex items-center justify-between bg-white dark:bg-gray-800 p-3 rounded-lg border border-gray-200 dark:border-gray-700">
                                     <div className="flex-1">
                                         <span className="font-medium text-sm">Q{idx + 1}:</span>
                                         <span className="text-sm ml-2">{q.question}</span>
-                                        <span className="text-xs text-gray-500 ml-2">({q.marks} marks)</span>
-                                        <span className="text-xs text-green-600 ml-2">
+                                        <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">({q.marks} marks)</span>
+                                        <span className="text-xs text-green-600 dark:text-green-400 ml-2">
                                             ✓ {String.fromCharCode(65 + q.correctAnswer)}
                                         </span>
                                     </div>
                                     <button
                                         type="button"
                                         onClick={() => handleRemoveQuestion(idx)}
-                                        className="p-1 text-red-600 hover:bg-red-50 rounded"
+                                        className="p-1 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
                                     >
                                         <Trash2 size={16} />
                                     </button>
@@ -444,8 +444,8 @@ const TeacherWorksheets = () => {
             <div className="space-y-6">
                 <div className="flex justify-between items-center">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-800">Worksheets</h1>
-                        <p className="text-gray-500">Create and manage online worksheets</p>
+                        <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Worksheets</h1>
+                        <p className="text-gray-500 dark:text-gray-400">Create and manage online worksheets</p>
                     </div>
                     <button
                         onClick={() => setShowModal(true)}
@@ -456,27 +456,27 @@ const TeacherWorksheets = () => {
                 </div>
 
                 {worksheets.length === 0 ? (
-                    <div className="bg-white rounded-xl shadow-sm p-8 text-center">
-                        <FileText size={48} className="mx-auto text-gray-300" />
-                        <h3 className="mt-4 text-lg font-medium text-gray-700">No Worksheets</h3>
-                        <p className="text-gray-500">Create your first worksheet for students.</p>
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-8 text-center">
+                        <FileText size={48} className="mx-auto text-gray-300 dark:text-gray-600" />
+                        <h3 className="mt-4 text-lg font-medium text-gray-700 dark:text-gray-200">No Worksheets</h3>
+                        <p className="text-gray-500 dark:text-gray-400">Create your first worksheet for students.</p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {worksheets.map((ws) => (
-                            <div key={ws._id} className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                            <div key={ws._id} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-100 dark:border-gray-700">
                                 <div className="flex justify-between items-start">
                                     <div className="flex-1">
-                                        <h3 className="text-lg font-semibold text-gray-800">{ws.title}</h3>
-                                        <p className="text-sm text-gray-500">{ws.subject} • {ws.classId?.name || 'No class'}</p>
-                                        <p className="text-sm text-gray-400 mt-1">{ws.questions.length} questions • {ws.totalMarks} marks</p>
+                                        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{ws.title}</h3>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400">{ws.subject} • {ws.classId?.name || 'No class'}</p>
+                                        <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">{ws.questions.length} questions • {ws.totalMarks} marks</p>
                                     </div>
                                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusBadge(ws.status)}`}>
                                         {ws.status.toUpperCase()}
                                     </span>
                                 </div>
 
-                                <div className="flex items-center gap-4 mt-3 text-xs text-gray-500">
+                                <div className="flex items-center gap-4 mt-3 text-xs text-gray-500 dark:text-gray-400">
                                     <span className="flex items-center gap-1">
                                         <Clock size={14} /> {ws.duration} min
                                     </span>
@@ -489,7 +489,7 @@ const TeacherWorksheets = () => {
                                     {ws.status === 'draft' && (
                                         <button
                                             onClick={() => handlePublish(ws._id)}
-                                            className="px-3 py-1 bg-green-100 text-green-700 rounded-lg text-xs hover:bg-green-200"
+                                            className="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-lg text-xs hover:bg-green-200 dark:hover:bg-green-900/50"
                                         >
                                             Publish
                                         </button>
@@ -497,26 +497,26 @@ const TeacherWorksheets = () => {
                                     {ws.status === 'published' && (
                                         <button
                                             onClick={() => handleClose(ws._id)}
-                                            className="px-3 py-1 bg-red-100 text-red-700 rounded-lg text-xs hover:bg-red-200"
+                                            className="px-3 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-lg text-xs hover:bg-red-200 dark:hover:bg-red-900/50"
                                         >
                                             Close
                                         </button>
                                     )}
                                     <button
                                         onClick={() => openEditModal(ws)}
-                                        className="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg text-xs hover:bg-blue-200"
+                                        className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-lg text-xs hover:bg-blue-200 dark:hover:bg-blue-900/50"
                                     >
                                         <Edit2 size={14} className="inline mr-1" /> Edit
                                     </button>
                                     <button
                                         onClick={() => handleDelete(ws._id)}
-                                        className="px-3 py-1 bg-red-100 text-red-700 rounded-lg text-xs hover:bg-red-200"
+                                        className="px-3 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-lg text-xs hover:bg-red-200 dark:hover:bg-red-900/50"
                                     >
                                         <Trash2 size={14} className="inline mr-1" /> Delete
                                     </button>
                                     <button
                                         onClick={() => window.location.href = `/teacher/worksheets/${ws._id}/results`}
-                                        className="px-3 py-1 bg-purple-100 text-purple-700 rounded-lg text-xs hover:bg-purple-200"
+                                        className="px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 rounded-lg text-xs hover:bg-purple-200 dark:hover:bg-purple-900/50"
                                     >
                                         <Eye size={14} className="inline mr-1" /> Results
                                     </button>

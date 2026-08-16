@@ -24,7 +24,9 @@ const UserSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['student', 'teacher', 'parent', 'admin', 'finance'],
+    // NOTE: 'finance' is kept for backwards compatibility with older
+    // seeded databases. New data should use 'finance_officer'.
+    enum: ['student', 'teacher', 'parent', 'admin', 'finance_officer', 'registrar', 'finance'],
     required: true,
     default: 'student',
   },
@@ -84,7 +86,28 @@ const UserSchema = new mongoose.Schema({
   }],
 
 
+  //  TEACHER-ASSIGNED CLASSES
+
+  assignedClasses: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Class',
+  }],
+
+
   //  COMMON FIELDS
+
+  phone: {
+    type: String,
+    trim: true,
+  },
+  gender: {
+    type: String,
+    trim: true,
+  },
+  address: {
+    type: String,
+    trim: true,
+  },
 
   createdAt: {
     type: Date,

@@ -107,7 +107,7 @@ const Register = () => {
                                 placeholder="John Doe"
                                 value={formData.name}
                                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                className="w-full border border-gray-200 rounded-xl pl-10 pr-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/50"
+                                className="w-full border border-gray-200 dark:border-gray-600 rounded-xl pl-10 pr-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/50 dark:bg-gray-700 dark:text-gray-100"
                                 required
                             />
                         </div>
@@ -122,7 +122,7 @@ const Register = () => {
                                 placeholder="you@school.com"
                                 value={formData.email}
                                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                className="w-full border border-gray-200 rounded-xl pl-10 pr-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/50"
+                                className="w-full border border-gray-200 dark:border-gray-600 rounded-xl pl-10 pr-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/50 dark:bg-gray-700 dark:text-gray-100"
                                 required
                             />
                         </div>
@@ -137,7 +137,7 @@ const Register = () => {
                                 placeholder="Min 6 characters"
                                 value={formData.password}
                                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                className="w-full border border-gray-200 rounded-xl pl-10 pr-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/50"
+                                className="w-full border border-gray-200 dark:border-gray-600 rounded-xl pl-10 pr-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/50 dark:bg-gray-700 dark:text-gray-100"
                                 required
                                 minLength={6}
                             />
@@ -153,7 +153,7 @@ const Register = () => {
                                 placeholder="Confirm your password"
                                 value={formData.confirmPassword}
                                 onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                                className="w-full border border-gray-200 rounded-xl pl-10 pr-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/50"
+                                className="w-full border border-gray-200 dark:border-gray-600 rounded-xl pl-10 pr-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/50 dark:bg-gray-700 dark:text-gray-100"
                                 required
                             />
                         </div>
@@ -164,7 +164,7 @@ const Register = () => {
                         <select
                             value={formData.role}
                             onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                            className="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/50"
+                            className="w-full border border-gray-200 dark:border-gray-600 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/50 dark:bg-gray-700 dark:text-gray-100"
                         >
                             <option value="student">Student</option>
                             <option value="teacher">Teacher</option>
@@ -182,7 +182,7 @@ const Register = () => {
                                     placeholder="e.g., Grade 10A"
                                     value={formData.class}
                                     onChange={(e) => setFormData({ ...formData, class: e.target.value })}
-                                    className="w-full border border-gray-200 rounded-xl pl-10 pr-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/50"
+                                    className="w-full border border-gray-200 dark:border-gray-600 rounded-xl pl-10 pr-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/50 dark:bg-gray-700 dark:text-gray-100"
                                 />
                             </div>
                         </div>

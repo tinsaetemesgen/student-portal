@@ -153,7 +153,7 @@ const ChatWindow: React.FC = () => {
                     className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition disabled:opacity-50"
                     title="Refresh messages"
                 >
-                    <RefreshCw size={18} className={`text-gray-500 ${isLoading ? 'animate-spin' : ''}`} />
+                    <RefreshCw size={18} className={`text-gray-500 dark:text-gray-400 ${isLoading ? 'animate-spin' : ''}`} />
                 </button>
             </div>
 

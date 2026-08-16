@@ -183,12 +183,12 @@ const StudentDashboard = () => {
 
     const getPriorityColor = (priority: string) => {
         const colors: Record<string, string> = {
-            low: 'bg-gray-100 text-gray-600',
-            medium: 'bg-blue-100 text-blue-700',
-            high: 'bg-orange-100 text-orange-700',
-            urgent: 'bg-red-100 text-red-700 animate-pulse',
+            low: 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300',
+            medium: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+            high: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
+            urgent: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 animate-pulse',
         };
-        return colors[priority] || 'bg-gray-100 text-gray-600';
+        return colors[priority] || 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300';
     };
 
     const getPriorityIcon = (priority: string) => {
@@ -232,7 +232,7 @@ const StudentDashboard = () => {
                 <div className="flex items-center justify-center min-h-[60vh]">
                     <div className="text-center">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                        <p className="text-gray-500">Loading your dashboard...</p>
+                        <p className="text-gray-500 dark:text-gray-400">Loading your dashboard...</p>
                     </div>
                 </div>
             </DashboardLayout>
@@ -247,18 +247,18 @@ const StudentDashboard = () => {
                     ============================================ */}
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-2">
+                        <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
                             {greeting}, {studentName}!
                             <Sparkles size={20} className="text-yellow-500" />
                         </h1>
-                        <p className="text-gray-500">Here's what's happening with your learning journey</p>
+                        <p className="text-gray-500 dark:text-gray-400">Here's what's happening with your learning journey</p>
                     </div>
                     <div className="flex items-center gap-3">
                         <Link 
                             to="/student/announcements"
-                            className="relative p-3 bg-white rounded-xl shadow-sm hover:shadow-md transition border border-gray-100"
+                            className="relative p-3 bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-md transition border border-gray-100 dark:border-gray-700"
                         >
-                            <Bell size={20} className="text-gray-600" />
+                            <Bell size={20} className="text-gray-600 dark:text-gray-300" />
                             {notificationCount > 0 && (
                                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold animate-pulse">
                                     {notificationCount > 9 ? '9+' : notificationCount}
@@ -280,54 +280,54 @@ const StudentDashboard = () => {
                     STATS CARDS
                     ============================================ */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100 hover:shadow-md transition">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 border border-gray-100 dark:border-gray-700 hover:shadow-md transition">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-gray-500 text-sm">Avg Grade</p>
-                                <h2 className="text-2xl font-bold text-gray-800">
+                                <p className="text-gray-500 dark:text-gray-400 text-sm">Avg Grade</p>
+                                <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
                                     {gradeSummary?.average || 'N/A'}%
                                 </h2>
                             </div>
-                            <div className="bg-green-100 p-3 rounded-xl">
+                            <div className="bg-green-100 dark:bg-green-900/30 p-3 rounded-xl">
                                 <Award size={20} className="text-green-600" />
                             </div>
                         </div>
                     </div>
-                    <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100 hover:shadow-md transition">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 border border-gray-100 dark:border-gray-700 hover:shadow-md transition">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-gray-500 text-sm">Subjects</p>
-                                <h2 className="text-2xl font-bold text-gray-800">
+                                <p className="text-gray-500 dark:text-gray-400 text-sm">Subjects</p>
+                                <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
                                     {gradeSummary?.subjects || 0}
                                 </h2>
                             </div>
-                            <div className="bg-blue-100 p-3 rounded-xl">
+                            <div className="bg-blue-100 dark:bg-blue-900/30 p-3 rounded-xl">
                                 <BookOpen size={20} className="text-blue-600" />
                             </div>
                         </div>
                     </div>
-                    <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100 hover:shadow-md transition">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 border border-gray-100 dark:border-gray-700 hover:shadow-md transition">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-gray-500 text-sm">Fees Due</p>
-                                <h2 className="text-2xl font-bold text-yellow-600">
+                                <p className="text-gray-500 dark:text-gray-400 text-sm">Fees Due</p>
+                                <h2 className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
                                     {feeStatus?.pending || 0}
                                 </h2>
                             </div>
-                            <div className="bg-yellow-100 p-3 rounded-xl">
+                            <div className="bg-yellow-100 dark:bg-yellow-900/30 p-3 rounded-xl">
                                 <DollarSign size={20} className="text-yellow-600" />
                             </div>
                         </div>
                     </div>
-                    <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100 hover:shadow-md transition">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 border border-gray-100 dark:border-gray-700 hover:shadow-md transition">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-gray-500 text-sm">Resources</p>
-                                <h2 className="text-2xl font-bold text-purple-600">
+                                <p className="text-gray-500 dark:text-gray-400 text-sm">Resources</p>
+                                <h2 className="text-2xl font-bold text-purple-600 dark:text-purple-400">
                                     {recentResources.length}
                                 </h2>
                             </div>
-                            <div className="bg-purple-100 p-3 rounded-xl">
+                            <div className="bg-purple-100 dark:bg-purple-900/30 p-3 rounded-xl">
                                 <FileText size={20} className="text-purple-600" />
                             </div>
                         </div>
@@ -347,13 +347,13 @@ const StudentDashboard = () => {
                         <Link
                             key={index}
                             to={item.path}
-                            className={`bg-white rounded-xl shadow-sm p-4 border border-gray-100 hover:shadow-md transition flex items-center gap-3 group`}
+                            className={`bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 border border-gray-100 dark:border-gray-700 hover:shadow-md transition flex items-center gap-3 group`}
                         >
                             <div className={`p-2 rounded-xl bg-${item.color}-100 text-${item.color}-600 group-hover:scale-110 transition`}>
                                 {item.icon}
                             </div>
-                            <span className="font-medium text-gray-700">{item.label}</span>
-                            <ChevronRight size={16} className="ml-auto text-gray-300 group-hover:text-gray-500 transition" />
+                            <span className="font-medium text-gray-700 dark:text-gray-200">{item.label}</span>
+                            <ChevronRight size={16} className="ml-auto text-gray-300 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 transition" />
                         </Link>
                     ))}
                 </div>
@@ -361,23 +361,23 @@ const StudentDashboard = () => {
                 {/* ============================================
                     RECENT RESOURCES
                     ============================================ */}
-                <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-                    <div className="flex items-center justify-between p-5 border-b border-gray-100">
-                        <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
+                    <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-gray-700">
+                        <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2">
                             <FileText size={20} className="text-blue-600" />
                             Recent Resources
                         </h2>
                         <Link 
                             to="/student/resources" 
-                            className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1 font-medium"
+                            className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 flex items-center gap-1 font-medium"
                         >
                             View All <ChevronRight size={16} />
                         </Link>
                     </div>
                     <div className="p-4">
                         {recentResources.length === 0 ? (
-                            <div className="text-center py-8 text-gray-500">
-                                <FileText size={40} className="mx-auto text-gray-300 mb-3" />
+                            <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                                <FileText size={40} className="mx-auto text-gray-300 dark:text-gray-500 mb-3" />
                                 <p>No resources available yet</p>
                                 <p className="text-sm">Check back later for learning materials</p>
                             </div>
@@ -386,13 +386,13 @@ const StudentDashboard = () => {
                                 {recentResources.map((resource) => (
                                     <div 
                                         key={resource._id} 
-                                        className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition border border-gray-100"
+                                        className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition border border-gray-100 dark:border-gray-700"
                                     >
                                         <div className="flex items-center gap-4 min-w-0">
                                             <span className="text-3xl flex-shrink-0">{getFileIcon(resource.fileType)}</span>
                                             <div className="min-w-0">
-                                                <p className="font-semibold text-gray-800 truncate">{resource.title}</p>
-                                                <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500">
+                                                <p className="font-semibold text-gray-800 dark:text-gray-100 truncate">{resource.title}</p>
+                                                <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
                                                     <span className="flex items-center gap-1">
                                                         <BookOpen size={12} />
                                                         {resource.subject}
@@ -405,7 +405,7 @@ const StudentDashboard = () => {
                                                         <Clock size={12} />
                                                         {getTimeAgo(resource.createdAt)}
                                                     </span>
-                                                    <span className="text-gray-400">{resource.readableSize}</span>
+                                                    <span className="text-gray-400 dark:text-gray-500">{resource.readableSize}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -426,9 +426,9 @@ const StudentDashboard = () => {
                 {/* ============================================
                     ANNOUNCEMENTS SECTION
                     ============================================ */}
-                <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-                    <div className="flex items-center justify-between p-5 border-b border-gray-100">
-                        <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
+                    <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-gray-700">
+                        <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2">
                             <Bell size={20} className="text-blue-600" />
                             Announcements
                             {notificationCount > 0 && (
@@ -439,15 +439,15 @@ const StudentDashboard = () => {
                         </h2>
                         <Link 
                             to="/student/announcements" 
-                            className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1 font-medium"
+                            className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 flex items-center gap-1 font-medium"
                         >
                             View All <ChevronRight size={16} />
                         </Link>
                     </div>
                     <div className="p-4">
                         {announcements.length === 0 ? (
-                            <div className="text-center py-8 text-gray-500">
-                                <Bell size={40} className="mx-auto text-gray-300 mb-3" />
+                            <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                                <Bell size={40} className="mx-auto text-gray-300 dark:text-gray-500 mb-3" />
                                 <p>No announcements</p>
                                 <p className="text-sm">Check back later for updates</p>
                             </div>
@@ -457,17 +457,17 @@ const StudentDashboard = () => {
                                     <div 
                                         key={announcement._id}
                                         className={`p-4 rounded-xl border-l-4 ${
-                                            announcement.priority === 'urgent' ? 'border-red-500 bg-red-50' :
-                                            announcement.priority === 'high' ? 'border-orange-500 bg-orange-50' :
-                                            'border-blue-500 bg-blue-50'
+                                            announcement.priority === 'urgent' ? 'border-red-500 bg-red-50 dark:bg-red-900/20' :
+                                            announcement.priority === 'high' ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20' :
+                                            'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
                                         }`}
                                     >
                                         <div className="flex items-start gap-3">
                                             <span className="text-xl">{getPriorityIcon(announcement.priority)}</span>
                                             <div className="flex-1 min-w-0">
-                                                <p className="font-semibold text-gray-800">{announcement.title}</p>
-                                                <p className="text-sm text-gray-600 line-clamp-2">{announcement.content}</p>
-                                                <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
+                                                <p className="font-semibold text-gray-800 dark:text-gray-100">{announcement.title}</p>
+                                                <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">{announcement.content}</p>
+                                                <div className="flex items-center gap-3 mt-1 text-xs text-gray-500 dark:text-gray-400">
                                                     <span className="flex items-center gap-1">
                                                         <Clock size={12} />
                                                         {getTimeAgo(announcement.createdAt)}
@@ -488,14 +488,14 @@ const StudentDashboard = () => {
                 {/* ============================================
                     QUICK TIPS / MOTIVATIONAL
                     ============================================ */}
-                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-5 border border-blue-100">
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl p-5 border border-blue-100 dark:border-blue-800">
                     <div className="flex items-center gap-4">
-                        <div className="p-3 bg-white rounded-xl shadow-sm">
+                        <div className="p-3 bg-white dark:bg-gray-800 rounded-xl shadow-sm">
                             <Sparkles size={24} className="text-yellow-500" />
                         </div>
                         <div>
-                            <p className="font-semibold text-gray-800">💡 Did you know?</p>
-                            <p className="text-sm text-gray-600">
+                            <p className="font-semibold text-gray-800 dark:text-gray-100">💡 Did you know?</p>
+                            <p className="text-sm text-gray-600 dark:text-gray-300">
                                 You have {recentResources.length} new resource{recentResources.length !== 1 ? 's' : ''} available. 
                                 Check them out to enhance your learning!
                             </p>

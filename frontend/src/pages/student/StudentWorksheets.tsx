@@ -80,22 +80,22 @@ const StudentWorksheets = () => {
             return {
                 icon: <CheckCircle size={16} className="text-green-600" />,
                 text: 'Submitted',
-                color: 'bg-green-100 text-green-700'
+                color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
             };
         }
         return {
             icon: <Clock size={16} className="text-yellow-600" />,
             text: 'Pending',
-            color: 'bg-yellow-100 text-yellow-700'
+            color: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
         };
     };
 
     const getScoreColor = (percentage?: number | null) => {
-        if (percentage === undefined || percentage === null) return 'text-gray-500';
-        if (percentage >= 80) return 'text-green-600';
-        if (percentage >= 60) return 'text-blue-600';
-        if (percentage >= 40) return 'text-yellow-600';
-        return 'text-red-600';
+        if (percentage === undefined || percentage === null) return 'text-gray-500 dark:text-gray-400';
+        if (percentage >= 80) return 'text-green-600 dark:text-green-400';
+        if (percentage >= 60) return 'text-blue-600 dark:text-blue-400';
+        if (percentage >= 40) return 'text-yellow-600 dark:text-yellow-400';
+        return 'text-red-600 dark:text-red-400';
     };
 
     const filteredWorksheets = worksheets.filter(w => {
@@ -113,7 +113,7 @@ const StudentWorksheets = () => {
                 <div className="flex items-center justify-center min-h-[60vh]">
                     <div className="text-center">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                        <p className="text-gray-500">Loading worksheets...</p>
+                        <p className="text-gray-500 dark:text-gray-400">Loading worksheets...</p>
                     </div>
                 </div>
             </DashboardLayout>
@@ -139,43 +139,43 @@ const StudentWorksheets = () => {
             <div className="space-y-6">
                 {/* Header */}
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                    <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
                         <BookOpen size={24} className="text-blue-600" />
                         Available Worksheets
                     </h1>
-                    <p className="text-gray-500">Complete worksheets to test your knowledge</p>
+                    <p className="text-gray-500 dark:text-gray-400">Complete worksheets to test your knowledge</p>
                 </div>
 
                 {/* Stats */}
                 <div className="grid grid-cols-3 gap-4">
-                    <div className="bg-white rounded-xl shadow-sm p-4 text-center border">
-                        <p className="text-gray-500 text-sm">Total</p>
-                        <h2 className="text-2xl font-bold text-gray-800">{worksheets.length}</h2>
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 text-center border">
+                        <p className="text-gray-500 dark:text-gray-400 text-sm">Total</p>
+                        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">{worksheets.length}</h2>
                     </div>
-                    <div className="bg-yellow-50 rounded-xl shadow-sm p-4 text-center border border-yellow-200">
-                        <p className="text-yellow-600 text-sm">Pending</p>
-                        <h2 className="text-2xl font-bold text-yellow-700">
+                    <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-xl shadow-sm p-4 text-center border border-yellow-200 dark:border-yellow-800">
+                        <p className="text-yellow-600 dark:text-yellow-400 text-sm">Pending</p>
+                        <h2 className="text-2xl font-bold text-yellow-700 dark:text-yellow-400">
                             {worksheets.filter(w => !isSubmitted(w)).length}
                         </h2>
                     </div>
-                    <div className="bg-green-50 rounded-xl shadow-sm p-4 text-center border border-green-200">
-                        <p className="text-green-600 text-sm">Submitted</p>
-                        <h2 className="text-2xl font-bold text-green-700">
+                    <div className="bg-green-50 dark:bg-green-900/20 rounded-xl shadow-sm p-4 text-center border border-green-200 dark:border-green-800">
+                        <p className="text-green-600 dark:text-green-400 text-sm">Submitted</p>
+                        <h2 className="text-2xl font-bold text-green-700 dark:text-green-400">
                             {worksheets.filter(w => isSubmitted(w)).length}
                         </h2>
                     </div>
                 </div>
 
                 {/* Search & Filter */}
-                <div className="bg-white rounded-xl shadow-sm p-4 flex flex-col md:flex-row gap-4">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 flex flex-col md:flex-row gap-4">
                     <div className="flex-1 relative">
-                        <Search size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                        <Search size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" />
                         <input
                             type="text"
                             placeholder="Search..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full border rounded-lg pl-10 pr-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full border rounded-lg pl-10 pr-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
                         />
                     </div>
                     <div className="flex gap-2">
@@ -184,7 +184,7 @@ const StudentWorksheets = () => {
                                 key={f}
                                 onClick={() => setFilter(f as 'all' | 'pending' | 'submitted')}
                                 className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-                                    filter === f ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                    filter === f ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                                 }`}
                             >
                                 {f.charAt(0).toUpperCase() + f.slice(1)}
@@ -196,8 +196,8 @@ const StudentWorksheets = () => {
                 {/* List */}
                 <div className="space-y-4">
                     {filteredWorksheets.length === 0 ? (
-                        <div className="bg-white rounded-xl shadow-sm p-12 text-center text-gray-500">
-                            <FileText size={48} className="mx-auto text-gray-300 mb-4" />
+                        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-12 text-center text-gray-500 dark:text-gray-400">
+                            <FileText size={48} className="mx-auto text-gray-300 dark:text-gray-500 mb-4" />
                             No worksheets found.
                         </div>
                     ) : (
@@ -206,12 +206,12 @@ const StudentWorksheets = () => {
                             const status = getStatusBadge(w);
 
                             return (
-                                <div key={w._id} className="bg-white rounded-xl shadow-sm border p-5 hover:shadow-md transition">
+                                <div key={w._id} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border p-5 hover:shadow-md transition">
                                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                                         <div>
-                                            <h3 className="font-semibold text-gray-800">{w.title}</h3>
-                                            <p className="text-sm text-gray-500">{w.subject} • {w.teacherName || 'Teacher'}</p>
-                                            <div className="flex flex-wrap gap-3 mt-1 text-xs text-gray-400">
+                                            <h3 className="font-semibold text-gray-800 dark:text-gray-100">{w.title}</h3>
+                                            <p className="text-sm text-gray-500 dark:text-gray-400">{w.subject} • {w.teacherName || 'Teacher'}</p>
+                                            <div className="flex flex-wrap gap-3 mt-1 text-xs text-gray-400 dark:text-gray-500">
                                                 <span>{w.totalQuestions} questions</span>
                                                 <span>{w.totalMarks} marks</span>
                                                 <span>{w.duration} min</span>
@@ -221,11 +221,11 @@ const StudentWorksheets = () => {
 
                                         <div className="flex items-center gap-3 flex-wrap">
                                             {submitted && w.score !== undefined && w.score !== null && (
-                                                <div className="text-center px-3 py-1.5 bg-gray-50 rounded-lg">
+                                                <div className="text-center px-3 py-1.5 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                                                     <p className={`text-lg font-bold ${getScoreColor(w.percentage)}`}>
                                                         {w.percentage ?? 0}%
                                                     </p>
-                                                    <p className="text-xs text-gray-500">{w.score}/{w.totalMarks}</p>
+                                                    <p className="text-xs text-gray-500 dark:text-gray-400">{w.score}/{w.totalMarks}</p>
                                                 </div>
                                             )}
 

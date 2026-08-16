@@ -108,17 +108,17 @@ const StudentResources = () => {
 
     const getFileIcon = (fileType: string) => {
         const icons: Record<string, { icon: string; color: string }> = {
-            pdf: { icon: '📄', color: 'bg-red-100 text-red-700' },
-            doc: { icon: '📝', color: 'bg-blue-100 text-blue-700' },
-            docx: { icon: '📝', color: 'bg-blue-100 text-blue-700' },
-            xls: { icon: '📊', color: 'bg-green-100 text-green-700' },
-            xlsx: { icon: '📊', color: 'bg-green-100 text-green-700' },
-            ppt: { icon: '📑', color: 'bg-orange-100 text-orange-700' },
-            pptx: { icon: '📑', color: 'bg-orange-100 text-orange-700' },
-            image: { icon: '🖼️', color: 'bg-purple-100 text-purple-700' },
-            video: { icon: '🎬', color: 'bg-pink-100 text-pink-700' },
+            pdf: { icon: '📄', color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' },
+            doc: { icon: '📝', color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' },
+            docx: { icon: '📝', color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' },
+            xls: { icon: '📊', color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' },
+            xlsx: { icon: '📊', color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' },
+            ppt: { icon: '📑', color: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400' },
+            pptx: { icon: '📑', color: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400' },
+            image: { icon: '🖼️', color: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400' },
+            video: { icon: '🎬', color: 'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400' },
         };
-        return icons[fileType] || { icon: '📎', color: 'bg-gray-100 text-gray-700' };
+        return icons[fileType] || { icon: '📎', color: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300' };
     };
 
     const getClassLevelLabel = (level: string) => {
@@ -143,7 +143,7 @@ const StudentResources = () => {
                 <div className="flex items-center justify-center min-h-[60vh]">
                     <div className="text-center">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                        <p className="text-gray-500">Loading resources...</p>
+                        <p className="text-gray-500 dark:text-gray-400">Loading resources...</p>
                     </div>
                 </div>
             </DashboardLayout>
@@ -155,32 +155,32 @@ const StudentResources = () => {
             <div className="max-w-6xl mx-auto space-y-6">
                 {/* Header */}
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                    <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
                         <BookOpen size={24} className="text-blue-600" />
                         Learning Resources
                     </h1>
-                    <p className="text-gray-500">Access learning materials shared by your teachers</p>
+                    <p className="text-gray-500 dark:text-gray-400">Access learning materials shared by your teachers</p>
                 </div>
 
                 {/* Stats */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
-                        <p className="text-gray-500 text-sm">Total Resources</p>
-                        <h2 className="text-2xl font-bold text-gray-800">{resources.length}</h2>
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 border border-gray-100 dark:border-gray-700">
+                        <p className="text-gray-500 dark:text-gray-400 text-sm">Total Resources</p>
+                        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">{resources.length}</h2>
                     </div>
-                    <div className="bg-blue-50 rounded-xl shadow-sm p-4 border border-blue-200">
-                        <p className="text-blue-600 text-sm">Subjects</p>
-                        <h2 className="text-2xl font-bold text-blue-700">
+                    <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl shadow-sm p-4 border border-blue-200 dark:border-blue-800">
+                        <p className="text-blue-600 dark:text-blue-400 text-sm">Subjects</p>
+                        <h2 className="text-2xl font-bold text-blue-700 dark:text-blue-400">
                             {new Set(resources.map(r => r.subject)).size}
                         </h2>
                     </div>
-                    <div className="bg-green-50 rounded-xl shadow-sm p-4 border border-green-200">
-                        <p className="text-green-600 text-sm">Downloaded</p>
-                        <h2 className="text-2xl font-bold text-green-700">0</h2>
+                    <div className="bg-green-50 dark:bg-green-900/20 rounded-xl shadow-sm p-4 border border-green-200 dark:border-green-800">
+                        <p className="text-green-600 dark:text-green-400 text-sm">Downloaded</p>
+                        <h2 className="text-2xl font-bold text-green-700 dark:text-green-400">0</h2>
                     </div>
-                    <div className="bg-purple-50 rounded-xl shadow-sm p-4 border border-purple-200">
-                        <p className="text-purple-600 text-sm">New This Week</p>
-                        <h2 className="text-2xl font-bold text-purple-700">
+                    <div className="bg-purple-50 dark:bg-purple-900/20 rounded-xl shadow-sm p-4 border border-purple-200 dark:border-purple-800">
+                        <p className="text-purple-600 dark:text-purple-400 text-sm">New This Week</p>
+                        <h2 className="text-2xl font-bold text-purple-700 dark:text-purple-400">
                             {resources.filter(r => {
                                 const weekAgo = new Date();
                                 weekAgo.setDate(weekAgo.getDate() - 7);
@@ -191,23 +191,23 @@ const StudentResources = () => {
                 </div>
 
                 {/* Search & Filter */}
-                <div className="bg-white rounded-xl shadow-sm p-4">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
                     <div className="flex flex-col md:flex-row gap-4">
                         <div className="flex-1 relative">
-                            <Search size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                            <Search size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" />
                             <input
                                 type="text"
                                 placeholder="Search by title, subject, or description..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full border rounded-xl pl-10 pr-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full border rounded-xl pl-10 pr-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
                             />
                         </div>
                         <div className="flex gap-2 flex-wrap">
                             <select
                                 value={filterSubject}
                                 onChange={(e) => setFilterSubject(e.target.value)}
-                                className="border rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                                className="border rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
                             >
                                 <option value="">All Subjects</option>
                                 {SUBJECTS.map(subject => (
@@ -217,7 +217,7 @@ const StudentResources = () => {
                             <select
                                 value={filterClassLevel}
                                 onChange={(e) => setFilterClassLevel(e.target.value)}
-                                className="border rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                                className="border rounded-xl px-4 py-2.5 outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
                             >
                                 <option value="">All Levels</option>
                                 {CLASS_LEVELS.map(level => (
@@ -226,13 +226,13 @@ const StudentResources = () => {
                                     </option>
                                 ))}
                             </select>
-                            <div className="flex border rounded-xl overflow-hidden">
+                            <div className="flex border rounded-xl overflow-hidden dark:border-gray-600">
                                 <button
                                     onClick={() => setViewMode("grid")}
                                     className={`px-3 py-2.5 transition ${
                                         viewMode === "grid" 
                                             ? 'bg-blue-600 text-white' 
-                                            : 'bg-white text-gray-500 hover:bg-gray-50'
+                                            : 'bg-white text-gray-500 dark:bg-gray-700 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-600'
                                     }`}
                                     title="Grid View"
                                 >
@@ -243,7 +243,7 @@ const StudentResources = () => {
                                     className={`px-3 py-2.5 transition ${
                                         viewMode === "list" 
                                             ? 'bg-blue-600 text-white' 
-                                            : 'bg-white text-gray-500 hover:bg-gray-50'
+                                            : 'bg-white text-gray-500 dark:bg-gray-700 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-600'
                                     }`}
                                     title="List View"
                                 >
@@ -256,10 +256,10 @@ const StudentResources = () => {
 
                 {/* Resources Display */}
                 {filteredResources.length === 0 ? (
-                    <div className="bg-white rounded-xl shadow-sm p-12 text-center">
-                        <FileText size={48} className="mx-auto text-gray-300 mb-4" />
-                        <h3 className="text-lg font-medium text-gray-700">No resources available</h3>
-                        <p className="text-gray-500">Your teachers haven't uploaded any resources yet.</p>
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-12 text-center">
+                        <FileText size={48} className="mx-auto text-gray-300 dark:text-gray-500 mb-4" />
+                        <h3 className="text-lg font-medium text-gray-700 dark:text-gray-200">No resources available</h3>
+                        <p className="text-gray-500 dark:text-gray-400">Your teachers haven't uploaded any resources yet.</p>
                     </div>
                 ) : viewMode === "grid" ? (
                     // Grid View
@@ -269,7 +269,7 @@ const StudentResources = () => {
                             return (
                                 <div 
                                     key={resource._id}
-                                    className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all overflow-hidden group"
+                                    className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all overflow-hidden group"
                                 >
                                     {/* File Icon */}
                                     <div className={`p-4 flex items-center justify-center ${fileInfo.color.replace('text-', 'bg-').replace('700', '50')}`}>
@@ -278,27 +278,27 @@ const StudentResources = () => {
 
                                     {/* Content */}
                                     <div className="p-4">
-                                        <h3 className="font-semibold text-gray-800 line-clamp-1">{resource.title}</h3>
-                                        <p className="text-sm text-gray-500 line-clamp-2 mt-1">{resource.description || 'No description'}</p>
+                                        <h3 className="font-semibold text-gray-800 dark:text-gray-100 line-clamp-1">{resource.title}</h3>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2 mt-1">{resource.description || 'No description'}</p>
                                         
                                         <div className="flex flex-wrap gap-2 mt-3">
-                                            <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-xs">
+                                            <span className="px-2 py-0.5 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 rounded-full text-xs">
                                                 {resource.subject}
                                             </span>
-                                            <span className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full text-xs">
+                                            <span className="px-2 py-0.5 bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 rounded-full text-xs">
                                                 {getClassLevelLabel(resource.classLevel)}
                                             </span>
-                                            <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs">
+                                            <span className="px-2 py-0.5 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 rounded-full text-xs">
                                                 {resource.readableSize}
                                             </span>
                                         </div>
 
-                                        <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
-                                            <div className="flex items-center gap-2 text-xs text-gray-500">
+                                        <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100 dark:border-gray-700">
+                                            <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
                                                 <User size={12} />
                                                 <span>{resource.uploadedBy?.name || 'Unknown'}</span>
                                             </div>
-                                            <div className="flex items-center gap-2 text-xs text-gray-500">
+                                            <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
                                                 <Clock size={12} />
                                                 <span>{getTimeAgo(resource.createdAt)}</span>
                                             </div>
@@ -318,44 +318,44 @@ const StudentResources = () => {
                     </div>
                 ) : (
                     // List View
-                    <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
                         <div className="overflow-x-auto">
                             <table className="w-full border-collapse">
-                                <thead className="bg-gray-50">
+                                <thead className="bg-gray-50 dark:bg-gray-700">
                                     <tr>
-                                        <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600">File</th>
-                                        <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600">Title</th>
-                                        <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600">Subject</th>
-                                        <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600">Level</th>
-                                        <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600">Size</th>
-                                        <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600">Actions</th>
+                                        <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">File</th>
+                                        <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Title</th>
+                                        <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Subject</th>
+                                        <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Level</th>
+                                        <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Size</th>
+                                        <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-gray-100">
+                                <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                                     {filteredResources.map((resource) => {
                                         const fileInfo = getFileIcon(resource.fileType);
                                         return (
-                                            <tr key={resource._id} className="hover:bg-gray-50">
+                                            <tr key={resource._id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                                                 <td className="px-4 py-3">
                                                     <span className="text-2xl">{fileInfo.icon}</span>
                                                 </td>
                                                 <td className="px-4 py-3">
                                                     <div>
-                                                        <p className="font-medium text-gray-800">{resource.title}</p>
-                                                        <p className="text-xs text-gray-500">{resource.uploadedBy?.name || 'Unknown'} • {getTimeAgo(resource.createdAt)}</p>
+                                                        <p className="font-medium text-gray-800 dark:text-gray-100">{resource.title}</p>
+                                                        <p className="text-xs text-gray-500 dark:text-gray-400">{resource.uploadedBy?.name || 'Unknown'} • {getTimeAgo(resource.createdAt)}</p>
                                                     </div>
                                                 </td>
                                                 <td className="px-4 py-3">{resource.subject}</td>
                                                 <td className="px-4 py-3">
-                                                    <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs">
+                                                    <span className="px-2 py-1 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 rounded-full text-xs">
                                                         {getClassLevelLabel(resource.classLevel)}
                                                     </span>
                                                 </td>
-                                                <td className="px-4 py-3 text-sm text-gray-500">{resource.readableSize}</td>
+                                                <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{resource.readableSize}</td>
                                                 <td className="px-4 py-3">
                                                     <button
                                                         onClick={() => handleDownload(resource._id, resource.fileName)}
-                                                        className="p-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition"
+                                                        className="p-2 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 rounded-lg hover:bg-green-200 dark:hover:bg-green-900/50 transition"
                                                         title="Download"
                                                     >
                                                         <Download size={16} />
@@ -371,7 +371,7 @@ const StudentResources = () => {
                 )}
 
                 {/* Footer */}
-                <div className="text-center text-sm text-gray-400">
+                <div className="text-center text-sm text-gray-400 dark:text-gray-500">
                     {filteredResources.length} resource{filteredResources.length !== 1 ? 's' : ''} available
                 </div>
             </div>
