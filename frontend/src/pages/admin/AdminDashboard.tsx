@@ -31,11 +31,11 @@ const AdminDashboard = () => {
         try {
             const token = localStorage.getItem('token');
 
-            const statsRes = await axios.get('http://localhost:7000/api/users/stats/roles', {
+            const statsRes = await axios.get('https://kamara-school-backend.onrender.com/api/users/stats/roles', {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
-            const usersRes = await axios.get('http://localhost:7000/api/users?limit=5', {
+            const usersRes = await axios.get('https://kamara-school-backend.onrender.com/api/users?limit=5', {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
@@ -100,7 +100,7 @@ const AdminDashboard = () => {
 
             console.log("📤 Sending to backend:", userData);
 
-            const response = await axios.post('http://localhost:7000/api/users', userData, {
+            const response = await axios.post('https://kamara-school-backend.onrender.com/api/users', userData, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 

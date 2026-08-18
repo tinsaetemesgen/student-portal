@@ -36,7 +36,7 @@ const MyAttendance = () => {
             try {
                 const token = localStorage.getItem('token');
                 const response = await axios.get(
-                    'http://localhost:7000/api/attendance/my-summary',
+                    'https://kamara-school-backend.onrender.com/api/attendance/my-summary',
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
 

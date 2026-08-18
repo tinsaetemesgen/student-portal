@@ -44,7 +44,7 @@ const TeacherAnnouncements = () => {
     async function fetchAnnouncements() {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get('http://localhost:7000/api/announcements', {
+            const response = await axios.get('https://kamara-school-backend.onrender.com/api/announcements', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setAnnouncements(response.data.data || []);
@@ -61,8 +61,8 @@ const TeacherAnnouncements = () => {
         try {
             const token = localStorage.getItem('token');
             const url = editingId 
-                ? `http://localhost:7000/api/announcements/${editingId}`
-                : 'http://localhost:7000/api/announcements';
+                ? `https://kamara-school-backend.onrender.com/api/announcements/${editingId}`
+                : 'https://kamara-school-backend.onrender.com/api/announcements';
             const method = editingId ? 'put' : 'post';
             
             await axios[method](url, formData, {
@@ -89,7 +89,7 @@ const TeacherAnnouncements = () => {
         if (!window.confirm("Are you sure you want to delete this announcement?")) return;
         try {
             const token = localStorage.getItem('token');
-            await axios.delete(`http://localhost:7000/api/announcements/${id}`, {
+            await axios.delete(`https://kamara-school-backend.onrender.com/api/announcements/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             fetchAnnouncements();

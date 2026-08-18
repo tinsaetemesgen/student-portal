@@ -51,7 +51,7 @@ const RegistrarTeachers = () => {
     async function fetchTeachers() {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get('http://localhost:7000/api/registrar/teachers', {
+            const response = await axios.get('https://kamara-school-backend.onrender.com/api/registrar/teachers', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setTeachers(response.data.data || []);
@@ -66,7 +66,7 @@ const RegistrarTeachers = () => {
     async function fetchClasses() {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get('http://localhost:7000/api/registrar/classes', {
+            const response = await axios.get('https://kamara-school-backend.onrender.com/api/registrar/classes', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setClasses(response.data.data || []);
@@ -79,7 +79,7 @@ const RegistrarTeachers = () => {
         e.preventDefault();
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.post('http://localhost:7000/api/registrar/teachers', formData, {
+            const response = await axios.post('https://kamara-school-backend.onrender.com/api/registrar/teachers', formData, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
@@ -111,7 +111,7 @@ const RegistrarTeachers = () => {
         if (!window.confirm("Are you sure you want to delete this teacher?")) return;
         try {
             const token = localStorage.getItem('token');
-            await axios.delete(`http://localhost:7000/api/registrar/teachers/${id}`, {
+            await axios.delete(`https://kamara-school-backend.onrender.com/api/registrar/teachers/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             fetchTeachers();

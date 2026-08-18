@@ -93,7 +93,7 @@ const TeacherDashboard = () => {
                 const headers = { Authorization: `Bearer ${token}` };
 
                 // 1️⃣ My classes (backend filters by the logged-in teacher)
-                const classRes = await axios.get('http://localhost:7000/api/classes', { headers });
+                const classRes = await axios.get('https://kamara-school-backend.onrender.com/api/classes', { headers });
                 const myClasses = classRes.data.data || [];
                 setClasses(myClasses);
 
@@ -102,7 +102,7 @@ const TeacherDashboard = () => {
                     myClasses.map((c: TeacherClass) =>
                         axios
                             .get(
-                                `http://localhost:7000/api/grades/class/${c._id}?semester=Semester%201&academicYear=${c.academicYear}`,
+                                `https://kamara-school-backend.onrender.com/api/grades/class/${c._id}?semester=Semester%201&academicYear=${c.academicYear}`,
                                 { headers }
                             )
                             .then((r) => r.data.data || [])

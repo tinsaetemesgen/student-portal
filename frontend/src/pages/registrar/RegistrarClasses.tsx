@@ -52,7 +52,7 @@ const RegistrarClasses = () => {
     async function fetchClasses() {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get('http://localhost:7000/api/registrar/classes', {
+            const response = await axios.get('https://kamara-school-backend.onrender.com/api/registrar/classes', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setClasses(response.data.data || []);
@@ -67,7 +67,7 @@ const RegistrarClasses = () => {
     async function fetchTeachers() {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get('http://localhost:7000/api/registrar/teachers', {
+            const response = await axios.get('https://kamara-school-backend.onrender.com/api/registrar/teachers', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setTeachers(response.data.data || []);
@@ -132,7 +132,7 @@ const RegistrarClasses = () => {
 
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.post('http://localhost:7000/api/registrar/classes', {
+            const response = await axios.post('https://kamara-school-backend.onrender.com/api/registrar/classes', {
                 name: formData.name,
                 grade: formData.grade,
                 section: formData.section,

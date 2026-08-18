@@ -47,13 +47,13 @@ const AdminAttendance = () => {
             const token = localStorage.getItem('token');
 
             // 1️⃣ Get all classes
-            const classesRes = await axios.get('http://localhost:7000/api/classes', {
+            const classesRes = await axios.get('https://kamara-school-backend.onrender.com/api/classes', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setClasses(classesRes.data.data);
 
             // 2️⃣ Get attendance reports
-            const reportRes = await axios.get('http://localhost:7000/api/attendance/reports?semester=Semester%201&academicYear=2024/25', {
+            const reportRes = await axios.get('https://kamara-school-backend.onrender.com/api/attendance/reports?semester=Semester%201&academicYear=2024/25', {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
@@ -97,7 +97,7 @@ const AdminAttendance = () => {
         try {
             const token = localStorage.getItem('token');
             const res = await axios.get(
-                `http://localhost:7000/api/attendance/class/${classId}?semester=Semester%201&academicYear=2024/25`,
+                `https://kamara-school-backend.onrender.com/api/attendance/class/${classId}?semester=Semester%201&academicYear=2024/25`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 

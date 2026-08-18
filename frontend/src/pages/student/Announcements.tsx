@@ -47,7 +47,7 @@ const StudentAnnouncements = () => {
         async function load() {
             try {
                 const token = localStorage.getItem('token');
-                const response = await axios.get('http://localhost:7000/api/announcements', {
+                const response = await axios.get('https://kamara-school-backend.onrender.com/api/announcements', {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setAnnouncements(response.data.data || []);

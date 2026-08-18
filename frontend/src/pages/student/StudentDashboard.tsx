@@ -115,7 +115,7 @@ const StudentDashboard = () => {
                 const token = localStorage.getItem('token');
                 
                 // 1️⃣ Fetch announcements
-                const annRes = await axios.get('http://localhost:7000/api/announcements', {
+                const annRes = await axios.get('https://kamara-school-backend.onrender.com/api/announcements', {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 const announcementsData = annRes.data.data || [];
@@ -123,14 +123,14 @@ const StudentDashboard = () => {
                 setNotificationCount(announcementsData.length);
 
                 // 2️⃣ Fetch recent resources
-                const resRes = await axios.get('http://localhost:7000/api/resources/recent?limit=5', {
+                const resRes = await axios.get('https://kamara-school-backend.onrender.com/api/resources/recent?limit=5', {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setRecentResources(resRes.data.data || []);
 
                 // 3️⃣ Fetch fee status
                 try {
-                    const feeRes = await axios.get('http://localhost:7000/api/finance/parent/student-fees', {
+                    const feeRes = await axios.get('https://kamara-school-backend.onrender.com/api/finance/parent/student-fees', {
                         headers: { Authorization: `Bearer ${token}` }
                     });
                     const fees = feeRes.data.data || [];
@@ -145,7 +145,7 @@ const StudentDashboard = () => {
 
                 // 4️⃣ Fetch grade summary
                 try {
-                    const gradeRes = await axios.get('http://localhost:7000/api/grades/my-summary', {
+                    const gradeRes = await axios.get('https://kamara-school-backend.onrender.com/api/grades/my-summary', {
                         headers: { Authorization: `Bearer ${token}` }
                     });
                     setGradeSummary(gradeRes.data.data || null);
@@ -204,7 +204,7 @@ const StudentDashboard = () => {
     const handleDownload = async (id: string, fileName: string) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get(`http://localhost:7000/api/resources/${id}/download`, {
+            const response = await axios.get(`https://kamara-school-backend.onrender.com/api/resources/${id}/download`, {
                 headers: { Authorization: `Bearer ${token}` },
                 responseType: 'blob',
             });

@@ -25,7 +25,7 @@ const ForgotPassword = () => {
         setSuccess(false);
 
         try {
-            const response = await axios.post('http://localhost:7000/api/password-reset/request', { email });
+            const response = await axios.post('https://kamara-school-backend.onrender.com/api/password-reset/request', { email });
 
             if (response.data.success) {
                 setSuccess(true);

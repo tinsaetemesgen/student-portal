@@ -22,7 +22,7 @@ const ChatList: React.FC = () => {
             try {
                 const token = localStorage.getItem('token');
                 const response = await axios.get<{ success: boolean; data: { unreadCounts: UnreadCounts } }>(
-                    'http://localhost:7000/api/messages/unread/per-user',
+                    'https://kamara-school-backend.onrender.com/api/messages/unread/per-user',
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
                 setUnreadCounts(response.data.data?.unreadCounts || {});

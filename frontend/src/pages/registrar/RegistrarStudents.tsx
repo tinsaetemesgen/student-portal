@@ -65,7 +65,7 @@ const RegistrarStudents = () => {
     async function fetchStudents() {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get('http://localhost:7000/api/registrar/students', {
+            const response = await axios.get('https://kamara-school-backend.onrender.com/api/registrar/students', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setStudents(response.data.data || []);
@@ -80,7 +80,7 @@ const RegistrarStudents = () => {
     async function fetchClasses() {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get('http://localhost:7000/api/registrar/classes', {
+            const response = await axios.get('https://kamara-school-backend.onrender.com/api/registrar/classes', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setClasses(response.data.data || []);
@@ -139,7 +139,7 @@ const RegistrarStudents = () => {
                 ? classes.find(c => c._id === formData.classId)?.name || generateClassName(formData.grade, formData.section)
                 : generateClassName(formData.grade, formData.section);
 
-            const response = await axios.post('http://localhost:7000/api/registrar/students', {
+            const response = await axios.post('https://kamara-school-backend.onrender.com/api/registrar/students', {
                 name: formData.name,
                 email: formData.email,
                 password: formData.password,
@@ -184,7 +184,7 @@ const RegistrarStudents = () => {
         if (!window.confirm("Are you sure you want to delete this student?")) return;
         try {
             const token = localStorage.getItem('token');
-            await axios.delete(`http://localhost:7000/api/registrar/students/${id}`, {
+            await axios.delete(`https://kamara-school-backend.onrender.com/api/registrar/students/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             fetchStudents();

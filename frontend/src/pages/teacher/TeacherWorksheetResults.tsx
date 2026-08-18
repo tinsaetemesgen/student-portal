@@ -56,7 +56,7 @@ const TeacherWorksheetResults = () => {
     async function fetchResults() {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get(`http://localhost:7000/api/worksheets/${id}/results`, {
+            const response = await axios.get(`https://kamara-school-backend.onrender.com/api/worksheets/${id}/results`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setData(response.data.data);

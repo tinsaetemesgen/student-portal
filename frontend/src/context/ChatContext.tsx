@@ -175,7 +175,7 @@ export const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     async function fetchUsers(): Promise<void> {        try {
             const token = localStorage.getItem('token');
             const response = await axios.get<{ success: boolean; data: User[] }>(
-                'http://localhost:7000/api/messages/users/available',
+                'https://kamara-school-backend.onrender.com/api/messages/users/available',
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             if (isMounted.current) {
@@ -197,7 +197,7 @@ export const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         try {
             const token = localStorage.getItem('token');
             const response = await axios.get<{ success: boolean; data: Message[] }>(
-                `http://localhost:7000/api/messages/${selectedUser._id}`,
+                `https://kamara-school-backend.onrender.com/api/messages/${selectedUser._id}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             if (isMounted.current) {
@@ -214,7 +214,7 @@ export const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         try {
             const token = localStorage.getItem('token');
             const response = await axios.get<{ success: boolean; data: { unread: number } }>(
-                'http://localhost:7000/api/messages/unread/count',
+                'https://kamara-school-backend.onrender.com/api/messages/unread/count',
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             if (isMounted.current) {
@@ -253,7 +253,7 @@ export const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         try {
             const token = localStorage.getItem('token');
             await axios.put(
-                'http://localhost:7000/api/messages/read-all',
+                'https://kamara-school-backend.onrender.com/api/messages/read-all',
                 {},
                 { headers: { Authorization: `Bearer ${token}` } }
             );

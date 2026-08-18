@@ -86,7 +86,7 @@ const AdminAnnouncements = () => {
     async function fetchAnnouncements() {
         try {
             // API call - replace with actual endpoint
-            // const response = await axios.get('http://localhost:7000/api/announcements', {
+            // const response = await axios.get('https://kamara-school-backend.onrender.com/api/announcements', {
             //     headers: { Authorization: `Bearer ${token}` }
             // });
             // setAnnouncements(response.data.data || []);
@@ -151,7 +151,7 @@ const AdminAnnouncements = () => {
         e.preventDefault();
         try {
             // API call - replace with actual endpoint
-            // await axios.post('http://localhost:7000/api/announcements', formData, {
+            // await axios.post('https://kamara-school-backend.onrender.com/api/announcements', formData, {
             //     headers: { Authorization: `Bearer ${token}` }
             // });
 

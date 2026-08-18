@@ -48,7 +48,7 @@ const RegistrarParents = () => {
     async function fetchParents() {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get('http://localhost:7000/api/registrar/parents', {
+            const response = await axios.get('https://kamara-school-backend.onrender.com/api/registrar/parents', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setParents(response.data.data || []);
@@ -63,7 +63,7 @@ const RegistrarParents = () => {
     async function fetchStudents() {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get('http://localhost:7000/api/registrar/students', {
+            const response = await axios.get('https://kamara-school-backend.onrender.com/api/registrar/students', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setStudents(response.data.data || []);
@@ -76,7 +76,7 @@ const RegistrarParents = () => {
         e.preventDefault();
         try {
             const token = localStorage.getItem('token');
-            await axios.post('http://localhost:7000/api/registrar/parents', formData, {
+            await axios.post('https://kamara-school-backend.onrender.com/api/registrar/parents', formData, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setShowModal(false);
@@ -95,7 +95,7 @@ const RegistrarParents = () => {
         try {
             const token = localStorage.getItem('token');
             await axios.put(
-                `http://localhost:7000/api/registrar/parents/${selectedParent._id}/link/${selectedStudentId}`,
+                `https://kamara-school-backend.onrender.com/api/registrar/parents/${selectedParent._id}/link/${selectedStudentId}`,
                 {},
                 { headers: { Authorization: `Bearer ${token}` } }
             );

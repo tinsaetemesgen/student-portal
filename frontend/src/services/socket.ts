@@ -17,7 +17,7 @@ export const initializeSocket = (): Socket | null => {
     return socket;
   }
 
-  socket = io('http://localhost:7000', {
+  socket = io('https://kamara-school-backend.onrender.com', {
     auth: { token },
     transports: ['websocket'],
   });

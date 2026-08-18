@@ -55,7 +55,7 @@ const AdminGrades = () => {
             const token = localStorage.getItem('token');
 
             // 1️⃣ Get all grades
-            const gradesRes = await axios.get('http://localhost:7000/api/grades/all', {
+            const gradesRes = await axios.get('https://kamara-school-backend.onrender.com/api/grades/all', {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
@@ -63,7 +63,7 @@ const AdminGrades = () => {
             setGrades(allGrades);
 
             // 2️⃣ Get grade statistics
-            const statsRes = await axios.get('http://localhost:7000/api/grades/stats', {
+            const statsRes = await axios.get('https://kamara-school-backend.onrender.com/api/grades/stats', {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
@@ -74,7 +74,7 @@ const AdminGrades = () => {
             setSubjects(uniqueSubjects);
 
             // 4️⃣ Get classes for filter
-            const classesRes = await axios.get('http://localhost:7000/api/classes', {
+            const classesRes = await axios.get('https://kamara-school-backend.onrender.com/api/classes', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setClasses(classesRes.data.data || []);

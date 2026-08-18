@@ -68,8 +68,8 @@ const FinancePayments = () => {
         try {
             const token = localStorage.getItem('token');
             const url = filter === 'all'
-                ? 'http://localhost:7000/api/finance/payments'
-                : `http://localhost:7000/api/finance/payments?status=${filter}`;
+                ? 'https://kamara-school-backend.onrender.com/api/finance/payments'
+                : `https://kamara-school-backend.onrender.com/api/finance/payments?status=${filter}`;
 
             const response = await axios.get(url, {
                 headers: { Authorization: `Bearer ${token}` }
@@ -86,7 +86,7 @@ const FinancePayments = () => {
     async function fetchStats() {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get('http://localhost:7000/api/finance/revenue', {
+            const response = await axios.get('https://kamara-school-backend.onrender.com/api/finance/revenue', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setStats(response.data.data || {
@@ -114,7 +114,7 @@ const FinancePayments = () => {
             setViewLoading(true);
             const token = localStorage.getItem('token');
             const response = await axios.get(
-                `http://localhost:7000/api/finance/payments/${paymentId}`,
+                `https://kamara-school-backend.onrender.com/api/finance/payments/${paymentId}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             setSelectedPayment(response.data.data);
@@ -131,7 +131,7 @@ const FinancePayments = () => {
         if (!window.confirm("Are you sure you want to approve this payment?")) return;
         try {
             const token = localStorage.getItem('token');
-            await axios.put(`http://localhost:7000/api/finance/payments/${id}/confirm`, {}, {
+            await axios.put(`https://kamara-school-backend.onrender.com/api/finance/payments/${id}/confirm`, {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setSuccess(true);
@@ -153,7 +153,7 @@ const FinancePayments = () => {
         if (!window.confirm("Are you sure you want to reject this payment?")) return;
         try {
             const token = localStorage.getItem('token');
-            await axios.put(`http://localhost:7000/api/finance/payments/${id}/reject`,
+            await axios.put(`https://kamara-school-backend.onrender.com/api/finance/payments/${id}/reject`,
                 { reason: reason || "Payment rejected" },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -476,7 +476,7 @@ const FinancePayments = () => {
                                 {selectedPayment.screenshotUrl ? (
                                     <div className="border rounded-lg overflow-hidden">
                                         <img
-                                            src={`http://localhost:7000${selectedPayment.screenshotUrl}`}
+                                            src={`https://kamara-school-backend.onrender.com${selectedPayment.screenshotUrl}`}
                                             alt="Payment Screenshot"
                                             className="w-full max-h-96 object-contain"
                                             onError={(e) => {
@@ -485,7 +485,7 @@ const FinancePayments = () => {
                                         />
                                         <div className="bg-gray-50 dark:bg-gray-700 p-2 text-center">
                                             <a
-                                                href={`http://localhost:7000${selectedPayment.screenshotUrl}`}
+                                                href={`https://kamara-school-backend.onrender.com${selectedPayment.screenshotUrl}`}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="text-blue-600 hover:text-blue-800 text-sm flex items-center justify-center gap-1"

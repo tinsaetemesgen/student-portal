@@ -24,7 +24,7 @@ const Login = () => {
         setError("");
 
         try {
-            const response = await axios.post('http://localhost:7000/api/auth/login', {
+            const response = await axios.post('https://kamara-school-backend.onrender.com/api/auth/login', {
                 email,
                 password
             });

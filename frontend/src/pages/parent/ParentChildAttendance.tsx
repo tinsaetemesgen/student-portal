@@ -33,13 +33,13 @@ const ParentChildAttendance = () => {
             try {
                 const token = localStorage.getItem('token');
                 
-                const userRes = await axios.get(`http://localhost:7000/api/users/${childId}`, {
+                const userRes = await axios.get(`https://kamara-school-backend.onrender.com/api/users/${childId}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setStudent(userRes.data.data);
 
                 const attendanceRes = await axios.get(
-                    `http://localhost:7000/api/attendance/child/${childId}/attendance`,
+                    `https://kamara-school-backend.onrender.com/api/attendance/child/${childId}/attendance`,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
                 setAttendance(attendanceRes.data.data?.records || []);

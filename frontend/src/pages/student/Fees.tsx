@@ -50,7 +50,7 @@ const MyFees = () => {
 
                 // ✅ Use the correct finance route for student fees
                 const response = await axios.get(
-                    `http://localhost:7000/api/finance/parent/student-fees?studentId=${studentId}`,
+                    `https://kamara-school-backend.onrender.com/api/finance/parent/student-fees?studentId=${studentId}`,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
 

@@ -33,7 +33,7 @@ const FinanceDashboard = () => {
     async function fetchStats() {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get('http://localhost:7000/api/finance/dashboard/stats', {
+            const response = await axios.get('https://kamara-school-backend.onrender.com/api/finance/dashboard/stats', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             console.log('📊 Stats response:', response.data);

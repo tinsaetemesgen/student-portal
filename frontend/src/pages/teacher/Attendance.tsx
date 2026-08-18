@@ -75,7 +75,7 @@ const Attendance = () => {
             const token = localStorage.getItem('token');
             
             // Get teacher's classes first
-            const classesRes = await axios.get('http://localhost:7000/api/classes', {
+            const classesRes = await axios.get('https://kamara-school-backend.onrender.com/api/classes', {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
@@ -84,7 +84,7 @@ const Attendance = () => {
                 
                 // Get attendance for the first class
                 const attendanceRes = await axios.get(
-                    `http://localhost:7000/api/attendance/class/${classId}?semester=Semester%201&academicYear=2024/25`,
+                    `https://kamara-school-backend.onrender.com/api/attendance/class/${classId}?semester=Semester%201&academicYear=2024/25`,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
                 
@@ -110,13 +110,13 @@ const Attendance = () => {
             const token = localStorage.getItem('token');
             
             // Get students
-            const studentsRes = await axios.get('http://localhost:7000/api/users?role=student', {
+            const studentsRes = await axios.get('https://kamara-school-backend.onrender.com/api/users?role=student', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setStudents(studentsRes.data.data);
 
             // Get teacher's classes
-            const classesRes = await axios.get('http://localhost:7000/api/classes', {
+            const classesRes = await axios.get('https://kamara-school-backend.onrender.com/api/classes', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setClasses(classesRes.data.data);
@@ -148,7 +148,7 @@ const Attendance = () => {
                 }]
             };
 
-            await axios.post('http://localhost:7000/api/attendance', attendanceData, {
+            await axios.post('https://kamara-school-backend.onrender.com/api/attendance', attendanceData, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 

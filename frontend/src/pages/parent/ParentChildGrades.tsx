@@ -37,13 +37,13 @@ const ParentChildGrades = () => {
             try {
                 const token = localStorage.getItem('token');
                 
-                const userRes = await axios.get(`http://localhost:7000/api/users/${childId}`, {
+                const userRes = await axios.get(`https://kamara-school-backend.onrender.com/api/users/${childId}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setStudent(userRes.data.data);
 
                 const gradesRes = await axios.get(
-                    `http://localhost:7000/api/grades/child/${childId}/grades`,
+                    `https://kamara-school-backend.onrender.com/api/grades/child/${childId}/grades`,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
                 setGrades(gradesRes.data.data || []);

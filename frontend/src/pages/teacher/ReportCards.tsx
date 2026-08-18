@@ -110,7 +110,7 @@ const TeacherReportCards = () => {
     async function fetchReportCards() {
         try {
             const token = localStorage.getItem('token');
-            let url = 'http://localhost:7000/api/report-cards';
+            let url = 'https://kamara-school-backend.onrender.com/api/report-cards';
             const params = new URLSearchParams();
             if (filterTerm) params.append('term', filterTerm);
             if (filterAcademicYear) params.append('academicYear', filterAcademicYear);
@@ -131,7 +131,7 @@ const TeacherReportCards = () => {
             const token = localStorage.getItem('token');
             
             // ✅ First try to get students from registrar
-            const response = await axios.get('http://localhost:7000/api/registrar/students', {
+            const response = await axios.get('https://kamara-school-backend.onrender.com/api/registrar/students', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             
@@ -146,7 +146,7 @@ const TeacherReportCards = () => {
             // ✅ Fallback: Try to get students from another endpoint
             try {
                 const token = localStorage.getItem('token');
-                const response = await axios.get('http://localhost:7000/api/users?role=student', {
+                const response = await axios.get('https://kamara-school-backend.onrender.com/api/users?role=student', {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setStudents(response.data.data || []);
@@ -163,7 +163,7 @@ const TeacherReportCards = () => {
             const token = localStorage.getItem('token');
             
             // ✅ First try to get classes from registrar
-            const response = await axios.get('http://localhost:7000/api/registrar/classes', {
+            const response = await axios.get('https://kamara-school-backend.onrender.com/api/registrar/classes', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             
@@ -178,7 +178,7 @@ const TeacherReportCards = () => {
             // ✅ Fallback: Try to get classes from another endpoint
             try {
                 const token = localStorage.getItem('token');
-                const response = await axios.get('http://localhost:7000/api/classes', {
+                const response = await axios.get('https://kamara-school-backend.onrender.com/api/classes', {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setClasses(response.data.data || []);
@@ -259,7 +259,7 @@ const TeacherReportCards = () => {
                 formDataToSend.append('file', selectedFile);
             }
 
-            await axios.post('http://localhost:7000/api/report-cards/upload', formDataToSend, {
+            await axios.post('https://kamara-school-backend.onrender.com/api/report-cards/upload', formDataToSend, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'multipart/form-data',
@@ -311,7 +311,7 @@ const TeacherReportCards = () => {
         if (!window.confirm("Are you sure you want to delete this report card?")) return;
         try {
             const token = localStorage.getItem('token');
-            await axios.delete(`http://localhost:7000/api/report-cards/${id}`, {
+            await axios.delete(`https://kamara-school-backend.onrender.com/api/report-cards/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             fetchReportCards();
@@ -324,7 +324,7 @@ const TeacherReportCards = () => {
     const handleDownload = async (id: string) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get(`http://localhost:7000/api/report-cards/${id}/download`, {
+            const response = await axios.get(`https://kamara-school-backend.onrender.com/api/report-cards/${id}/download`, {
                 headers: { Authorization: `Bearer ${token}` },
                 responseType: 'blob',
             });

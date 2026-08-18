@@ -63,7 +63,7 @@ const FinanceFees = () => {
     async function fetchFees() {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get('http://localhost:7000/api/finance/fee-structures', {
+            const response = await axios.get('https://kamara-school-backend.onrender.com/api/finance/fee-structures', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setFees(response.data.data || []);
@@ -87,7 +87,7 @@ const handleSubmit = async (e: React.FormEvent) => {
 
     try {
         const token = localStorage.getItem('token');
-        const response = await axios.post('http://localhost:7000/api/finance/fee-structures', {
+        const response = await axios.post('https://kamara-school-backend.onrender.com/api/finance/fee-structures', {
             name: formData.name,
             description: "",
             amount: parseFloat(formData.amount),
@@ -201,7 +201,7 @@ const handleSubmit = async (e: React.FormEvent) => {
         if (!window.confirm("Are you sure you want to delete this fee structure?")) return;
         try {
             const token = localStorage.getItem('token');
-            await axios.delete(`http://localhost:7000/api/finance/fee-structures/${id}`, {
+            await axios.delete(`https://kamara-school-backend.onrender.com/api/finance/fee-structures/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             fetchFees();
@@ -215,7 +215,7 @@ const handleSubmit = async (e: React.FormEvent) => {
     const handleToggleActive = async (id: string, currentStatus: boolean) => {
         try {
             const token = localStorage.getItem('token');
-            await axios.patch(`http://localhost:7000/api/finance/fee-structures/${id}/toggle`, {}, {
+            await axios.patch(`https://kamara-school-backend.onrender.com/api/finance/fee-structures/${id}/toggle`, {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             fetchFees();

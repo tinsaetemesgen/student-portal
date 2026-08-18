@@ -36,7 +36,7 @@ const StudentAvailableWorksheets = () => {
         async function load() {
             try {
                 const token = localStorage.getItem('token');
-                const response = await axios.get('http://localhost:7000/api/worksheets/available', {
+                const response = await axios.get('https://kamara-school-backend.onrender.com/api/worksheets/available', {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setWorksheets(response.data.data || []);
@@ -53,7 +53,7 @@ const StudentAvailableWorksheets = () => {
     const handleStart = async (worksheetId: string) => {
         try {
             const token = localStorage.getItem('token');
-            await axios.post(`http://localhost:7000/api/worksheets/${worksheetId}/start`, {}, {
+            await axios.post(`https://kamara-school-backend.onrender.com/api/worksheets/${worksheetId}/start`, {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             navigate(`/student/worksheet/${worksheetId}/attempt`);

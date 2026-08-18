@@ -69,7 +69,7 @@ const ParentAnnouncements = () => {
             try {
                 const token = localStorage.getItem('token');
                 
-                const annRes = await axios.get('http://localhost:7000/api/announcements', {
+                const annRes = await axios.get('https://kamara-school-backend.onrender.com/api/announcements', {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setAnnouncements(annRes.data.data || []);
@@ -80,7 +80,7 @@ const ParentAnnouncements = () => {
 
                 if (userId) {
                     const childRes = await axios.get(
-                        `http://localhost:7000/api/parents/${userId}/children`,
+                        `https://kamara-school-backend.onrender.com/api/parents/${userId}/children`,
                         { headers: { Authorization: `Bearer ${token}` } }
                     );
                     setChildren(childRes.data.data || []);

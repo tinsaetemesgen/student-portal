@@ -63,7 +63,7 @@ const ParentGrades = () => {
             const authToken = token || localStorage.getItem('token');
 
             const gradesRes = await axios.get(
-                `http://localhost:7000/api/grades/child/${childId}/grades`,
+                `https://kamara-school-backend.onrender.com/api/grades/child/${childId}/grades`,
                 { headers: { Authorization: `Bearer ${authToken}` } }
             );
 
@@ -98,7 +98,7 @@ const ParentGrades = () => {
                 }
 
                 const childrenRes = await axios.get(
-                    `http://localhost:7000/api/parents/${userId}/children`,
+                    `https://kamara-school-backend.onrender.com/api/parents/${userId}/children`,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
 

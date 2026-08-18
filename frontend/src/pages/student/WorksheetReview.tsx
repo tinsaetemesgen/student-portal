@@ -67,7 +67,7 @@ const WorksheetReview = () => {
             try {
                 const token = localStorage.getItem('token');
                 const response = await axios.get(
-                    `http://localhost:7000/api/worksheets/${id}/result`,
+                    `https://kamara-school-backend.onrender.com/api/worksheets/${id}/result`,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
 

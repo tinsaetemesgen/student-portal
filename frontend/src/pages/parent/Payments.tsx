@@ -108,7 +108,7 @@ const ParentPayments = () => {
                 }
 
                 const childrenRes = await axios.get(
-                    `http://localhost:7000/api/parents/${userId}/children`,
+                    `https://kamara-school-backend.onrender.com/api/parents/${userId}/children`,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
 
@@ -134,7 +134,7 @@ const ParentPayments = () => {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.get(
-                `http://localhost:7000/api/finance/parent/student-fees?studentId=${childId}`,
+                `https://kamara-school-backend.onrender.com/api/finance/parent/student-fees?studentId=${childId}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             
@@ -159,7 +159,7 @@ const ParentPayments = () => {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.get(
-                `http://localhost:7000/api/finance/parent/payments?studentId=${childId}`,
+                `https://kamara-school-backend.onrender.com/api/finance/parent/payments?studentId=${childId}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             setPayments(response.data.data || []);
@@ -232,7 +232,7 @@ const ParentPayments = () => {
             formDataToSend.append('screenshot', screenshot);
 
             await axios.post(
-                'http://localhost:7000/api/payments/submit',
+                'https://kamara-school-backend.onrender.com/api/payments/submit',
                 formDataToSend,
                 {
                     headers: {
@@ -283,7 +283,7 @@ const ParentPayments = () => {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.get(
-                `http://localhost:7000/api/finance/payments/${paymentId}/receipt`,
+                `https://kamara-school-backend.onrender.com/api/finance/payments/${paymentId}/receipt`,
                 {
                     headers: { Authorization: `Bearer ${token}` },
                     responseType: 'blob',

@@ -36,19 +36,19 @@ const RegistrarDashboard = () => {
                 const token = localStorage.getItem('token');
 
                 // Fetch students
-                const studentsRes = await axios.get('http://localhost:7000/api/registrar/students', {
+                const studentsRes = await axios.get('https://kamara-school-backend.onrender.com/api/registrar/students', {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setStudents(studentsRes.data.data || []);
 
                 // Fetch teachers
-                const teachersRes = await axios.get('http://localhost:7000/api/registrar/teachers', {
+                const teachersRes = await axios.get('https://kamara-school-backend.onrender.com/api/registrar/teachers', {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setTeachers(teachersRes.data.data || []);
 
                 // Fetch classes
-                const classesRes = await axios.get('http://localhost:7000/api/registrar/classes', {
+                const classesRes = await axios.get('https://kamara-school-backend.onrender.com/api/registrar/classes', {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setClasses(classesRes.data.data || []);

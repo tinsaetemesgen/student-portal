@@ -106,7 +106,7 @@ const Grades = () => {
             
             let classId = formData.classId;
             if (!classId) {
-                const classesRes = await axios.get('http://localhost:7000/api/classes', {
+                const classesRes = await axios.get('https://kamara-school-backend.onrender.com/api/classes', {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 const classList = classesRes.data.data || [];
@@ -126,7 +126,7 @@ const Grades = () => {
             const academicYear = formData.academicYear || "2024/25";
             
             const gradesRes = await axios.get(
-                `http://localhost:7000/api/grades/class/${classId}?semester=Semester%201&academicYear=${academicYear}`,
+                `https://kamara-school-backend.onrender.com/api/grades/class/${classId}?semester=Semester%201&academicYear=${academicYear}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             
@@ -142,12 +142,12 @@ const Grades = () => {
         try {
             const token = localStorage.getItem('token');
             
-            const studentsRes = await axios.get('http://localhost:7000/api/users?role=student', {
+            const studentsRes = await axios.get('https://kamara-school-backend.onrender.com/api/users?role=student', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setStudents(studentsRes.data.data || []);
 
-            const classesRes = await axios.get('http://localhost:7000/api/classes', {
+            const classesRes = await axios.get('https://kamara-school-backend.onrender.com/api/classes', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setClasses(classesRes.data.data || []);
@@ -185,7 +185,7 @@ const Grades = () => {
             const academicYear = formData.academicYear || "2024/25";
             
             const gradesRes = await axios.get(
-                `http://localhost:7000/api/grades/class/${classId}?semester=Semester%201&academicYear=${academicYear}`,
+                `https://kamara-school-backend.onrender.com/api/grades/class/${classId}?semester=Semester%201&academicYear=${academicYear}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             
@@ -224,7 +224,7 @@ const Grades = () => {
                 }
             };
 
-            await axios.post('http://localhost:7000/api/grades', gradeData, {
+            await axios.post('https://kamara-school-backend.onrender.com/api/grades', gradeData, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
@@ -273,7 +273,7 @@ const Grades = () => {
                 }
             };
 
-            await axios.put(`http://localhost:7000/api/grades/${editingGrade._id}`, gradeData, {
+            await axios.put(`https://kamara-school-backend.onrender.com/api/grades/${editingGrade._id}`, gradeData, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 

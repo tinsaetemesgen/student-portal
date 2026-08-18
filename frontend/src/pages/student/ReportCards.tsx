@@ -33,7 +33,7 @@ const StudentReportCards = () => {
         async function load() {
             try {
                 const token = localStorage.getItem('token');
-                const response = await axios.get('http://localhost:7000/api/report-cards', {
+                const response = await axios.get('https://kamara-school-backend.onrender.com/api/report-cards', {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setReportCards(response.data.data || []);
@@ -50,7 +50,7 @@ const StudentReportCards = () => {
     const handleDownload = async (id: string) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get(`http://localhost:7000/api/report-cards/${id}/download`, {
+            const response = await axios.get(`https://kamara-school-backend.onrender.com/api/report-cards/${id}/download`, {
                 headers: { Authorization: `Bearer ${token}` },
                 responseType: 'blob',
             });

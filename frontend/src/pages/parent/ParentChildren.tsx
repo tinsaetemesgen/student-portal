@@ -36,7 +36,7 @@ const ParentChildren = () => {
                 }
 
                 const response = await axios.get(
-                    `http://localhost:7000/api/parents/${userId}/children`,
+                    `https://kamara-school-backend.onrender.com/api/parents/${userId}/children`,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
                 setChildren(response.data.data || []);

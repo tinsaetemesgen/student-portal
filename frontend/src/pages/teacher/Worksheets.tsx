@@ -72,7 +72,7 @@ const TeacherWorksheets = () => {
     async function fetchWorksheets() {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get('http://localhost:7000/api/worksheets', {
+            const response = await axios.get('https://kamara-school-backend.onrender.com/api/worksheets', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setWorksheets(response.data.data || []);
@@ -87,7 +87,7 @@ const TeacherWorksheets = () => {
     async function fetchClasses() {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get('http://localhost:7000/api/classes', {
+            const response = await axios.get('https://kamara-school-backend.onrender.com/api/classes', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setClasses(response.data.data || []);
@@ -130,8 +130,8 @@ const TeacherWorksheets = () => {
         try {
             const token = localStorage.getItem('token');
             const url = editingId
-                ? `http://localhost:7000/api/worksheets/${editingId}`
-                : 'http://localhost:7000/api/worksheets';
+                ? `https://kamara-school-backend.onrender.com/api/worksheets/${editingId}`
+                : 'https://kamara-school-backend.onrender.com/api/worksheets';
             const method = editingId ? 'put' : 'post';
 
             await axios[method](url, formData, {
@@ -151,7 +151,7 @@ const TeacherWorksheets = () => {
     const handlePublish = async (id: string) => {
         try {
             const token = localStorage.getItem('token');
-            await axios.put(`http://localhost:7000/api/worksheets/${id}/publish`, {}, {
+            await axios.put(`https://kamara-school-backend.onrender.com/api/worksheets/${id}/publish`, {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             fetchWorksheets();
@@ -164,7 +164,7 @@ const TeacherWorksheets = () => {
     const handleClose = async (id: string) => {
         try {
             const token = localStorage.getItem('token');
-            await axios.put(`http://localhost:7000/api/worksheets/${id}/close`, {}, {
+            await axios.put(`https://kamara-school-backend.onrender.com/api/worksheets/${id}/close`, {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             fetchWorksheets();
@@ -178,7 +178,7 @@ const TeacherWorksheets = () => {
         if (!window.confirm("Are you sure you want to delete this worksheet?")) return;
         try {
             const token = localStorage.getItem('token');
-            await axios.delete(`http://localhost:7000/api/worksheets/${id}`, {
+            await axios.delete(`https://kamara-school-backend.onrender.com/api/worksheets/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             fetchWorksheets();

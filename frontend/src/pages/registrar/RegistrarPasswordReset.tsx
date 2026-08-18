@@ -59,7 +59,7 @@ const RegistrarPasswordReset = () => {
         try {
             setLoading(true);
             const token = localStorage.getItem('token');
-            const response = await axios.get('http://localhost:7000/api/password-reset/all', {
+            const response = await axios.get('https://kamara-school-backend.onrender.com/api/password-reset/all', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setRequests(response.data.data || []);
@@ -82,7 +82,7 @@ const RegistrarPasswordReset = () => {
         try {
             const token = localStorage.getItem('token');
             await axios.post(
-                `http://localhost:7000/api/password-reset/${selectedRequest._id}/reset`,
+                `https://kamara-school-backend.onrender.com/api/password-reset/${selectedRequest._id}/reset`,
                 { newPassword, notes },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -111,7 +111,7 @@ const RegistrarPasswordReset = () => {
         try {
             const token = localStorage.getItem('token');
             await axios.put(
-                `http://localhost:7000/api/password-reset/${requestId}/cancel`,
+                `https://kamara-school-backend.onrender.com/api/password-reset/${requestId}/cancel`,
                 { reason: "Cancelled by registrar" },
                 { headers: { Authorization: `Bearer ${token}` } }
             );

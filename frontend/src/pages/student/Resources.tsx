@@ -66,7 +66,7 @@ const StudentResources = () => {
         async function load() {
             try {
                 const token = localStorage.getItem('token');
-                let url = 'http://localhost:7000/api/resources';
+                let url = 'https://kamara-school-backend.onrender.com/api/resources';
                 const params = new URLSearchParams();
                 if (filterSubject) params.append('subject', filterSubject);
                 if (filterClassLevel) params.append('classLevel', filterClassLevel);
@@ -88,7 +88,7 @@ const StudentResources = () => {
     const handleDownload = async (id: string, fileName: string) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get(`http://localhost:7000/api/resources/${id}/download`, {
+            const response = await axios.get(`https://kamara-school-backend.onrender.com/api/resources/${id}/download`, {
                 headers: { Authorization: `Bearer ${token}` },
                 responseType: 'blob',
             });

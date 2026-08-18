@@ -49,7 +49,7 @@ const MyGrades = () => {
             try {
                 const token = localStorage.getItem('token');
                 
-                const response = await axios.get('http://localhost:7000/api/grades/my-grades', {
+                const response = await axios.get('https://kamara-school-backend.onrender.com/api/grades/my-grades', {
                     headers: { Authorization: `Bearer ${token}` }
                 });
 

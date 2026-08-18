@@ -81,7 +81,7 @@ const TeacherResources = () => {
     async function fetchResources() {
         try {
             const token = localStorage.getItem('token');
-            let url = 'http://localhost:7000/api/resources';
+            let url = 'https://kamara-school-backend.onrender.com/api/resources';
             const params = new URLSearchParams();
             if (filterClassLevel) params.append('classLevel', filterClassLevel);
             if (filterSubject) params.append('subject', filterSubject);
@@ -105,7 +105,7 @@ const TeacherResources = () => {
             const token = localStorage.getItem('token');
             
             // ✅ Get teacher's classes from the API
-            const response = await axios.get('http://localhost:7000/api/resources/teacher/classes', {
+            const response = await axios.get('https://kamara-school-backend.onrender.com/api/resources/teacher/classes', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             
@@ -116,7 +116,7 @@ const TeacherResources = () => {
             // ✅ If no classes, try fallback
             if (classesData.length === 0) {
                 console.log('⚠️ No classes from /teacher/classes, trying /auth/me');
-                const meRes = await axios.get('http://localhost:7000/api/auth/me', {
+                const meRes = await axios.get('https://kamara-school-backend.onrender.com/api/auth/me', {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 const user = meRes.data.data;
@@ -198,8 +198,8 @@ const TeacherResources = () => {
             }
 
             const url = editingId 
-                ? `http://localhost:7000/api/resources/${editingId}`
-                : 'http://localhost:7000/api/resources/upload';
+                ? `https://kamara-school-backend.onrender.com/api/resources/${editingId}`
+                : 'https://kamara-school-backend.onrender.com/api/resources/upload';
             const method = editingId ? 'put' : 'post';
 
             await axios({
@@ -249,7 +249,7 @@ const TeacherResources = () => {
         if (!window.confirm("Are you sure you want to delete this resource?")) return;
         try {
             const token = localStorage.getItem('token');
-            await axios.delete(`http://localhost:7000/api/resources/${id}`, {
+            await axios.delete(`https://kamara-school-backend.onrender.com/api/resources/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             fetchResources();
@@ -262,7 +262,7 @@ const TeacherResources = () => {
     const handleDownload = async (id: string, fileName: string) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get(`http://localhost:7000/api/resources/${id}/download`, {
+            const response = await axios.get(`https://kamara-school-backend.onrender.com/api/resources/${id}/download`, {
                 headers: { Authorization: `Bearer ${token}` },
                 responseType: 'blob',
             });
