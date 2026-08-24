@@ -29,10 +29,10 @@ import {
 } from "lucide-react";
 
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import schoolLogo from "../assets/logo.png";
+import schoolLogo from "../assets/elevate skill logo.png";
 
-const SCHOOL_NAME = "Kamara School";
-const SCHOOL_SHORT_NAME = "KS";
+const SCHOOL_NAME = "Elevate Skill";
+const SCHOOL_SHORT_NAME = "ES";
 
 interface SidebarProps {
     role:

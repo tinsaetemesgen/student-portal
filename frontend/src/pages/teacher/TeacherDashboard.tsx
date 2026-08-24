@@ -72,19 +72,17 @@ const TeacherDashboard = () => {
     const [grades, setGrades] = useState<GradeRecord[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
-    const [greeting, setGreeting] = useState("");
+    const [greeting] = useState(() => {
+        const hour = new Date().getHours();
+        if (hour < 12) return "Good Morning";
+        if (hour < 17) return "Good Afternoon";
+        return "Good Evening";
+    });
 
     const userStr = localStorage.getItem('user');
     const user = userStr ? JSON.parse(userStr) : null;
     const teacherName = user?.name || 'Teacher';
     const subject = user?.subject || '';
-
-    useEffect(() => {
-        const hour = new Date().getHours();
-        if (hour < 12) setGreeting("Good Morning");
-        else if (hour < 17) setGreeting("Good Afternoon");
-        else setGreeting("Good Evening");
-    }, []);
 
     useEffect(() => {
         async function load() {

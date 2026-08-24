@@ -10,7 +10,7 @@ import axios from "axios";
 import { getApiErrorMessage } from "../services/error";
 
 // ✅ School Logo
-const SCHOOL_LOGO = '/src/assets/logo.png';
+const SCHOOL_LOGO = '../assets/elevate skill logo.png';
 const SCHOOL_NAME = 'Elevate Skills Academy';
 const SCHOOL_TAGLINE = 'Empowering Ethiopian Futures';
 
@@ -60,7 +60,7 @@ const Register = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900 p-4">
+        <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900 p-4">
             <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-3xl shadow-2xl max-w-md w-full p-8 border border-white/20 dark:border-gray-700">
                 {/* ✅ School Logo & Branding */}
                 <div className="text-center mb-6">
@@ -72,7 +72,7 @@ const Register = () => {
                                 className="w-14 h-14 rounded-2xl object-cover shadow-lg"
                             />
                         ) : (
-                            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center shadow-lg">
+                                <div className="w-14 h-14 rounded-2xl bg-linear-to-br from-blue-600 to-indigo-700 flex items-center justify-center shadow-lg">
                                 <GraduationCap size={28} className="text-white" />
                             </div>
                         )}
@@ -86,7 +86,7 @@ const Register = () => {
                             </p>
                         </div>
                     </div>
-                    <div className="h-px w-16 bg-gradient-to-r from-transparent via-blue-300 to-transparent mx-auto my-2"></div>
+                    <div className="h-px w-16 bg-linear-to-r from-transparent via-blue-300 to-transparent mx-auto my-2"></div>
                     <p className="text-gray-500 dark:text-gray-400 text-sm">Create your account</p>
                 </div>
 

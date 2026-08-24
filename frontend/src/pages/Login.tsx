@@ -6,9 +6,9 @@ import { Mail, Lock, AlertCircle, Sparkles } from "lucide-react";
 import axios from "axios";
 
 // ✅ IMPORT LOGO
-import schoolLogo from '../assets/logo.png';
+import schoolLogo from '../assets/elevate skill logo.png';
 
-const SCHOOL_NAME = 'Kamara School';
+const SCHOOL_NAME = 'Elevate Skill';
 const SCHOOL_TAGLINE = 'Empowering Ethiopian Futures';
 
 const Login = () => {
@@ -66,7 +66,7 @@ const Login = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900 p-4">
+        <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900 p-4">
             <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-3xl shadow-2xl max-w-md w-full p-8 border border-white/20 dark:border-gray-700">
                 {/* ✅ School Logo & Branding - CENTERED & LARGER */}
                 <div className="text-center mb-8">
@@ -82,7 +82,7 @@ const Login = () => {
                                 if (parent) {
                                     const fallback = document.createElement('div');
                                     fallback.className = 'w-28 h-28 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center shadow-xl text-3xl font-bold text-white';
-                                    fallback.textContent = 'KS';
+                                    fallback.textContent = 'ES';
                                     parent.appendChild(fallback);
                                 }
                             }}
@@ -98,13 +98,13 @@ const Login = () => {
                             </p>
                         </div>
                     </div>
-                    <div className="h-px w-24 bg-gradient-to-r from-transparent via-blue-300 to-transparent mx-auto my-3"></div>
+                    <div className="h-px w-24 bg-linear-to-r from-transparent via-blue-300 to-transparent mx-auto my-3"></div>
                     <p className="text-gray-500 dark:text-gray-400 text-sm">Sign in to your account</p>
                 </div>
 
                 {error && (
                     <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-3 flex items-start gap-2 mb-4">
-                        <AlertCircle size={18} className="text-red-500 flex-shrink-0 mt-0.5" />
+                        <AlertCircle size={18} className="text-red-500 shrink-0 mt-0.5" />
                         <p className="text-sm text-red-600">{error}</p>
                     </div>
                 )}
@@ -152,7 +152,7 @@ const Login = () => {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 transition font-medium shadow-lg shadow-blue-200 disabled:opacity-50"
+                        className="w-full py-3 bg-linear-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 transition font-medium shadow-lg shadow-blue-200 disabled:opacity-50"
                     >
                         {loading ? (
                             <span className="flex items-center justify-center gap-2">
