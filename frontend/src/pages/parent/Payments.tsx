@@ -56,7 +56,7 @@ interface StudentFee {
 
 const SCHOOL_BANK = {
     bankName: "Commercial Bank of Ethiopia",
-    accountName: "Adama Science and Technology University",
+    accountName: "Elevate Skills",
     accountNumber: "1000123456789",
     branch: "Adama Main Branch",
 };
