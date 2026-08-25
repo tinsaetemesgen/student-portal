@@ -418,7 +418,7 @@ router.get('/parent/payments', auth, parentGuard, async (req, res) => {
 // ============================================
 
 function buildReceiptPdf(payment) {
-  const schoolName = 'Kamara School';
+  const schoolName = 'Elevate skills';
   const lines = [
     `${schoolName} - Official Payment Receipt`,
     `Receipt: ${payment.receiptNumber || payment._id}`,
